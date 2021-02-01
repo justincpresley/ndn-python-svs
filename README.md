@@ -16,6 +16,6 @@ ndn-python-svs uses the [python-ndn](https://github.com/named-data/python-ndn) l
 
 To be Made.
 
-### License
+## License
 
 ndn-python-svs is an open source project that is licensed. See [`COPYING.md`](COPYING.md) for more information.
