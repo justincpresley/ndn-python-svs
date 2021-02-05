@@ -16,6 +16,9 @@ ndn-python-svs uses the [python-ndn](https://github.com/named-data/python-ndn) l
 
 To be Made.
 
-## License
+## License and Authors
 
 ndn-python-svs is an open source project that is licensed. See [`COPYING.md`](COPYING.md) for more information.
+
+The Names of all authors associated with this project are below:
+  *Justin Presley
