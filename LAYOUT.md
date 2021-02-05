@@ -16,5 +16,8 @@ STRUCTURE
     ├── cmd
     │   └── main.py
     ├── storage
+    ├── state
+    │   ├── tlv.py
+    │   └── version_vector.py
     └── utils
-    	└── class to publish and subscribe
+    	└── pubsub.py

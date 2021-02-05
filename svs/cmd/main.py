@@ -37,11 +37,10 @@ def main() -> int:
     cmdline_args = process_cmd_args() # Process Command Line Arguments
     config_logging(cmdline_args)      # Setup Logging
 
-    print(cmdline_args)
+    app = NDNApp()                    # Start the NDN App
+
 
     #storage = create_storage()
-
-    app = NDNApp()
 
     #pb = PubSub(app)
     #read_handle = ReadHandle(app, storage, config)
