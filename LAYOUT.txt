@@ -1,0 +1,20 @@
+
+TODO:
+  Create the main loop of sending a Sync interest and reciving a sync interest
+  Create a publish / subscribing system.
+  Calculate node ID and State vector
+  Learn more about SVS
+
+STRUCTURE
+
+├── LAYOUT.md
+├── COPYING.md
+├── README.md
+├── examples
+│   └── chat_node.py
+└── svs
+    ├── logic.py
+    ├── publish/fetch class
+    ├── version_vector
+    ├── storages
+    └── utils
