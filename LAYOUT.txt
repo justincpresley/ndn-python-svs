@@ -8,7 +8,7 @@ TODO:
 STRUCTURE
 
 ├── LAYOUT.md
-├── COPYING.md
+├── LICENSE.md
 ├── README.md
 ├── examples
 │   └── chat_node.py
