@@ -18,7 +18,7 @@ ndn-python-svs uses the [python-ndn](https://github.com/named-data/python-ndn) l
 
 To try out the chat demo application, follow the below steps.
 
-To create a chat client, simply run:
+To create a chat client, simply run in the home directory:
 ```
 python3 examples/chat_node.py -n NODE_NAME [-h] [-gp GROUP_PREFIX]
 ```

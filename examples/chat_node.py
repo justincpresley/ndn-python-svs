@@ -1,9 +1,10 @@
 from argparse import ArgumentParser, SUPPRESS
 import sys
 from ndn.app import NDNApp
-
-
-from ndn.encoding import Name, NonStrictName, Component
+from ndn.encoding import Name
+import asyncio as aio
+sys.path.insert(0,'.')
+from svs.svs_logic import *
 
 def process_cmd_args():
     # Command Line Parser
@@ -29,17 +30,27 @@ def process_cmd_args():
     return args
 
 class Program:
-    def __init__(self, cmdline_args):
+    def __init__(self, app, cmdline_args):
         self.args = cmdline_args
-        self.app = NDNApp()
-        print(f'SVS client stared | {Name.to_str(self.args["group_prefix"])} - {Name.to_str(self.args["node_name"])} |')
-    def run(self):
-        pass
+        self.app = app
+        self.logic = None
+        print(f'SVS chat client stared | {Name.to_str(self.args["group_prefix"])} - {Name.to_str(self.args["node_name"])} |')
+    async def run(self):
+        self.logic = SVS_Logic(self.app, self.args["group_prefix"], self.args["node_name"])
+        while True:
+            await aio.sleep(1)
 
 def main() -> int:
     cmdline_args = process_cmd_args()
-    program = Program(cmdline_args)
-    program.run()
-
+    app = NDNApp()
+    prog = Program(app, cmdline_args)
+    try:
+        app.run_forever(after_start=prog.run())
+    except FileNotFoundError:
+        print('Error: could not connect to NFD.')
+    except KeyboardInterrupt:
+        print('Error: interrupted')
+    finally:
+        app.shutdown()
 if __name__ == "__main__":
-    sys.exit(main())
+    main()
