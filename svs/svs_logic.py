@@ -2,6 +2,7 @@ from ndn.app import NDNApp
 from ndn.encoding import Component, Name
 import time
 import asyncio as aio
+from random import uniform
 from collections import OrderedDict
 from ndn.types import InterestNack, InterestTimeout, InterestCanceled, ValidationFailure
 
@@ -31,10 +32,11 @@ class VersionVector:
     def keys(self):
         return list(self.m_map.keys())
 class SVS_Scheduler:
-    def __init__(self, function, interval):
+    def __init__(self, function, interval, rand_percent):
         self.function = function
         self.default_interval = interval # milliseconds
-        self.interval = self.default_interval
+        self.rand_percent = rand_percent
+        self.interval = self.default_interval + round( uniform(-self.rand_percent,self.rand_percent)*self.default_interval )
         self.start = None
         self.run = True
         self.task = aio.ensure_future(self._target())
@@ -44,7 +46,7 @@ class SVS_Scheduler:
             while not ( self._current_milli_time()>=self.start+self.interval ):
                 await aio.sleep(0.001)
             self.function()
-            self.interval = self.default_interval
+            self.interval = self.default_interval + round( uniform(-self.rand_percent,self.rand_percent)*self.default_interval )
     def stop(self):
         self.run = False
     def reset(self):
@@ -68,7 +70,8 @@ class SVS_Logic:
         self.need_vector.set(Name.to_str(self.nid), 0)
         print(f'SVS_Logic: starting sync interests')
         self.interval = 30000 # time in milliseconds
-        self.scheduler = SVS_Scheduler(self.retxSyncInterest, self.interval)
+        self.rand_percent = 0.1
+        self.scheduler = SVS_Scheduler(self.retxSyncInterest, self.interval, self.rand_percent)
         self.scheduler.skip_interval()
     def __del__(self):
         aio.ensure_future(self.app.unregister(self.syncPrefix))
@@ -104,3 +107,9 @@ class SVS_Logic:
                 self.need_vector.set(key, sync_vector.get(key) - self.state_vector.get(key))
     def retxSyncInterest(self):
         aio.get_event_loop().create_task(self.sendSyncInterest())
+    def updateState(self):
+        self.seqNum = self.seqNum+1
+        self.state_vector.set(Name.to_str(self.nid), self.seqNum)
+        self.scheduler.skip_interval()
+    def getNeedVector(self):
+        return self.need_vector
