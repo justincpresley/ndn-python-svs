@@ -1,3 +1,6 @@
+Questions:
+  Is the version vector sorted in any way?
+  If a node completely shutsdown (it becomes non-existent in our case), is there a way to detect this? or handle this?
 
 TODO:
   Calculate node ID and State vector

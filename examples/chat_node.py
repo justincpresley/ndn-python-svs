@@ -13,7 +13,7 @@ def process_cmd_args():
     optionalArgs = parser.add_argument_group("optional arguments")
     # Adding All Command Line Arguments
     requiredArgs.add_argument("-n", "--nodename",action="store",dest="node_name",required=True,help="name of this node")
-    optionalArgs.add_argument("-gp","--groupprefix",action="store",dest="group_prefix",required=False,default="/ndn/svs",help="group prefix to listen from")
+    optionalArgs.add_argument("-gp","--groupprefix",action="store",dest="group_prefix",required=False,default="/svs",help="group prefix to listen from")
     optionalArgs.add_argument("-h","--help",action="help",default=SUPPRESS,help="show this help message and exit")
     # Getting All Arugments
     args = {}

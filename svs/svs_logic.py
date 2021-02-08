@@ -6,11 +6,15 @@ from collections import OrderedDict
 from ndn.types import InterestNack, InterestTimeout, InterestCanceled, ValidationFailure
 
 class VersionVector:
-    def __init__(self):
+    def __init__(self, component=None):
         self.m_map = OrderedDict()
+        if component:
+            res = list(map(str.strip, component.tobytes().decode().split("/")[1:]))
+            for x in res:
+                temp = x.split(":")
+                self.set(temp[0],int(temp[1]))
     def set(self,nid,seqNo): # returns seqNo as well
         self.m_map[nid] = seqNo
-        return seqNo
     def get(self,nid): # seqNo returned
         return self.m_map[nid] if nid in self.m_map.keys() else 0
     def has(self,nid): # bool value
@@ -57,10 +61,15 @@ class SVS_Logic:
         self.syncPrefix = self.groupPrefix + [Component.from_str("s")]
         self.app.route(self.syncPrefix)(self.onSyncInterest)
         print(f'SVS_Logic: started listening to {Name.to_str(self.syncPrefix)}')
-        self.v_vector = VersionVector()
+        self.state_vector = VersionVector()
+        self.update_vector = VersionVector()
+        self.seqNum = 0
+        self.state_vector.set(Name.to_str(self.nid), self.seqNum)
+        self.update_vector.set(Name.to_str(self.nid), 0)
         print(f'SVS_Logic: starting sync interests')
         self.interval = 30000 # time in milliseconds
         self.scheduler = SVS_Scheduler(self.retxSyncInterest, self.interval)
+        self.scheduler.skip_interval()
     def __del__(self):
         aio.ensure_future(self.app.unregister(self.syncPrefix))
         print(f'SVS_Logic: done listening to {Name.to_str(self.syncPrefix)}')
@@ -68,7 +77,7 @@ class SVS_Logic:
         print(f'SVS_Logic: finished sync interests')
 
     async def sendSyncInterest(self):
-        name = self.syncPrefix + [Component.from_bytes(self.v_vector.encode())]
+        name = self.syncPrefix + [Component.from_bytes(self.state_vector.encode())]
         try:
             data_name, meta_info, content = await self.app.express_interest(
                 name, must_be_fresh=True, can_be_prefix=True, lifetime=1000)
@@ -82,6 +91,10 @@ class SVS_Logic:
             pass
         print(f'SVS_Logic: sent sync {Name.to_str(name)}')
     def onSyncInterest(self, int_name, int_param, _app_param):
-        print(f'SVS_Logic: received {Name.to_str(int_name)}')
+        print(f'SVS_Logic: received sync {Name.to_str(int_name)}')
+        sync_vector = VersionVector(int_name[-1])
+        self.mergeStateVector(sync_vector)
     def retxSyncInterest(self):
         aio.get_event_loop().create_task(self.sendSyncInterest())
+    def mergeStateVector(self, sync_vector):
+        pass
