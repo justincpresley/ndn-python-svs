@@ -9,20 +9,18 @@ class VersionVector:
     def __init__(self, component=None):
         self.m_map = OrderedDict()
         if component:
-            res = list(map(str.strip, component.tobytes().decode().split("/")[1:]))
-            for x in res:
+            res = component.tobytes().decode()
+            res = res[res.find('/'):]
+            lst = res.split(" ")
+            for x in lst:
                 temp = x.split(":")
                 self.set(temp[0],int(temp[1]))
     def set(self,nid,seqNo): # returns seqNo as well
         self.m_map[nid] = seqNo
     def get(self,nid): # seqNo returned
-        return self.m_map[nid] if nid in self.m_map.keys() else 0
+        return self.m_map[nid] if self.has(nid) else 0
     def has(self,nid): # bool value
         return ( nid in self.m_map.keys() )
-    def begin(self): # returns only nid
-        return next(iter(self.m_map))
-    def end(self): # returns only nid
-        return next(reversed(self.m_map))
     def to_str(self):
         stream = ""
         for key,value in self.m_map.items():
@@ -30,6 +28,8 @@ class VersionVector:
         return stream.rstrip()
     def encode(self):
         return self.to_str().encode()
+    def keys(self):
+        return list(self.m_map.keys())
 class SVS_Scheduler:
     def __init__(self, function, interval):
         self.function = function
@@ -62,10 +62,10 @@ class SVS_Logic:
         self.app.route(self.syncPrefix)(self.onSyncInterest)
         print(f'SVS_Logic: started listening to {Name.to_str(self.syncPrefix)}')
         self.state_vector = VersionVector()
-        self.update_vector = VersionVector()
+        self.need_vector = VersionVector()
         self.seqNum = 0
         self.state_vector.set(Name.to_str(self.nid), self.seqNum)
-        self.update_vector.set(Name.to_str(self.nid), 0)
+        self.need_vector.set(Name.to_str(self.nid), 0)
         print(f'SVS_Logic: starting sync interests')
         self.interval = 30000 # time in milliseconds
         self.scheduler = SVS_Scheduler(self.retxSyncInterest, self.interval)
@@ -93,8 +93,14 @@ class SVS_Logic:
     def onSyncInterest(self, int_name, int_param, _app_param):
         print(f'SVS_Logic: received sync {Name.to_str(int_name)}')
         sync_vector = VersionVector(int_name[-1])
-        self.mergeStateVector(sync_vector)
+        # get any missing keys
+        for key in sync_vector.keys():
+            if not self.state_vector.has(key):
+                self.state_vector.set(key, 0)
+                self.need_vector.set(key, 0)
+        # update the need vector
+        for key in sync_vector.keys():
+            if sync_vector.get(key) > self.state_vector.get(key):
+                self.need_vector.set(key, sync_vector.get(key) - self.state_vector.get(key))
     def retxSyncInterest(self):
         aio.get_event_loop().create_task(self.sendSyncInterest())
-    def mergeStateVector(self, sync_vector):
-        pass
