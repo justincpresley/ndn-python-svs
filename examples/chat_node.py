@@ -38,7 +38,7 @@ class Program:
     async def run(self):
         self.logic = SVS_Logic(self.app, self.args["group_prefix"], self.args["node_name"])
         while True:
-            await aio.sleep(1)
+            await aio.sleep(5)
 
 def main() -> int:
     cmdline_args = process_cmd_args()
@@ -47,10 +47,10 @@ def main() -> int:
     try:
         app.run_forever(after_start=prog.run())
     except FileNotFoundError:
-        print('Error: could not connect to NFD.')
-    except KeyboardInterrupt:
-        print('Error: interrupted')
+        print(f'Error: could not connect to NFD.')
     finally:
+        del prog
         app.shutdown()
+
 if __name__ == "__main__":
     main()

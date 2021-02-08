@@ -38,17 +38,15 @@ class SVS_Scheduler:
         while self.run:
             self.start = self._current_milli_time()
             while not ( self._current_milli_time()>=self.start+self.interval ):
-                await aio.sleep(0)
+                await aio.sleep(0.001)
             self.function()
             self.interval = self.default_interval
     def stop(self):
         self.run = False
     def reset(self):
         self.interval = self.interval + self.default_interval
-    def skip(self):
+    def skip_interval(self):
         self.interval = 0
-    def get_task(self):
-        return self.task
     def _current_milli_time(self):
         return round(time.time() * 1000)
 class SVS_Logic:
@@ -63,14 +61,12 @@ class SVS_Logic:
         print(f'SVS_Logic: starting sync interests')
         self.interval = 30000 # time in milliseconds
         self.scheduler = SVS_Scheduler(self.retxSyncInterest, self.interval)
-        self.scheduler_task = self.scheduler.get_task()
     def __del__(self):
         aio.ensure_future(self.app.unregister(self.syncPrefix))
         print(f'SVS_Logic: done listening to {Name.to_str(self.syncPrefix)}')
         self.scheduler.stop()
         print(f'SVS_Logic: finished sync interests')
-    def get_scheduler_task(self):
-        return self.scheduler_task
+
     async def sendSyncInterest(self):
         name = self.syncPrefix + [Component.from_bytes(self.v_vector.encode())]
         try:
@@ -86,6 +82,6 @@ class SVS_Logic:
             pass
         print(f'SVS_Logic: sent sync {Name.to_str(name)}')
     def onSyncInterest(self, int_name, int_param, _app_param):
-        print(f'On SyncInterest: {Name.to_str(int_name)}')
+        print(f'SVS_Logic: received {Name.to_str(int_name)}')
     def retxSyncInterest(self):
         aio.get_event_loop().create_task(self.sendSyncInterest())
