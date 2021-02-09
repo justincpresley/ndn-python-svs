@@ -37,8 +37,6 @@ class Program:
         print(f'SVS chat client stared | {Name.to_str(self.args["group_prefix"])} - {Name.to_str(self.args["node_name"])} |')
     async def run(self):
         self.logic = SVS_Logic(self.app, self.args["group_prefix"], self.args["node_name"])
-        while True:
-            await aio.sleep(5)
 
 def main() -> int:
     cmdline_args = process_cmd_args()

@@ -10,10 +10,8 @@ class VersionVector:
     def __init__(self, component=None):
         self.m_map = OrderedDict()
         if component:
-            res = component.tobytes().decode()
-            res = res[res.find('/'):]
-            lst = res.split(" ")
-            for x in lst:
+            res = bytes(Component.get_value(component)).decode().split(" ")
+            for x in res:
                 temp = x.split(":")
                 self.set(temp[0],int(temp[1]))
     def set(self,nid,seqNo): # returns seqNo as well
@@ -49,10 +47,15 @@ class SVS_Scheduler:
             self.interval = self.default_interval + round( uniform(-self.rand_percent,self.rand_percent)*self.default_interval )
     def stop(self):
         self.run = False
-    def reset(self):
-        self.interval = self.interval + self.default_interval
+    def make_time_left(self, delay):
+        self.interval = self._current_milli_time() - self.start + delay
+    def reset(self, delay=0):
+        delay = self.default_interval+round( uniform(-self.rand_percent,self.rand_percent)*self.default_interval ) if delay==0 else delay
+        self.interval = self.interval + delay
     def skip_interval(self):
         self.interval = 0
+    def time_left(self):
+        return (self.start + self.interval - self._current_milli_time())
     def _current_milli_time(self):
         return round(time.time() * 1000)
 class SVS_Logic:
@@ -71,6 +74,8 @@ class SVS_Logic:
         print(f'SVS_Logic: starting sync interests')
         self.interval = 30000 # time in milliseconds
         self.rand_percent = 0.1
+        self.lower_interval = 200 # time in milliseconds
+        self.lower_rand_percent = 0.9
         self.scheduler = SVS_Scheduler(self.retxSyncInterest, self.interval, self.rand_percent)
         self.scheduler.skip_interval()
     def __del__(self):
@@ -80,6 +85,7 @@ class SVS_Logic:
         print(f'SVS_Logic: finished sync interests')
 
     async def sendSyncInterest(self):
+        print(f'SVS_Logic: sent sync {Name.to_str(name)}')
         name = self.syncPrefix + [Component.from_bytes(self.state_vector.encode())]
         try:
             data_name, meta_info, content = await self.app.express_interest(
@@ -92,19 +98,39 @@ class SVS_Logic:
             pass
         except ValidationFailure:
             pass
-        print(f'SVS_Logic: sent sync {Name.to_str(name)}')
     def onSyncInterest(self, int_name, int_param, _app_param):
         print(f'SVS_Logic: received sync {Name.to_str(int_name)}')
         sync_vector = VersionVector(int_name[-1])
-        # get any missing keys
+        same_vector = True
+
+        # check if the incoming vector is old
+        for key in self.state_vector.keys():
+            if not sync_vector.has(key):
+                same_vector = False
+            if sync_vector.get(key) < self.state_vector.get(key):
+                same_vector = False
+
         for key in sync_vector.keys():
+        # get any missing keys
             if not self.state_vector.has(key):
+                same_vector = False
                 self.state_vector.set(key, 0)
                 self.need_vector.set(key, 0)
         # update the need vector
-        for key in sync_vector.keys():
             if sync_vector.get(key) > self.state_vector.get(key):
+                same_vector = False
                 self.need_vector.set(key, sync_vector.get(key) - self.state_vector.get(key))
+                
+        # reset the sync timer if incoming vector is the same
+        # set the sync timer to smaller delay if incoming vector is not the same
+        if same_vector:
+            self.scheduler.reset()
+        else:
+            delay = self.lower_interval + round( uniform(-self.lower_rand_percent,self.lower_rand_percent)*self.lower_interval )
+            if self.scheduler.time_left() > delay:
+                self.scheduler.make_time_left(delay)
+        print(f'SVS_Logic: state {self.state_vector.to_str()}')
+        print(f'SVS_Logic: need  {self.need_vector.to_str()}')
     def retxSyncInterest(self):
         aio.get_event_loop().create_task(self.sendSyncInterest())
     def updateState(self):
@@ -113,3 +139,5 @@ class SVS_Logic:
         self.scheduler.skip_interval()
     def getNeedVector(self):
         return self.need_vector
+    def getStateVector(self):
+        return self.state_vector
