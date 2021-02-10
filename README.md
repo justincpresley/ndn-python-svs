@@ -2,7 +2,7 @@
 
 This python library implements the State Vector Sync (SVS) protocol to synchronise states between multiple clients over NDN for distributed realtime applications that is originally implemented and designed in c++ [here](https://github.com/named-data/ndn-svs).
 
-**This is NOT an official implementation and consider 'experimental'**.
+> This is NOT an official implementation and consider 'experimental'.
 
 ndn-python-svs uses the [python-ndn](https://github.com/named-data/python-ndn) library for it's implementation.
 
@@ -23,7 +23,6 @@ To create a chat client, simply run this in the home directory:
 python3 examples/chat_node.py -n NODE_NAME [-h] [-gp GROUP_PREFIX]
 ```
 You may create as many of these as possible and all clients will sync up using SVS.
-
 
 Before you run the program, you must register the group prefix as multi-cast (even if you did not specifically define the group prefix):
 ```
