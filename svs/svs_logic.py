@@ -15,7 +15,12 @@ class VersionVector:
                 temp = x.split(":")
                 self.set(temp[0],int(temp[1]))
     def set(self,nid,seqNo): # returns seqNo as well
+        sort = False
+        if not self.has(nid):
+            sort = True
         self.m_map[nid] = seqNo
+        if sort:
+            self.m_map = OrderedDict(sorted(self.m_map.items()))
     def get(self,nid): # seqNo returned
         return self.m_map[nid] if self.has(nid) else 0
     def has(self,nid): # bool value
@@ -47,7 +52,8 @@ class SVS_Scheduler:
             self.interval = self.default_interval + round( uniform(-self.rand_percent,self.rand_percent)*self.default_interval )
     def stop(self):
         self.run = False
-    def make_time_left(self, delay):
+    def make_time_left(self, delay=0):
+        delay = self.default_interval+round( uniform(-self.rand_percent,self.rand_percent)*self.default_interval ) if delay==0 else delay
         self.interval = self._current_milli_time() - self.start + delay
     def reset(self, delay=0):
         delay = self.default_interval+round( uniform(-self.rand_percent,self.rand_percent)*self.default_interval ) if delay==0 else delay
@@ -110,21 +116,22 @@ class SVS_Logic:
             if sync_vector.get(key) < self.state_vector.get(key):
                 same_vector = False
 
+        # check if the incoming vector is new and update
         for key in sync_vector.keys():
-        # get any missing keys
+            # get any missing keys
             if not self.state_vector.has(key):
                 same_vector = False
                 self.state_vector.set(key, 0)
                 self.need_vector.set(key, 0)
-        # update the need vector
+            # update the need vector
             if sync_vector.get(key) > self.state_vector.get(key):
                 same_vector = False
                 self.need_vector.set(key, sync_vector.get(key) - self.state_vector.get(key))
-                
+
         # reset the sync timer if incoming vector is the same
         # set the sync timer to smaller delay if incoming vector is not the same
         if same_vector:
-            self.scheduler.reset()
+            self.scheduler.make_time_left() # just resets the timer like its a new loop
         else:
             delay = self.lower_interval + round( uniform(-self.lower_rand_percent,self.lower_rand_percent)*self.lower_interval )
             if self.scheduler.time_left() > delay:
