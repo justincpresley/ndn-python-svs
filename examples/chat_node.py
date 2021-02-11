@@ -4,7 +4,7 @@ from ndn.app import NDNApp
 from ndn.encoding import Name
 import asyncio as aio
 sys.path.insert(0,'.')
-from svs.svs_logic import *
+from svs.svs_socket import *
 
 def process_cmd_args():
     # Command Line Parser
@@ -33,10 +33,20 @@ class Program:
     def __init__(self, app, cmdline_args):
         self.args = cmdline_args
         self.app = app
-        self.logic = None
+        self.svs = None
+        self.update = None
         print(f'SVS chat client stared | {Name.to_str(self.args["group_prefix"])} - {Name.to_str(self.args["node_name"])} |')
     async def run(self):
-        self.logic = SVS_Logic(self.app, self.args["group_prefix"], self.args["node_name"])
+        self.svs = SVS_Socket(self.app, self.args["group_prefix"], self.args["node_name"])
+        self.update = aio.get_event_loop().create_task(self._update())
+        #init_msg = "User " + Name.to_str(self.args["node_name"]) + " has joined the groupchat";
+        #self.svs.publishMsg(init_msg);
+        #user_input = "";
+        #while True:
+        #  user_input = input("Enter: ")
+        #  self.svs.publishMsg(user_input);
+    async def _update(self):
+        pass
 
 def main() -> int:
     cmdline_args = process_cmd_args()

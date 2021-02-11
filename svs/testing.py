@@ -3,8 +3,8 @@ import time
 from collections import OrderedDict
 
 def main() -> int:
-    pass
-
+    str = input("Enter:")
+    print(str)
 
 if __name__ == "__main__":
     sys.exit(main())
