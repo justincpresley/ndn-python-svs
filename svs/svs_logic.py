@@ -66,6 +66,7 @@ class SVS_Scheduler:
         return round(time.time() * 1000)
 class SVS_Logic:
     def __init__(self,app,groupPrefix,nid):
+        print(f'SVS_Logic: started svs logic')
         self.app = app
         self.groupPrefix = groupPrefix
         self.nid = nid
@@ -75,7 +76,6 @@ class SVS_Logic:
         self.state_vector = VersionVector()
         self.seqNum = 0
         self.state_vector.set(Name.to_str(self.nid), self.seqNum)
-        print(f'SVS_Logic: starting sync interests')
         self.interval = 30000 # time in milliseconds
         self.rand_percent = 0.1
         self.lower_interval = 200 # time in milliseconds
@@ -86,7 +86,7 @@ class SVS_Logic:
         aio.ensure_future(self.app.unregister(self.syncPrefix))
         print(f'SVS_Logic: done listening to sync prefix')
         self.scheduler.stop()
-        print(f'SVS_Logic: finished sync interests')
+        print(f'SVS_Logic: finished svs logic')
 
     async def sendSyncInterest(self):
         name = self.syncPrefix + [Component.from_bytes(self.state_vector.encode())]
@@ -142,3 +142,5 @@ class SVS_Logic:
         self.scheduler.skip_interval()
     def getStateVector(self):
         return self.state_vector
+    def getCurrentSeqNum(self):
+        return self.seqNum
