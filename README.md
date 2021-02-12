@@ -41,4 +41,4 @@ Please note: This is only a reimplementation in python and does not claim any cr
 
 The Names of all authors associated with this reimplementation project are below:
 
-  * *Justin Presley* (embersight)
+  * *Justin C Presley* (justincpresley)
