@@ -24,11 +24,12 @@ python3 examples/chat_node.py -n NODE_NAME [-h] [-gp GROUP_PREFIX]
 ```
 You may create as many of these as possible and all clients will sync up using SVS.
 
-Before you run the program, you must register the sync prefix as multi-cast (even if you did not specifically define the group prefix):
+Before you run the program, you must register the group prefix as multi-cast (even if you did not specifically define the group prefix):
 ```
-nfdc strategy set <sync-prefix> /localhost/nfd/strategy/multicast/%FD%03
+nfdc strategy set <group-prefix> /localhost/nfd/strategy/multicast/%FD%03
 ```
-The default group prefix is ['/svs'] for our examples. This would make the sync prefix ['/svs/s'].
+The default group prefix is ['/svs'] for our examples.
+
 More on setting different strategies (like mutli-cast) for different prefixes can be found [here](https://named-data.net/doc/NFD/current/manpages/nfdc-strategy.html).
 
 
@@ -40,4 +41,4 @@ Please note: This is only a reimplementation in python and does not claim any cr
 
 The Names of all authors associated with this reimplementation project are below:
 
-  * *Justin Presley* (embersight)
+  * *Justin C Presley* (justincpresley)
