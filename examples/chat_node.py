@@ -42,6 +42,7 @@ class SVS_Thread(threading.Thread):
         self.svs = None
         self.loop = None
         self.app = None
+        self.failed = False
     def run(self):
         def loop_task():
             self.app = NDNApp()
@@ -49,7 +50,8 @@ class SVS_Thread(threading.Thread):
                 self.app.run_forever(after_start=self.function())
             except FileNotFoundError:
                 print(f'Error: could not connect to NFD for SVS.')
-                exit()
+                self.failed = True
+                quit()
 
         self.loop = aio.new_event_loop()
         aio.set_event_loop(self.loop)
@@ -63,18 +65,26 @@ class SVS_Thread(threading.Thread):
         return self.loop
     def get_app(self):
         return self.app
+    def has_failed(self):
+        return self.failed
 class Program:
     def __init__(self, cmdline_args):
         self.args = cmdline_args
         self.svs_thread = SVS_Thread(self.args["group_prefix"],self.args["node_name"])
+        self.svs_thread.daemon = True
         self.svs_thread.start()
         while self.svs_thread.get_svs() == None:
             time.sleep(0.001)
+            if self.svs_thread.has_failed():
+                quit()
         print(f'SVS chat client started | {Name.to_str(self.args["group_prefix"])} - {Name.to_str(self.args["node_name"])} |')
     def run(self):
         while True:
-            time.sleep(1)
-            print("Main thread Executed")
+            try:
+                time.sleep(5)
+                print("Main thread Executed")
+            except:
+                quit()
 
 def main() -> int:
     cmdline_args = process_cmd_args()
