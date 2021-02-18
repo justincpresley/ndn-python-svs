@@ -4,7 +4,7 @@ import asyncio as aio
 import threading
 from ndn.app import NDNApp
 sys.path.insert(0,'.')
-from svs.svs_logic import *
+from svs.svs_logic import SVS_Logic
 
 class SVS_Thread(threading.Thread):
     def __init__(self):

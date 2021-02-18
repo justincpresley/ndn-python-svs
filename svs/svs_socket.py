@@ -5,8 +5,8 @@ from ndn.app import NDNApp
 from ndn.encoding import Component, Name
 # Custom Imports
 sys.path.insert(0,'.')
-from svs.svs_logic import *
-from svs.svs_storage import *
+from svs.svs_logic import SVS_Logic
+from svs.svs_storage import SVS_Storage
 
 # API of the SVS_Socket
 # - fetchData()

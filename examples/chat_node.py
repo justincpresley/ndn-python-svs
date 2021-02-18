@@ -9,11 +9,11 @@ from ndn.app import NDNApp
 from ndn.encoding import Name
 # Custom Imports
 sys.path.insert(0,'.')
-from svs.svs_socket import *
+from svs.svs_socket import SVS_Socket
 
 def process_cmd_args():
     # Command Line Parser
-    parser = ArgumentParser(add_help=False,description="An SVS Chat Node capable of syncing with others by using the API.")
+    parser = ArgumentParser(add_help=False,description="An SVS Chat Node capable of syncing with others.")
     requiredArgs = parser.add_argument_group("required arguments")
     optionalArgs = parser.add_argument_group("optional arguments")
     # Adding All Command Line Arguments
@@ -77,6 +77,7 @@ class Program:
             time.sleep(0.001)
             if self.svs_thread.has_failed():
                 quit()
+        self.svs = self.svs_thread.get_svs()
         print(f'SVS chat client started | {Name.to_str(self.args["group_prefix"])} - {Name.to_str(self.args["node_name"])} |')
     def run(self):
         while True:

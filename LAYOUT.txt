@@ -1,21 +1,21 @@
 Questions:
-  Is the version vector sorted in any way? lexicographically
   If a node completely shuts down (it becomes non-existent in our case), is there a way to detect this? or handle this?
 
 TODO:
-  Sort Version Vector lexicographically
-  Start the socket class
-  API
+  create storage
+  create API
+  do logging
   Learn more about SVS
 
 STRUCTURE
-
 ├── LAYOUT.md
 ├── LICENSE.md
 ├── README.md
 ├── examples
 │   └── chat_node.py
 └── svs
-    ├── svs_logic.py
     ├── svs_socket.py
-    └── testing.py
+    ├── svs_logic.py
+    ├── svs_storage.py
+    ├── version_vector.py
+    └── testing.py - Not used in actual implementation

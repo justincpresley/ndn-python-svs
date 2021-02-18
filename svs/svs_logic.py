@@ -9,7 +9,7 @@ from ndn.encoding import Component, Name
 from ndn.types import InterestNack, InterestTimeout, InterestCanceled, ValidationFailure
 # Custom Imports
 sys.path.insert(0,'.')
-from svs.version_vector import *
+from svs.version_vector import VersionVector
 
 class SVS_Scheduler:
     def __init__(self, function, interval, rand_percent):
