@@ -1,57 +1,32 @@
-from ndn.app import NDNApp
-from ndn.encoding import Component, Name
+# Basic Libraries
 import time
+import sys
 import asyncio as aio
 from random import uniform
-from collections import OrderedDict
+# NDN Imports
+from ndn.app import NDNApp
+from ndn.encoding import Component, Name
 from ndn.types import InterestNack, InterestTimeout, InterestCanceled, ValidationFailure
+# Custom Imports
+sys.path.insert(0,'.')
+from svs.version_vector import *
 
-class VersionVector:
-    def __init__(self, component=None):
-        self.m_map = OrderedDict()
-        if component:
-            res = bytes(Component.get_value(component)).decode().split(" ")
-            for x in res:
-                temp = x.split(":")
-                self.set(temp[0],int(temp[1]))
-    def set(self,nid,seqNo): # returns seqNo as well
-        sort = False
-        if not self.has(nid):
-            sort = True
-        self.m_map[nid] = seqNo
-        if sort:
-            self.m_map = OrderedDict(sorted(self.m_map.items()))
-    def get(self,nid): # seqNo returned
-        return self.m_map[nid] if self.has(nid) else 0
-    def has(self,nid): # bool value
-        return ( nid in self.m_map.keys() )
-    def to_str(self):
-        stream = ""
-        for key,value in self.m_map.items():
-            stream = stream + key + ":" + str(value) + " "
-        return stream.rstrip()
-    def encode(self):
-        return self.to_str().encode()
-    def keys(self):
-        return list(self.m_map.keys())
 class SVS_Scheduler:
     def __init__(self, function, interval, rand_percent):
+        print(f'SVS_Scheduler: started svs scheduler')
         self.function = function
         self.default_interval = interval # milliseconds
         self.rand_percent = rand_percent
         self.interval = self.default_interval + round( uniform(-self.rand_percent,self.rand_percent)*self.default_interval )
         self.start = None
-        self.run = True
         self.task = aio.get_event_loop().create_task(self._target())
     async def _target(self):
-        while self.run:
+        while True:
             self.start = self._current_milli_time()
             while not ( self._current_milli_time()>=self.start+self.interval ):
                 await aio.sleep(0.001)
             self.function()
             self.interval = self.default_interval + round( uniform(-self.rand_percent,self.rand_percent)*self.default_interval )
-    def stop(self):
-        self.run = False
     def make_time_left(self, delay=0):
         delay = self.default_interval+round( uniform(-self.rand_percent,self.rand_percent)*self.default_interval ) if delay==0 else delay
         self.interval = self._current_milli_time() - self.start + delay
@@ -71,8 +46,6 @@ class SVS_Logic:
         self.groupPrefix = groupPrefix
         self.nid = nid
         self.syncPrefix = self.groupPrefix + [Component.from_str("s")]
-        self.app.route(self.syncPrefix)(self.onSyncInterest)
-        print(f'SVS_Logic: started listening to {Name.to_str(self.syncPrefix)}')
         self.state_vector = VersionVector()
         self.seqNum = 0
         self.state_vector.set(Name.to_str(self.nid), self.seqNum)
@@ -80,14 +53,10 @@ class SVS_Logic:
         self.rand_percent = 0.1
         self.lower_interval = 200 # time in milliseconds
         self.lower_rand_percent = 0.9
+        self.app.route(self.syncPrefix)(self.onSyncInterest)
+        print(f'SVS_Logic: started listening to {Name.to_str(self.syncPrefix)}')
         self.scheduler = SVS_Scheduler(self.retxSyncInterest, self.interval, self.rand_percent)
         self.scheduler.skip_interval()
-    def __del__(self):
-        aio.ensure_future(self.app.unregister(self.syncPrefix))
-        print(f'SVS_Logic: done listening to sync prefix')
-        self.scheduler.stop()
-        print(f'SVS_Logic: finished svs logic')
-
     async def sendSyncInterest(self):
         name = self.syncPrefix + [Component.from_bytes(self.state_vector.encode())]
         print(f'SVS_Logic: sent sync {Name.to_str(name)}')
