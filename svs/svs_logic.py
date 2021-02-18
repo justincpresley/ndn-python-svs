@@ -10,10 +10,11 @@ from ndn.types import InterestNack, InterestTimeout, InterestCanceled, Validatio
 # Custom Imports
 sys.path.insert(0,'.')
 from svs.version_vector import VersionVector
+from svs.svs_logging import *
 
 class SVS_Scheduler:
     def __init__(self, function, interval, rand_percent):
-        print(f'SVS_Scheduler: started svs scheduler')
+        logging.info(f'SVS_Scheduler: started svs scheduler')
         self.function = function
         self.default_interval = interval # milliseconds
         self.rand_percent = rand_percent
@@ -41,7 +42,7 @@ class SVS_Scheduler:
         return round(time.time() * 1000)
 class SVS_Logic:
     def __init__(self,app,groupPrefix,nid):
-        print(f'SVS_Logic: started svs logic')
+        logging.info(f'SVS_Logic: started svs logic')
         self.app = app
         self.groupPrefix = groupPrefix
         self.nid = nid
@@ -54,12 +55,12 @@ class SVS_Logic:
         self.lower_interval = 200 # time in milliseconds
         self.lower_rand_percent = 0.9
         self.app.route(self.syncPrefix)(self.onSyncInterest)
-        print(f'SVS_Logic: started listening to {Name.to_str(self.syncPrefix)}')
+        logging.info(f'SVS_Logic: started listening to {Name.to_str(self.syncPrefix)}')
         self.scheduler = SVS_Scheduler(self.retxSyncInterest, self.interval, self.rand_percent)
         self.scheduler.skip_interval()
     async def sendSyncInterest(self):
         name = self.syncPrefix + [Component.from_bytes(self.state_vector.encode())]
-        print(f'SVS_Logic: sent sync {Name.to_str(name)}')
+        logging.info(f'SVS_Logic: sent sync {Name.to_str(name)}')
         try:
             data_name, meta_info, content = await self.app.express_interest(
                 name, must_be_fresh=True, can_be_prefix=True, lifetime=1000)
@@ -72,7 +73,7 @@ class SVS_Logic:
         except ValidationFailure:
             pass
     def onSyncInterest(self, int_name, int_param, _app_param):
-        print(f'SVS_Logic: received sync {Name.to_str(int_name)}')
+        logging.info(f'SVS_Logic: received sync {Name.to_str(int_name)}')
         sync_vector = VersionVector(int_name[-1])
         same_vector = True
 
@@ -102,7 +103,7 @@ class SVS_Logic:
             delay = self.lower_interval + round( uniform(-self.lower_rand_percent,self.lower_rand_percent)*self.lower_interval )
             if self.scheduler.time_left() > delay:
                 self.scheduler.make_time_left(delay)
-        print(f'SVS_Logic: state {self.state_vector.to_str()}')
+        logging.info(f'SVS_Logic: state {self.state_vector.to_str()}')
     def retxSyncInterest(self):
         aio.get_event_loop().create_task(self.sendSyncInterest())
     def updateState(self):

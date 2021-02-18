@@ -82,8 +82,8 @@ class Program:
     def run(self):
         while True:
             try:
-                time.sleep(5)
-                print("Main thread Executed")
+                val = input("Enter: ")
+                print(val)
             except:
                 quit()
 

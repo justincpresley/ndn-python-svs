@@ -18,4 +18,5 @@ STRUCTURE
     ├── svs_logic.py
     ├── svs_storage.py
     ├── version_vector.py
+    ├── svs_logging.py
     └── testing.py - Not used in actual implementation
