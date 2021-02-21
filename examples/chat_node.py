@@ -47,7 +47,6 @@ class SVS_Thread(threading.Thread):
         self.nid = node_id
         self.sqlite_path = sqlite_path
         self.cache_others = cache_others
-
         self.storage = None
         self.svs = None
         self.loop = None

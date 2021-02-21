@@ -1,16 +1,14 @@
 # Basic Libraries
 import time
-import sys
 import asyncio as aio
 from random import uniform
+import logging
 # NDN Imports
 from ndn.app import NDNApp
 from ndn.encoding import Component, Name
 from ndn.types import InterestNack, InterestTimeout, InterestCanceled, ValidationFailure
 # Custom Imports
-sys.path.insert(0,'.')
-from svs.version_vector import VersionVector
-from svs.svs_logging import *
+from .version_vector import VersionVector
 
 class SVS_Scheduler:
     def __init__(self, function, interval, rand_percent):

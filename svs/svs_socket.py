@@ -1,13 +1,10 @@
 # Basic Libraries
-import sys
+import logging
 # NDN Imports
 from ndn.app import NDNApp
 from ndn.encoding import Component, Name
 # Custom Imports
-sys.path.insert(0,'.')
-from svs.svs_logic import SVS_Logic
-from svs.svs_storage import SVS_Storage
-from svs.svs_logging import *
+from .svs_logic import SVS_Logic
 
 # API of the SVS_Socket
 # - fetchData()
@@ -21,7 +18,6 @@ class SVS_Socket:
         self.nid = nid
         self.dataPrefix = self.groupPrefix + [Component.from_str("d")]
         self.logic = SVS_Logic(self.app, self.groupPrefix, self.nid)
-        self.storage = SVS_Storage()
         self.app.route(self.dataPrefix)(self.onDataInterest)
         logging.info(f'SVS_Socket: started listening to {Name.to_str(self.dataPrefix)}')
     def onDataInterest(self, int_name, int_param, _app_param):
