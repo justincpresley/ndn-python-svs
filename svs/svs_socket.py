@@ -45,7 +45,6 @@ class SVS_Socket:
         except Exception as e:
             logging.warning(f'SVS_Socket: unknown error has occured: {e}')
         return None
-
     def publishData(self, bytes):
         logging.info(f'SVS_Socket: publishing data')
         name = self.dataPrefix + self.nid + Name.from_str( "/epoch-"+str(self.logic.getCurrentSeqNum()+1) )
