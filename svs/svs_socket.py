@@ -26,7 +26,11 @@ class SVS_Socket:
         self.app.route(self.listenPrefix)(self.onDataInterest)
         logging.info(f'SVS_Socket: started listening to {Name.to_str(self.listenPrefix)}')
     def onDataInterest(self, int_name, int_param, _app_param):
-        pass
+        data_bytes = self.storage.get_data_packet(int_name, int_param.can_be_prefix)
+        if data_bytes:
+            logging.info(f'SVS_Socket: served data')
+            self.app.put_raw_packet(data_bytes)
+        return
     async def fetchData(self, nid, seqNum):
         name = self.dataPrefix + nid + Name.from_str( "/epoch-"+str(seqNum) )
         try:

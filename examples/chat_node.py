@@ -120,7 +120,7 @@ def main() -> int:
     }
     if args["logging_file"] != None:
         logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', \
-            filename=args["logging_file"], \
+            filename=args["logging_file"]+"."+args["node_id"], \
             filemode='w+', \
             level=log_levels[args["logging_level"]])
     else:
