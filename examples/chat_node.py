@@ -11,6 +11,7 @@ from ndn.encoding import Name
 # Custom Imports
 sys.path.insert(0,'.')
 from svs.svs_socket import SVS_Socket
+from storage.sqlite import SqliteStorage
 
 def parse_cmd_args():
     # Command Line Parser
@@ -67,7 +68,8 @@ class SVS_Thread(threading.Thread):
         self.loop.create_task(loop_task())
         self.loop.run_forever()
     async def function(self):
-        self.svs = SVS_Socket(self.app, Name.from_str(self.group_prefix), Name.from_str(self.nid))
+        self.storage = SqliteStorage(self.sqlite_path)
+        self.svs = SVS_Socket(self.app, self.storage, Name.from_str(self.group_prefix), Name.from_str(self.nid), self.cache_others)
     def get_svs(self):
         return self.svs
     def get_loop(self):
