@@ -25,20 +25,19 @@ def parse_cmd_args():
     informationArgs.add_argument("-h","--help",action="help",default=SUPPRESS,help="show this help message and exit")
     # Getting all Arguments
     vars = parser.parse_args()
+    args = {}
+
     if vars.group_prefix != None:
         if vars.group_prefix[-1] == "/":
             vars.group_prefix = vars.group_prefix[:-1]
         if vars.group_prefix[0] != "/":
             vars.group_prefix = "/" + vars.group_prefix
+        args["group_prefix"] = vars.group_prefix
     if vars.node_name[-1] == "/":
         vars.node_name = vars.node_name[:-1]
     if vars.node_name[0] != "/":
         vars.node_name = "/" + vars.node_name
-
-    args = {}
     args["node_id"] = vars.node_name
-    if vars.group_prefix != None:
-        args["group_prefix"] = vars.group_prefix
     return args
 
 class SVS_Thread(threading.Thread):
@@ -95,7 +94,8 @@ class Program:
             try:
                 val = input("Enter: ")
                 print(val)
-            except:
+                self.svs.publishData(val.encode())
+            except KeyboardInterrupt:
                 sys.exit()
 
 def main() -> int:

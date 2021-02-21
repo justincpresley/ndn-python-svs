@@ -71,7 +71,7 @@ class Storage:
         # write data packet and freshness_period to cache
         name = Name.normalize(name)
         self.cache[name] = (data, expire_time_ms)
-        logging.info(f'Cache save: {Name.to_str(name)}')
+        logging.info(f'Cache Save: {Name.to_str(name)}')
 
     def get_data_packet(self, name: NonStrictName, can_be_prefix: bool=False,
                         must_be_fresh: bool=False) -> Optional[bytes]:

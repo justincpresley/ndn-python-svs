@@ -2,7 +2,7 @@
 import logging
 # NDN Imports
 from ndn.app import NDNApp
-from ndn.encoding import Component, Name
+from ndn.encoding import Component, Name, make_data, MetaInfo
 # Custom Imports
 from .svs_logic import SVS_Logic
 
@@ -27,10 +27,29 @@ class SVS_Socket:
         logging.info(f'SVS_Socket: started listening to {Name.to_str(self.listenPrefix)}')
     def onDataInterest(self, int_name, int_param, _app_param):
         pass
-    def fetchData(self, nid, seqNum):
-        pass
+    async def fetchData(self, nid, seqNum):
+        name = self.dataPrefix + nid + Name.from_str( "/epoch-"+str(seqNum) )
+        try:
+            logging.info(f'SVS_Socket: fetching data')
+            ex_int_name, meta_info, content = await self.app.express_interest(name, must_be_fresh=True, can_be_prefix=False, lifetime=6000)
+            logging.info(f'SVS_Socket: received data')
+            return bytes(content) if content else None
+        except InterestNack as e:
+            logging.warning(f'SVS_Socket: nacked with reason={e.reason}')
+        except InterestTimeout:
+            logging.warning(f'SVS_Socket: timeout')
+        except InterestCanceled:
+            logging.warning(f'SVS_Socket: canceled')
+        except ValidationFailure:
+            logging.warning(f'SVS_Socket: data failed to validate')
+        except Exception as e:
+            logging.warning(f'SVS_Socket: unknown error has occured: {e}')
+        return None
+
     def publishData(self, bytes):
-        #name = self.dataPrefix + self.nid + Name.from_str( "/epoch-"+str(self.logic.getCurrentSeqNum()+1) )
-        #data = form a data packet
-        #self.storage.put_data_packet(name, data)
+        logging.info(f'SVS_Socket: publishing data')
+        name = self.dataPrefix + self.nid + Name.from_str( "/epoch-"+str(self.logic.getCurrentSeqNum()+1) )
+        metainfo = MetaInfo(freshness_period=500)
+        data = make_data(name, metainfo, content=bytes)
+        self.storage.put_data_packet(name, data)
         self.logic.updateState()
