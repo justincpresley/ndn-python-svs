@@ -51,7 +51,7 @@ class Storage:
             expire_time_mss.append(expire_time_ms)
         if len(keys) > 0:
             self._put_batch(keys, values, expire_time_mss)
-            logging.info(f'Cache write back {len(keys)} items')
+            logging.info(f'Storage: cache write back {len(keys)} items')
         self.cache = NameTrie()
 
     def put_data_packet(self, name: NonStrictName, data: bytes):
@@ -71,7 +71,7 @@ class Storage:
         # write data packet and freshness_period to cache
         name = Name.normalize(name)
         self.cache[name] = (data, expire_time_ms)
-        logging.info(f'Cache Save: {Name.to_str(name)}')
+        logging.info(f'Storage: cache save {Name.to_str(name)}')
 
     def get_data_packet(self, name: NonStrictName, can_be_prefix: bool=False,
                         must_be_fresh: bool=False) -> Optional[bytes]:
@@ -89,14 +89,14 @@ class Storage:
             if not can_be_prefix:
                 data, expire_time_ms = self.cache[name]
                 if not must_be_fresh or expire_time_ms > self._time_ms():
-                    logging.info('get from cache')
+                    logging.info('Storage: get from cache')
                     return data
             else:
                 it = self.cache.itervalues(prefix=name, shallow=True)
                 while True:
                     data, expire_time_ms = next(it)
                     if not must_be_fresh or expire_time_ms > self._time_ms():
-                        logging.info('get from cache')
+                        logging.info('Storage: get from cache')
                         return data
         # not in cache, lookup in storage
         except (KeyError, StopIteration):

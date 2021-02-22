@@ -3,6 +3,7 @@ import time
 import asyncio as aio
 import threading
 from ndn.app import NDNApp
+from typing import NamedTuple
 sys.path.insert(0,'.')
 from svs.svs_logic import SVS_Logic
 
@@ -54,11 +55,18 @@ class Main_Thread(threading.Thread):
             time.sleep(1)
             print("Main thread Executed")
 
+
+class User:
+    __slots__ = ('name', 'uid')
+    def __init__(self, name: str, uid: int):
+        self.name = name
+        self.uid = uid
+
 def main():
-    svs_thread = SVS_Thread()
-    main_thread = Main_Thread()
-    svs_thread.start()
-    main_thread.start()
+    struct = User("seq1",4)
+    print(struct)
+    print(struct.name)
+
 
 if __name__ == "__main__":
     sys.exit(main())

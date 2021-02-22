@@ -10,6 +10,13 @@ from ndn.types import InterestNack, InterestTimeout, InterestCanceled, Validatio
 # Custom Imports
 from .version_vector import VersionVector
 
+class MissingData:
+    __slots__ = ('nid','lowSeqNum','highSeqNum')
+    def __init__(self, nid:str, lowSeqNum:int, highSeqNum:int):
+        self.nid = nid
+        self.lowSeqNum = lowSeqNum
+        self.highSeqNum = highSeqNum
+
 class SVS_Scheduler:
     def __init__(self, function, interval, rand_percent):
         logging.info(f'SVS_Scheduler: started svs scheduler')
@@ -39,11 +46,12 @@ class SVS_Scheduler:
     def _current_milli_time(self):
         return round(time.time() * 1000)
 class SVS_Logic:
-    def __init__(self,app,groupPrefix,nid):
+    def __init__(self,app,groupPrefix,nid,updateCallback):
         logging.info(f'SVS_Logic: started svs logic')
         self.app = app
         self.groupPrefix = groupPrefix
         self.nid = nid
+        self.updateCallback = updateCallback
         self.syncPrefix = self.groupPrefix + [Component.from_str("s")]
         self.state_vector = VersionVector()
         self.seqNum = 0
@@ -74,6 +82,7 @@ class SVS_Logic:
         logging.info(f'SVS_Logic: received sync {Name.to_str(int_name)}')
         sync_vector = VersionVector(int_name[-1])
         same_vector = True
+        missing_list = []
 
         # check if the incoming vector is old
         for key in self.state_vector.keys():
@@ -90,8 +99,13 @@ class SVS_Logic:
                 self.state_vector.set(key, 0)
             # update the need vector
             if sync_vector.get(key) > self.state_vector.get(key):
+                temp = MissingData(key, self.state_vector.get(key)+1, sync_vector.get(key))
                 same_vector = False
                 self.state_vector.set(key, sync_vector.get(key))
+                missing_list.append(temp)
+
+        # update data
+        self.updateCallback(missing_list)
 
         # reset the sync timer if incoming vector is the same
         # set the sync timer to smaller delay if incoming vector is not the same

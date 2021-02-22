@@ -68,19 +68,19 @@ class SVS_Thread(threading.Thread):
         self.loop.run_forever()
     async def function(self):
         self.storage = SqliteStorage(self.sqlite_path)
-        self.svs = SVS_Socket(self.app, self.storage, Name.from_str(self.group_prefix), Name.from_str(self.nid), self.cache_others)
-    def on_missing_data(self, missing_list):
-        pass
-        """
-        for (size_t i = 0; i < v.size(); i++)
-          for (ndn::svs::SeqNo s = v[i].low; s <= v[i].high; ++s)
-            ndn::svs::NodeID nid = v[i].session;
-            m_svs->fetchData(nid, s, [nid] (const ndn::Data& data)
-                size_t data_size = data.getContent().value_size();
-                std::string content_str((char *)data.getContent().value(), data_size);
-                content_str = nid + " : " + content_str;
-                std::cout << content_str << std::endl;
-        """
+        self.svs = SVS_Socket(self.app, self.storage, Name.from_str(self.group_prefix), Name.from_str(self.nid), self.missing_callback, self.cache_others)
+    def missing_callback(self, missing_list):
+        aio.ensure_future(self.on_missing_data(missing_list))
+    async def on_missing_data(self, missing_list):
+        for i in missing_list:
+            while i.lowSeqNum + 1 >= i.highSeqNum:
+                content_str = await self.svs.fetchData(i.nid, i.lowSeqNum)
+                if content_str != None:
+                    content_str = i.nid[1:] + ": " + content_str.decode();
+                    sys.stdout.write("\033[K")
+                    sys.stdout.flush()
+                    print(content_str)
+                i.lowSeqNum = i.lowSeqNum + 1
     def get_svs(self):
         return self.svs
     def has_failed(self):
@@ -100,8 +100,10 @@ class Program:
     def run(self):
         while True:
             try:
-                val = input("Enter: ")
-                print(val)
+                val = input("")
+                sys.stdout.write("\033[F"+"\033[K")
+                sys.stdout.flush()
+                print("YOU: "+val)
                 self.svs.publishData(val.encode())
             except KeyboardInterrupt:
                 sys.exit()
