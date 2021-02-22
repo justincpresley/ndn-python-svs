@@ -69,12 +69,20 @@ class SVS_Thread(threading.Thread):
     async def function(self):
         self.storage = SqliteStorage(self.sqlite_path)
         self.svs = SVS_Socket(self.app, self.storage, Name.from_str(self.group_prefix), Name.from_str(self.nid), self.cache_others)
+    def on_missing_data(self, missing_list):
+        pass
+        """
+        for (size_t i = 0; i < v.size(); i++)
+          for (ndn::svs::SeqNo s = v[i].low; s <= v[i].high; ++s)
+            ndn::svs::NodeID nid = v[i].session;
+            m_svs->fetchData(nid, s, [nid] (const ndn::Data& data)
+                size_t data_size = data.getContent().value_size();
+                std::string content_str((char *)data.getContent().value(), data_size);
+                content_str = nid + " : " + content_str;
+                std::cout << content_str << std::endl;
+        """
     def get_svs(self):
         return self.svs
-    def get_loop(self):
-        return self.loop
-    def get_app(self):
-        return self.app
     def has_failed(self):
         return self.failed
 class Program:
@@ -120,7 +128,7 @@ def main() -> int:
     }
     if args["logging_file"] != None:
         logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', \
-            filename=args["logging_file"]+"."+args["node_id"], \
+            filename=args["logging_file"]+"."+args["node_id"][1:], \
             filemode='w+', \
             level=log_levels[args["logging_level"]])
     else:

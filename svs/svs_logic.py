@@ -108,7 +108,5 @@ class SVS_Logic:
         self.seqNum = self.seqNum+1
         self.state_vector.set(Name.to_str(self.nid), self.seqNum)
         self.scheduler.skip_interval()
-    def getStateVector(self):
-        return self.state_vector
     def getCurrentSeqNum(self):
         return self.seqNum

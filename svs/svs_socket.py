@@ -11,7 +11,7 @@ from .svs_logic import SVS_Logic
 # - publishData()
 
 class SVS_Socket:
-    def __init__(self,app,storage,groupPrefix,nid,cacheOthers):
+    def __init__(self,app,storage,groupPrefix,nid,cacheOthers=False):
         logging.info(f'SVS_Socket: started svs socket')
         self.app = app
         self.storage = storage
@@ -31,12 +31,18 @@ class SVS_Socket:
             logging.info(f'SVS_Socket: served data')
             self.app.put_raw_packet(data_bytes)
         return
-    async def fetchData(self, nid, seqNum):
+    async def fetchData(self, nid, seqNum): # add number of retries
         name = self.dataPrefix + nid + Name.from_str( "/epoch-"+str(seqNum) )
         try:
             logging.info(f'SVS_Socket: fetching data')
             ex_int_name, meta_info, content = await self.app.express_interest(name, must_be_fresh=True, can_be_prefix=False, lifetime=6000)
             logging.info(f'SVS_Socket: received data')
+            if self.cacheOthers:
+                logging.info(f'SVS_Socket: publishing data')
+                name = self.dataPrefix + nid + Name.from_str( "/epoch-"+str(seqNum) )
+                metainfo = MetaInfo(freshness_period=500)
+                data = make_data(name, metainfo, content=bytes(content))
+                self.storage.put_data_packet(name, data)
             return bytes(content) if content else None
         except InterestNack as e:
             logging.warning(f'SVS_Socket: nacked with reason={e.reason}')
