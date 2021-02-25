@@ -4,7 +4,6 @@ Questions:
 TODO:
   Turn the VersionVector class into all TLV structures
   HMAC
-  Change Storage
 
 STRUCTURE
 ├── LAYOUT.md
