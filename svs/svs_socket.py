@@ -9,13 +9,13 @@ from ndn.types import InterestNack, InterestTimeout, InterestCanceled, Validatio
 # Custom Imports
 from .svs_logic import SVS_Logic
 sys.path.insert(0,'.')
-from storage.storage import Storage
+from .svs_storage import SVS_Storage
 
 class SVS_Socket:
-    def __init__(self, app:NDNApp, storage:Storage, groupPrefix:Name, nid:Name, updateCallback:Callable) -> None:
+    def __init__(self, app:NDNApp, groupPrefix:Name, nid:Name, updateCallback:Callable) -> None:
         logging.info(f'SVS_Socket: started svs socket')
         self.app = app
-        self.storage = storage
+        self.storage = SVS_Storage()
         self.groupPrefix = groupPrefix
         self.nid = nid
         self.updateCallback = updateCallback

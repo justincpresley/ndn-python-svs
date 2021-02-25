@@ -12,7 +12,6 @@ from ndn.encoding import Name
 # Custom Imports
 sys.path.insert(0,'.')
 from svs.svs_socket import SVS_Socket
-from storage.sqlite import SqliteStorage
 
 def parse_cmd_args():
     # Command Line Parser
@@ -33,11 +32,10 @@ def parse_cmd_args():
     return args
 
 class SVS_Thread(threading.Thread):
-    def __init__(self, group_prefix:str, node_id:str, sqlite_path:str) -> None:
+    def __init__(self, group_prefix:str, node_id:str) -> None:
         threading.Thread.__init__(self)
         self.group_prefix = Name.from_str(group_prefix)
         self.nid = Name.from_str(node_id)
-        self.sqlite_path = sqlite_path
         self.storage = None
         self.svs = None
         self.loop = None
@@ -58,8 +56,7 @@ class SVS_Thread(threading.Thread):
         self.loop.create_task(loop_task())
         self.loop.run_forever()
     async def function(self) -> None:
-        self.storage = SqliteStorage(self.sqlite_path)
-        self.svs = SVS_Socket(self.app, self.storage, self.group_prefix, self.nid, self.missing_callback)
+        self.svs = SVS_Socket(self.app, self.group_prefix, self.nid, self.missing_callback)
     def missing_callback(self, missing_list) -> None:
         aio.ensure_future(self.on_missing_data(missing_list))
     async def on_missing_data(self, missing_list) -> None:
@@ -80,7 +77,7 @@ class SVS_Thread(threading.Thread):
 class Program:
     def __init__(self, args):
         self.args = args
-        self.svs_thread = SVS_Thread(self.args["group_prefix"],self.args["node_id"], self.args["sqlite_path"])
+        self.svs_thread = SVS_Thread(self.args["group_prefix"],self.args["node_id"])
         self.svs_thread.daemon = True
         self.svs_thread.start()
         while self.svs_thread.get_svs() == None:
@@ -104,7 +101,6 @@ def main() -> int:
     default_args = {
         'node_id':None,
         'group_prefix':'/svs',
-        'sqlite_path':'~/.ndn/svspy/sqlite3.db',
         'logging_level':'INFO',
         'logging_file': "SVS.log"
     }
