@@ -10,15 +10,10 @@ STRUCTURE
 ├── LICENSE.md
 ├── README.md
 ├── examples
-│   │── test.py
 │   └── chat_node.py
-├── storage
-│   │── leveldb.py
-│   │── monogodb.py
-│   │── sqlite.py
-│   └── storage.py
 └── svs
     ├── svs_socket.py
     ├── svs_logic.py
+    ├── svs_storage.py
     ├── async_scheduler.py
     └── version_vector.py
