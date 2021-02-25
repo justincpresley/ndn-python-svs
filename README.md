@@ -2,7 +2,7 @@
 
 This python library implements the [State Vector Sync (SVS) protocol](https://named-data.github.io/StateVectorSync/) to synchronise states between multiple clients over NDN for distributed realtime applications.
 
-> This is NOT an official implementation and consider 'experimental'.
+> This is an official implementation but considered 'experimental'.
 
 ndn-python-svs uses the [python-ndn](https://github.com/named-data/python-ndn) library for it's implementation.
 
@@ -28,16 +28,21 @@ Before you run the program, you must register the group prefix as multi-cast (ev
 ```
 nfdc strategy set <group-prefix> /localhost/nfd/strategy/multicast/%FD%03
 ```
-The default group prefix is `/svs` for our examples.
+The default **group prefix** is `/svs` for our examples.
 
-More on setting different strategies (like mutli-cast) for different prefixes can be found [here](https://named-data.net/doc/NFD/current/manpages/nfdc-strategy.html).
+[More on setting different strategies (like mutli-cast) for prefixes.](https://named-data.net/doc/NFD/current/manpages/nfdc-strategy.html)
 
+### Branches
+
+* [master](https://github.com/justincpresley/ndn-python-svs) : Does not preserve cache between runs
+
+* [preserve](https://github.com/justincpresley/ndn-python-svs/tree/preserve) : Does preserve cache via database between runs 
 
 ## License and Authors
 
 ndn-python-svs is an open source project that is licensed. See [`LICENSE.md`](LICENSE.md) for more information.
 
-Please note: This is only a reimplementation in python and does not claim any credit towards the actual design of SVS.
+Please note: This is only a reimplementation in python and does not claim any credit towards the [actual design of SVS](https://named-data.github.io/StateVectorSync/).
 
 The Names of all authors associated with this reimplementation project are below:
 
