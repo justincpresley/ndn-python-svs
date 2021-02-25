@@ -4,8 +4,11 @@ import asyncio as aio
 import threading
 from ndn.app import NDNApp
 from typing import NamedTuple
+from ndn.encoding import Component, Name
+from enum import Enum
 sys.path.insert(0,'.')
 from svs.svs_logic import SVS_Logic
+from svs.version_vector import VersionVector
 
 class SVS_Thread(threading.Thread):
     def __init__(self):
@@ -56,17 +59,15 @@ class Main_Thread(threading.Thread):
             print("Main thread Executed")
 
 
-class User:
-    __slots__ = ('name', 'uid')
-    def __init__(self, name: str, uid: int):
-        self.name = name
-        self.uid = uid
+class SVS_State(Enum):
+    STEADY     = 0
+    SUPRESSION = 1
 
 def main():
-    struct = User("seq1",4)
-    print(struct)
-    print(struct.name)
+    a = Name.from_str("svs/group/")
+    b = Name.from_str("")
 
+    print(Name.to_str(a+b))
 
 if __name__ == "__main__":
     sys.exit(main())

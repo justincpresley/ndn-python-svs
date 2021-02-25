@@ -5,6 +5,7 @@ import sys
 import time
 import logging
 import threading
+from typing import Optional
 # NDN Imports
 from ndn.app import NDNApp
 from ndn.encoding import Name
@@ -26,33 +27,23 @@ def parse_cmd_args():
     # Getting all Arguments
     vars = parser.parse_args()
     args = {}
-
     if vars.group_prefix != None:
-        if vars.group_prefix[-1] == "/":
-            vars.group_prefix = vars.group_prefix[:-1]
-        if vars.group_prefix[0] != "/":
-            vars.group_prefix = "/" + vars.group_prefix
         args["group_prefix"] = vars.group_prefix
-    if vars.node_name[-1] == "/":
-        vars.node_name = vars.node_name[:-1]
-    if vars.node_name[0] != "/":
-        vars.node_name = "/" + vars.node_name
     args["node_id"] = vars.node_name
     return args
 
 class SVS_Thread(threading.Thread):
-    def __init__(self, group_prefix, node_id, sqlite_path, cache_others):
+    def __init__(self, group_prefix:str, node_id:str, sqlite_path:str) -> None:
         threading.Thread.__init__(self)
-        self.group_prefix = group_prefix
-        self.nid = node_id
+        self.group_prefix = Name.from_str(group_prefix)
+        self.nid = Name.from_str(node_id)
         self.sqlite_path = sqlite_path
-        self.cache_others = cache_others
         self.storage = None
         self.svs = None
         self.loop = None
         self.app = None
         self.failed = False
-    def run(self):
+    def run(self) -> None:
         def loop_task():
             self.app = NDNApp()
             try:
@@ -66,29 +57,30 @@ class SVS_Thread(threading.Thread):
         aio.set_event_loop(self.loop)
         self.loop.create_task(loop_task())
         self.loop.run_forever()
-    async def function(self):
+    async def function(self) -> None:
         self.storage = SqliteStorage(self.sqlite_path)
-        self.svs = SVS_Socket(self.app, self.storage, Name.from_str(self.group_prefix), Name.from_str(self.nid), self.missing_callback, self.cache_others)
-    def missing_callback(self, missing_list):
+        self.svs = SVS_Socket(self.app, self.storage, self.group_prefix, self.nid, self.missing_callback)
+    def missing_callback(self, missing_list) -> None:
         aio.ensure_future(self.on_missing_data(missing_list))
-    async def on_missing_data(self, missing_list):
+    async def on_missing_data(self, missing_list) -> None:
         for i in missing_list:
-            while i.lowSeqNum + 1 >= i.highSeqNum:
-                content_str = await self.svs.fetchData(i.nid, i.lowSeqNum)
+            nid = Name.from_str(i.nid)
+            while i.lowSeqNum <= i.highSeqNum:
+                content_str = await self.svs.fetchData(nid, i.lowSeqNum)
                 if content_str != None:
-                    content_str = i.nid[1:] + ": " + content_str.decode();
+                    content_str = i.nid + ": " + content_str.decode();
                     sys.stdout.write("\033[K")
                     sys.stdout.flush()
                     print(content_str)
                 i.lowSeqNum = i.lowSeqNum + 1
-    def get_svs(self):
+    def get_svs(self) -> Optional[SVS_Socket]:
         return self.svs
-    def has_failed(self):
+    def has_failed(self) -> None:
         return self.failed
 class Program:
     def __init__(self, args):
         self.args = args
-        self.svs_thread = SVS_Thread(self.args["group_prefix"],self.args["node_id"], self.args["sqlite_path"], self.args["cache_others"])
+        self.svs_thread = SVS_Thread(self.args["group_prefix"],self.args["node_id"], self.args["sqlite_path"])
         self.svs_thread.daemon = True
         self.svs_thread.start()
         while self.svs_thread.get_svs() == None:
@@ -112,7 +104,6 @@ def main() -> int:
     default_args = {
         'node_id':None,
         'group_prefix':'/svs',
-        'cache_others':False,
         'sqlite_path':'~/.ndn/svspy/sqlite3.db',
         'logging_level':'INFO',
         'logging_file': "SVS.log"
@@ -120,6 +111,8 @@ def main() -> int:
     cmd_args = parse_cmd_args()
     args = default_args.copy()
     args.update(cmd_args)
+    args["node_id"] = Name.to_str(Name.from_str(args["node_id"]))
+    args["group_prefix"] = Name.to_str(Name.from_str(args["group_prefix"]))
 
     log_levels = {
         'CRITICAL':logging.CRITICAL,
@@ -130,7 +123,7 @@ def main() -> int:
     }
     if args["logging_file"] != None:
         logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', \
-            filename=args["logging_file"]+"."+args["node_id"][1:], \
+            filename=args["logging_file"]+"."+args["node_id"][1:].replace("/","_"), \
             filemode='w+', \
             level=log_levels[args["logging_level"]])
     else:

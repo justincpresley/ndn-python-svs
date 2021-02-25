@@ -2,21 +2,24 @@ Questions:
   If a node completely shuts down (it becomes non-existent in our case), is there a way to detect this? or handle this?
 
 TODO:
-  create storage
-  create API
-  do logging
-  Learn more about SVS
+  Turn the VersionVector class into all TLV structures
+  HMAC
+  Change Storage
 
 STRUCTURE
 ├── LAYOUT.md
 ├── LICENSE.md
 ├── README.md
 ├── examples
+│   │── test.py
 │   └── chat_node.py
+├── storage
+│   │── leveldb.py
+│   │── monogodb.py
+│   │── sqlite.py
+│   └── storage.py
 └── svs
     ├── svs_socket.py
     ├── svs_logic.py
-    ├── svs_storage.py
-    ├── version_vector.py
-    ├── svs_logging.py
-    └── testing.py - Not used in actual implementation
+    ├── async_scheduler.py
+    └── version_vector.py
