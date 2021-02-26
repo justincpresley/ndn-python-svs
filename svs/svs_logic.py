@@ -84,9 +84,6 @@ class SVS_Logic:
         logging.info(f'SVS_Logic: received sync {Name.to_str(int_name)}')
         incomingVector = StateVector(int_name[-1])
 
-        logging.info(f'SVS_Logic: self: {self.vector.to_str()}')
-        logging.info(f'SVS_Logic: inco: {incomingVector.to_str()}')
-
         myVectorNew, incomingVectorNew = self.mergeStateVector(incomingVector)
         self.state = SVS_State.SUPRESSION if myVectorNew else SVS_State.STEADY
 
