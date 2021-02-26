@@ -8,7 +8,7 @@ from ndn.app import NDNApp
 from ndn.encoding import Component, Name, InterestParam, BinaryStr, FormalName
 from ndn.types import InterestNack, InterestTimeout, InterestCanceled, ValidationFailure
 # Custom Imports
-from .version_vector import VersionVector
+from .state_vector import StateVector
 from .async_scheduler import AsyncScheduler
 
 class MissingData:
@@ -31,7 +31,7 @@ class SVS_Logic:
         self.nid = nid
         self.updateCallback = updateCallback
         self.syncPrefix = self.groupPrefix
-        self.vector = VersionVector()
+        self.vector = StateVector()
         self.seqNum = 0
         self.interval = 30000 # time in milliseconds
         self.randomPercent = 0.1
@@ -42,7 +42,7 @@ class SVS_Logic:
         self.scheduler = AsyncScheduler(self.sendSyncInterest, self.interval, self.randomPercent)
         self.scheduler.skip_interval()
     async def asyncSendSyncInterest(self) -> None:
-        name = self.syncPrefix + Name.from_str(Component.to_str(Component.from_bytes(self.vector.encode())))
+        name = self.syncPrefix + [ Component.from_bytes(self.vector.encode()) ]
         logging.info(f'SVS_Logic: sent sync {Name.to_str(name)}')
         try:
             data_name, meta_info, content = await self.app.express_interest(
@@ -57,7 +57,7 @@ class SVS_Logic:
             pass
     def sendSyncInterest(self) -> None:
         aio.get_event_loop().create_task(self.asyncSendSyncInterest())
-    def mergeStateVector(self, otherVector:VersionVector) -> None:
+    def mergeStateVector(self, otherVector:StateVector) -> None:
         myVectorNew = False
         otherVectorNew = False
         missingList = []
@@ -88,7 +88,11 @@ class SVS_Logic:
         return (myVectorNew, otherVectorNew)
     def onSyncInterest(self, int_name:FormalName, int_param:InterestParam, _app_param:Optional[BinaryStr]) -> None:
         logging.info(f'SVS_Logic: received sync {Name.to_str(int_name)}')
-        incomingVector = VersionVector(int_name[-1])
+        incomingVector = StateVector(int_name[-1])
+
+        logging.info(f'SVS_Logic: self: {self.vector.to_str()}')
+        logging.info(f'SVS_Logic: inco: {incomingVector.to_str()}')
+
         myVectorNew, incomingVectorNew = self.mergeStateVector(incomingVector)
         self.state = SVS_State.SUPRESSION if myVectorNew else SVS_State.STEADY
 

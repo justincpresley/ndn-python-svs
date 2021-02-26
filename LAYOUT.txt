@@ -2,8 +2,11 @@ Questions:
   If a node completely shuts down (it becomes non-existent in our case), is there a way to detect this? or handle this?
 
 TODO:
-  Turn the VersionVector class into all TLV structures
+  lexicographically sort the StateVector
   HMAC
+
+  preserve: fetch current seq num from the database
+  master+preserve: get version vector from scoket
 
 STRUCTURE
 ├── LAYOUT.md
