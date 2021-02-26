@@ -50,3 +50,5 @@ class StateVector:
         return self.vector.encode()
     def keys(self) -> List[str]:
         return [bytes(i.node_id).decode() for i in self.vector.value]
+    def to_component(self) -> Component:
+        return Component.from_bytes(self.encode())

@@ -42,7 +42,7 @@ class SVS_Logic:
         self.scheduler = AsyncScheduler(self.sendSyncInterest, self.interval, self.randomPercent)
         self.scheduler.skip_interval()
     async def asyncSendSyncInterest(self) -> None:
-        name = self.syncPrefix + [ Component.from_bytes(self.vector.encode()) ]
+        name = self.syncPrefix + [ self.vector.to_component() ]
         logging.info(f'SVS_Logic: sent sync {Name.to_str(name)}')
         try:
             data_name, meta_info, content = await self.app.express_interest(
