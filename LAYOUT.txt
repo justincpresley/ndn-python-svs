@@ -1,5 +1,6 @@
 TODO:
   lexicographically sort the StateVector
+  number of retries at fetching data
   HMAC
 
 STRUCTURE
