@@ -47,13 +47,7 @@ class SVS_Logic:
         try:
             data_name, meta_info, content = await self.app.express_interest(
                 name, must_be_fresh=True, can_be_prefix=True, lifetime=1000)
-        except InterestNack as e:
-            pass
-        except InterestTimeout:
-            pass
-        except InterestCanceled:
-            pass
-        except ValidationFailure:
+        except (InterestNack, InterestTimeout, InterestCanceled, ValidationFailure) as e:
             pass
     def sendSyncInterest(self) -> None:
         aio.get_event_loop().create_task(self.asyncSendSyncInterest())

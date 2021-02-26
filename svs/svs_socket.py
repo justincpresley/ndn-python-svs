@@ -28,23 +28,28 @@ class SVS_Socket:
             _, _, content, _ = parse_data(data_bytes)
             logging.info(f'SVS_Socket: served data {bytes(content)}')
             self.app.put_data(int_name, content=bytes(content), freshness_period=500)
-    async def fetchData(self, nid:Name, seqNum:int) -> Optional[bytes]:
+    async def fetchData(self, nid:Name, seqNum:int, retries:int=0) -> Optional[bytes]:
         name = nid + self.groupPrefix + Name.from_str( "/epoch-"+str(seqNum) )
-        try:
-            logging.info(f'SVS_Socket: fetching data {Name.to_str(name)}')
-            ex_int_name, meta_info, content = await self.app.express_interest(name, must_be_fresh=True, can_be_prefix=False, lifetime=6000)
-            logging.info(f'SVS_Socket: received data {bytes(content)}')
-            return bytes(content) if content else None
-        except InterestNack as e:
-            logging.warning(f'SVS_Socket: nacked with reason={e.reason}')
-        except InterestTimeout:
-            logging.warning(f'SVS_Socket: timeout')
-        except InterestCanceled:
-            logging.warning(f'SVS_Socket: canceled')
-        except ValidationFailure:
-            logging.warning(f'SVS_Socket: data failed to validate')
-        except Exception as e:
-            logging.warning(f'SVS_Socket: unknown error has occured: {e}')
+        while retries+1 > 0:
+            try:
+                logging.info(f'SVS_Socket: fetching data {Name.to_str(name)}')
+                ex_int_name, meta_info, content = await self.app.express_interest(name, must_be_fresh=True, can_be_prefix=False, lifetime=6000)
+                logging.info(f'SVS_Socket: received data {bytes(content)}')
+                return bytes(content) if content else None
+            except InterestNack as e:
+                logging.warning(f'SVS_Socket: nacked with reason={e.reason}')
+            except InterestTimeout:
+                logging.warning(f'SVS_Socket: timeout')
+            except InterestCanceled:
+                logging.warning(f'SVS_Socket: canceled')
+            except ValidationFailure:
+                logging.warning(f'SVS_Socket: data failed to validate')
+            except Exception as e:
+                logging.warning(f'SVS_Socket: unknown error has occured: {e}')
+                
+            retries = retries - 1
+            if retries+1 > 0:
+                logging.warning(f'SVS_Socket: retrying fetching data')
         return None
     def publishData(self, data:bytes) -> None:
         name = self.dataPrefix + Name.from_str( "/epoch-"+str(self.logic.getCurrentSeqNum()+1) )
