@@ -5,15 +5,16 @@ import sys
 import time
 import logging
 import threading
-from typing import Optional
+from typing import Optional, List
 # NDN Imports
 from ndn.app import NDNApp
 from ndn.encoding import Name
 # Custom Imports
 sys.path.insert(0,'.')
 from svs.svs_socket import SVS_Socket
+from svs.svs_logic import MissingData
 
-def parse_cmd_args():
+def parse_cmd_args() -> dict:
     # Command Line Parser
     parser = ArgumentParser(add_help=False,description="An SVS Chat Node capable of syncing with others.")
     requiredArgs = parser.add_argument_group("required arguments")
@@ -57,9 +58,9 @@ class SVS_Thread(threading.Thread):
         self.loop.run_forever()
     async def function(self) -> None:
         self.svs = SVS_Socket(self.app, self.group_prefix, self.nid, self.missing_callback)
-    def missing_callback(self, missing_list) -> None:
+    def missing_callback(self, missing_list:List[MissingData]) -> None:
         aio.ensure_future(self.on_missing_data(missing_list))
-    async def on_missing_data(self, missing_list) -> None:
+    async def on_missing_data(self, missing_list:List[MissingData]) -> None:
         for i in missing_list:
             nid = Name.from_str(i.nid)
             while i.lowSeqNum <= i.highSeqNum:
@@ -75,7 +76,7 @@ class SVS_Thread(threading.Thread):
     def has_failed(self) -> None:
         return self.failed
 class Program:
-    def __init__(self, args):
+    def __init__(self, args:dict) -> None:
         self.args = args
         self.svs_thread = SVS_Thread(self.args["group_prefix"],self.args["node_id"])
         self.svs_thread.daemon = True
@@ -86,7 +87,7 @@ class Program:
                 sys.exit()
         self.svs = self.svs_thread.get_svs()
         print(f'SVS chat client started | {self.args["group_prefix"]} - {self.args["node_id"]} |')
-    def run(self):
+    def run(self) -> None:
         while True:
             try:
                 val = input("")
