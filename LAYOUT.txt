@@ -2,9 +2,6 @@ TODO:
   lexicographically sort the StateVector
   HMAC
 
-  preserve: fetch current seq num from the database
-  preserve: get version vector from scoket
-
 STRUCTURE
 ├── LAYOUT.md
 ├── LICENSE.md
