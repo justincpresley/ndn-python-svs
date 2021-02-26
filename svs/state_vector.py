@@ -1,6 +1,7 @@
 # Basic Libraries
 from typing import List, Optional
 from enum import Enum
+from operator import lt, gt
 # NDN Imports
 from ndn.encoding import Component, TlvModel, BytesField, UintField, RepeatedField, ModelField
 
@@ -28,7 +29,13 @@ class StateVector:
             svc = StateVectorComponentModel()
             svc.seq_num = seqNum
             svc.node_id = nid.encode()
-            self.vector.value.append(svc)
+
+            index = len(self.vector.value)
+            for i in range(len(self.vector.value)):
+                if bytes(self.vector.value[i].node_id).decode().lower() > nid.lower():
+                    index = i
+                    break
+            self.vector.value.insert(index, svc)
         else:
             for i in self.vector.value:
                 if bytes(i.node_id).decode() == nid:

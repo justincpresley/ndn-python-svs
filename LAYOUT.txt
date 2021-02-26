@@ -1,5 +1,4 @@
 TODO:
-  lexicographically sort the StateVector
   HMAC
 
 STRUCTURE
