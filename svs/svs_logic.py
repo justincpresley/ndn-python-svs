@@ -112,3 +112,5 @@ class SVS_Logic:
         self.scheduler.skip_interval()
     def getCurrentSeqNum(self) -> int:
         return self.seqNum
+    def getCurrentStateVector(self) -> StateVector:
+        return self.vector

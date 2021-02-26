@@ -1,14 +1,13 @@
 # Basic Libraries
 import logging
-import sys
 from typing import Optional, Callable
 # NDN Imports
 from ndn.app import NDNApp
 from ndn.encoding import Component, Name, make_data, MetaInfo, parse_data, InterestParam, BinaryStr, FormalName
 from ndn.types import InterestNack, InterestTimeout, InterestCanceled, ValidationFailure
 # Custom Imports
+from .state_vector import StateVector
 from .svs_logic import SVS_Logic
-sys.path.insert(0,'.')
 from .svs_storage import SVS_Storage
 
 class SVS_Socket:
@@ -53,3 +52,5 @@ class SVS_Socket:
         logging.info(f'SVS_Socket: publishing data {Name.to_str(name)}')
         self.storage.put_data_packet(name, data_packet)
         self.logic.updateState()
+    def getCurrentStateVector(self) -> StateVector:
+        return self.logic.getCurrentStateVector()
