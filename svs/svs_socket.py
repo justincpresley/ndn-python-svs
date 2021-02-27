@@ -58,4 +58,4 @@ class SVS_Socket:
         self.storage.put_data_packet(name, data_packet)
         self.logic.updateState()
     def getCurrentStateVector(self) -> StateVector:
-        return self.logic.getCurrentStateVector()
+        return self.logic.getCurrentStateVector().copy()
