@@ -1,7 +1,6 @@
 # Basic Libraries
-from typing import List, Optional
+from typing import List
 from enum import Enum
-from operator import lt, gt
 # NDN Imports
 from ndn.encoding import Component, TlvModel, BytesField, UintField, RepeatedField, ModelField
 
