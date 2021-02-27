@@ -34,9 +34,11 @@ The default (unless specified) **group prefix** is `/svs` for our examples.
 
 ### Branches
 
-* [master](https://github.com/justincpresley/ndn-python-svs) : Does not preserve cache between runs
+* [master](https://github.com/justincpresley/ndn-python-svs) : The Default Protocol Only, no other features from other branches
 
-* [preserve](https://github.com/justincpresley/ndn-python-svs/tree/preserve) : Does preserve cache via database `~/.ndn/svspy` between runs 
+* [preserve](https://github.com/justincpresley/ndn-python-svs/tree/preserve) : Does preserve cache via database `~/.ndn/svspy` between runs
+
+* [share](https://github.com/justincpresley/ndn-python-svs/tree/share) : Able to cache other node's messages in case one goes down
 
 ## License and Authors
 
