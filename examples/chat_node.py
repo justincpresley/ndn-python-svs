@@ -112,11 +112,11 @@ def main() -> int:
     args["group_prefix"] = Name.to_str(Name.from_str(args["group_prefix"]))
 
     log_levels = {
-        'CRITICAL':logging.CRITICAL,
-        'ERROR':logging.ERROR,
-        'WARNING':logging.WARNING,
-        'INFO':logging.INFO,
-        'DEBUG':logging.DEBUG
+        'CRITICAL': logging.CRITICAL,
+        'ERROR'   : logging.ERROR,
+        'WARNING' : logging.WARNING,
+        'INFO'    : logging.INFO,
+        'DEBUG'   : logging.DEBUG
     }
     if args["logging_file"] != None:
         logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', \
