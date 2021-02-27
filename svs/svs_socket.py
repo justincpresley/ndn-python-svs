@@ -3,7 +3,7 @@ import logging
 from typing import Optional, Callable
 # NDN Imports
 from ndn.app import NDNApp
-from ndn.encoding import Component, Name, make_data, MetaInfo, parse_data, InterestParam, BinaryStr, FormalName
+from ndn.encoding import Name, make_data, MetaInfo, parse_data, InterestParam, BinaryStr, FormalName
 from ndn.types import InterestNack, InterestTimeout, InterestCanceled, ValidationFailure
 # Custom Imports
 from .state_vector import StateVector
