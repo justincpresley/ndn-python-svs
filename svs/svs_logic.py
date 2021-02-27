@@ -5,7 +5,7 @@ from enum import Enum
 from typing import Callable, Optional
 # NDN Imports
 from ndn.app import NDNApp
-from ndn.encoding import Component, Name, InterestParam, BinaryStr, FormalName
+from ndn.encoding import Name, InterestParam, BinaryStr, FormalName
 from ndn.types import InterestNack, InterestTimeout, InterestCanceled, ValidationFailure
 # Custom Imports
 from .state_vector import StateVector

@@ -8,15 +8,13 @@ from ndn.name_tree import NameTrie
 
 class SVS_Storage:
     cache = NameTrie()
-    def _time_ms(self) -> int:
+    def time_ms(self) -> int:
         return int(time.time() * 1000)
     def put_data_packet(self, name:NonStrictName, data_packet:bytes) -> None:
         _, meta_info, _, _ = parse_data(data_packet)
-        expire_time_ms = self._time_ms()
+        expire_time_ms = self.time_ms()
         if meta_info.freshness_period:
             expire_time_ms += meta_info.freshness_period
-
-        # write data packet and freshness_period to cache
         name = Name.normalize(name)
         self.cache[name] = (data_packet, expire_time_ms)
         logging.info(f'SVS_Storage: cache save {Name.to_str(name)}')
@@ -25,14 +23,14 @@ class SVS_Storage:
         try:
             if not can_be_prefix:
                 data, expire_time_ms = self.cache[name]
-                if not must_be_fresh or expire_time_ms > self._time_ms():
+                if not must_be_fresh or expire_time_ms > self.time_ms():
                     logging.info('SVS_Storage: get from cache')
                     return data
             else:
                 it = self.cache.itervalues(prefix=name, shallow=True)
                 while True:
                     data, expire_time_ms = next(it)
-                    if not must_be_fresh or expire_time_ms > self._time_ms():
+                    if not must_be_fresh or expire_time_ms > self.time_ms():
                         logging.info('SVS_Storage: get from cache')
                         return data
         except (KeyError, StopIteration):
