@@ -28,7 +28,7 @@ Before you run the program, you must register the group prefix as multi-cast (ev
 ```
 nfdc strategy set <group-prefix> /localhost/nfd/strategy/multicast/%FD%03
 ```
-The default **group prefix** is `/svs` for our examples.
+The default (unless specified) **group prefix** is `/svs` for our examples.
 
 [More on setting different strategies (like mutli-cast) for prefixes.](https://named-data.net/doc/NFD/current/manpages/nfdc-strategy.html)
 
@@ -36,7 +36,7 @@ The default **group prefix** is `/svs` for our examples.
 
 * [master](https://github.com/justincpresley/ndn-python-svs) : Does not preserve cache between runs
 
-* [preserve](https://github.com/justincpresley/ndn-python-svs/tree/preserve) : Does preserve cache via database between runs 
+* [preserve](https://github.com/justincpresley/ndn-python-svs/tree/preserve) : Does preserve cache via database( "~/.ndn/svspy" ) between runs 
 
 ## License and Authors
 
