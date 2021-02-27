@@ -103,7 +103,7 @@ def main() -> int:
         'node_id'      : None,
         'group_prefix' : '/svs',
         'logging_level': 'INFO',
-        'logging_file' : "SVS.log"
+        'logging_file' : 'SVS.log'
     }
     cmd_args = parse_cmd_args()
     args = default_args.copy()
