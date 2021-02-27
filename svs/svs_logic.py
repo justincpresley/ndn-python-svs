@@ -26,17 +26,17 @@ class SVS_State(Enum):
 class SVS_Logic:
     def __init__(self, app:NDNApp, groupPrefix:Name, nid:Name, updateCallback:Callable) -> None:
         logging.info(f'SVS_Logic: started svs logic')
-        self.state          = SVS_State.STEADY
-        self.app            = app
-        self.groupPrefix    = groupPrefix
-        self.nid            = nid
+        self.state = SVS_State.STEADY
+        self.app = app
+        self.groupPrefix = groupPrefix
+        self.nid = nid
         self.updateCallback = updateCallback
-        self.syncPrefix     = self.groupPrefix
-        self.vector         = StateVector()
-        self.seqNum             = 0
-        self.interval           = 30000 # time in milliseconds
-        self.randomPercent      = 0.1
-        self.briefInterval      = 200 # time in milliseconds
+        self.syncPrefix = self.groupPrefix
+        self.vector = StateVector()
+        self.seqNum = 0
+        self.interval = 30000 # time in milliseconds
+        self.randomPercent = 0.1
+        self.briefInterval = 200 # time in milliseconds
         self.briefRandomPercent = 0.5
         self.app.route(self.syncPrefix)(self.onSyncInterest)
         logging.info(f'SVS_Logic: started listening to {Name.to_str(self.syncPrefix)}')

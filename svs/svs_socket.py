@@ -13,12 +13,12 @@ from .svs_storage import SVS_Storage
 class SVS_Socket:
     def __init__(self, app:NDNApp, groupPrefix:Name, nid:Name, updateCallback:Callable) -> None:
         logging.info(f'SVS_Socket: started svs socket')
-        self.app            = app
-        self.storage        = SVS_Storage()
-        self.groupPrefix    = groupPrefix
-        self.nid            = nid
+        self.app = app
+        self.storage = SVS_Storage()
+        self.groupPrefix = groupPrefix
+        self.nid = nid
         self.updateCallback = updateCallback
-        self.dataPrefix     = self.nid + self.groupPrefix
+        self.dataPrefix = self.nid + self.groupPrefix
         self.logic = SVS_Logic(self.app, self.groupPrefix, self.nid, self.updateCallback)
         self.app.route(self.dataPrefix)(self.onDataInterest)
         logging.info(f'SVS_Socket: started listening to {Name.to_str(self.dataPrefix)}')

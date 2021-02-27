@@ -8,13 +8,13 @@ import time
 class AsyncScheduler:
     def __init__(self, function:Callable, interval:int, randomPercent:float) -> None:
         logging.info(f'AsyncScheduler: started scheduler for an async function')
-        self.function        = function
+        self.function = function
         self.defaultInterval = interval # milliseconds
-        self.randomPercent   = randomPercent # float 0-1
-        self.startTime       = None
-        self.stop            = False
-        self.interval        = self.defaultInterval + round( uniform(-self.randomPercent,self.randomPercent)*self.defaultInterval )
-        self.task            = aio.get_event_loop().create_task(self.target())
+        self.randomPercent = randomPercent # float 0-1
+        self.startTime = None
+        self.stop = False
+        self.interval = self.defaultInterval + round( uniform(-self.randomPercent,self.randomPercent)*self.defaultInterval )
+        self.task = aio.get_event_loop().create_task(self.target())
     async def target(self) -> None:
         while not self.stop:
             self.startTime = self.get_current_milli_time()

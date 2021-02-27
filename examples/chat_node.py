@@ -36,12 +36,12 @@ class SVS_Thread(threading.Thread):
     def __init__(self, group_prefix:str, node_id:str) -> None:
         threading.Thread.__init__(self)
         self.group_prefix = Name.from_str(group_prefix)
-        self.nid          = Name.from_str(node_id)
+        self.nid = Name.from_str(node_id)
         self.storage = None
-        self.svs     = None
-        self.loop    = None
-        self.app     = None
-        self.failed  = False
+        self.svs = None
+        self.loop = None
+        self.app = None
+        self.failed = False
     def run(self) -> None:
         def loop_task():
             self.app = NDNApp()
@@ -77,7 +77,7 @@ class SVS_Thread(threading.Thread):
         return self.failed
 class Program:
     def __init__(self, args:dict) -> None:
-        self.args       = args
+        self.args = args
         self.svs_thread = SVS_Thread(self.args["group_prefix"],self.args["node_id"])
         self.svs_thread.daemon = True
         self.svs_thread.start()
@@ -100,10 +100,10 @@ class Program:
 
 def main() -> int:
     default_args = {
-        'node_id'       : None,
-        'group_prefix'  : '/svs',
-        'logging_level' : 'INFO',
-        'logging_file'  : "SVS.log"
+        'node_id'      : None,
+        'group_prefix' : '/svs',
+        'logging_level': 'INFO',
+        'logging_file' : "SVS.log"
     }
     cmd_args = parse_cmd_args()
     args = default_args.copy()
@@ -112,11 +112,11 @@ def main() -> int:
     args["group_prefix"] = Name.to_str(Name.from_str(args["group_prefix"]))
 
     log_levels = {
-        'CRITICAL': logging.CRITICAL,
-        'ERROR'   : logging.ERROR,
-        'WARNING' : logging.WARNING,
-        'INFO'    : logging.INFO,
-        'DEBUG'   : logging.DEBUG
+        'CRITICAL':logging.CRITICAL,
+        'ERROR'   :logging.ERROR,
+        'WARNING' :logging.WARNING,
+        'INFO'    :logging.INFO,
+        'DEBUG'   :logging.DEBUG
     }
     if args["logging_file"] != None:
         logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', \
