@@ -36,7 +36,7 @@ The default (unless specified) **group prefix** is `/svs` for our examples.
 
 * [master](https://github.com/justincpresley/ndn-python-svs) : Does not preserve cache between runs
 
-* [preserve](https://github.com/justincpresley/ndn-python-svs/tree/preserve) : Does preserve cache via database( "~/.ndn/svspy" ) between runs 
+* [preserve](https://github.com/justincpresley/ndn-python-svs/tree/preserve) : Does preserve cache via database `~/.ndn/svspy` between runs 
 
 ## License and Authors
 
