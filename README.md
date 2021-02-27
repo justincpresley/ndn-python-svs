@@ -20,7 +20,7 @@ To try out the chat demo application, follow the below steps.
 
 To create a chat client, simply run this in the home directory:
 ```
-python3 examples/chat_node.py -n NODE_NAME [-h] [-gp GROUP_PREFIX]
+python3 examples/chat_node.py -n NODE_NAME [-gp GROUP_PREFIX] [-h]
 ```
 You may create as many of these as possible and all clients will sync up using SVS.
 
