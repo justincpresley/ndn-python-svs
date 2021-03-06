@@ -10,7 +10,7 @@ requirements = ['python-ndn>=0.3a1']
 setup(
     name='ndn-svs',
     version='0.0.1',
-    description='The State Vector Sync (SVS) protocol in NDN',
+    description='The NDN State Vector Sync (SVS) protocol',
     url='https://github.com/justincpresley/ndn-python-svs',
     author='Justin C Presley',
     author_email='justincpresley@gmail.com',
@@ -24,7 +24,7 @@ setup(
         'Topic :: Internet',
         'Topic :: System :: Networking',
 
-        'License :: OSI Approved :: GNU Lesser General Public License V2',
+        'License :: OSI Approved :: GNU Lesser General Public License v2 (LGPLv2)',
 
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
