@@ -9,7 +9,7 @@ with io.open("src/svs/__init__.py", "rt", encoding="utf8") as f:
 requirements = ['python-ndn>=0.3a1']
 setup(
     name='ndn-svs',
-    version='0.0.1',
+    version=version,
     description='The NDN State Vector Sync (SVS) protocol',
     url='https://github.com/justincpresley/ndn-python-svs',
     author='Justin C Presley',

@@ -1,4 +1,4 @@
-__version__ = "0.3a1"
+__version__ = "0.0.1"
 
 from .svs import SVSync
 from .svs_shared import SVSyncShared
