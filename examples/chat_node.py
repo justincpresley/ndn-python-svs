@@ -11,9 +11,9 @@ from ndn.app import NDNApp
 from ndn.encoding import Name
 # Custom Imports
 sys.path.insert(0,'.')
-from svs.svsync import SVSync
-from svs.svsync_shared import SVSyncShared
-from svs.svsync_core import MissingData
+from svs.svs import SVSync
+from svs.svs_shared import SVSyncShared
+from svs.svs_core import MissingData
 
 def parse_cmd_args() -> dict:
     # Command Line Parser

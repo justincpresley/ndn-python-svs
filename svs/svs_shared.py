@@ -6,8 +6,8 @@ from ndn.app import NDNApp
 from ndn.encoding import Name, Component, make_data, MetaInfo, parse_data, InterestParam, BinaryStr, FormalName
 from ndn.types import InterestNack, InterestTimeout, InterestCanceled, ValidationFailure
 # Custom Imports
-from .svsync_base import SVSyncBase
-from .svsync_storage_base import SVSyncStorageBase
+from .svs_base import SVSyncBase
+from .svs_storage_base import SVSyncStorageBase
 
 class SVSyncShared(SVSyncBase):
     def __init__(self, app:NDNApp, groupPrefix:Name, nid:Name, updateCallback:Callable, cacheOthers:bool, storage:Optional[SVSyncStorageBase]=None) -> None:

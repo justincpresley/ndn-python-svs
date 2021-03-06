@@ -7,9 +7,9 @@ from ndn.encoding import Name, make_data, MetaInfo, parse_data, InterestParam, B
 from ndn.types import InterestNack, InterestTimeout, InterestCanceled, ValidationFailure
 # Custom Imports
 from .state_vector import StateVector
-from .svsync_core import SVSyncCore
-from .svsync_storage import SVSyncStorage
-from .svsync_storage_base import SVSyncStorageBase
+from .svs_core import SVSyncCore
+from .svs_storage import SVSyncStorage
+from .svs_storage_base import SVSyncStorageBase
 
 # Abstract Class to Derive Different SVSyncs from
 class SVSyncBase():

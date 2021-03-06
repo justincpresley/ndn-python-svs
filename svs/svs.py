@@ -4,8 +4,8 @@ from typing import Callable, Optional
 from ndn.app import NDNApp
 from ndn.encoding import Name
 # Custom Imports
-from .svsync_base import SVSyncBase
-from .svsync_storage_base import SVSyncStorageBase
+from .svs_base import SVSyncBase
+from .svs_storage_base import SVSyncStorageBase
 
 class SVSync(SVSyncBase):
     def __init__(self, app:NDNApp, groupPrefix:Name, nid:Name, updateCallback:Callable, storage:Optional[SVSyncStorageBase]=None) -> None:
