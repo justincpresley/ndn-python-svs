@@ -18,6 +18,7 @@ class SVSyncShared(SVSyncBase):
         if not self.cacheOthers:
             preDataPrefix = preDataPrefix + nid
         super().__init__(app, groupPrefix, groupPrefix+[Component.from_str("s")], preDataPrefix, nid, updateCallback, storage)
+        self.dataPrefix = groupPrefix + [Component.from_str("d")]
     async def fetchData(self, nid:Name, seqNum:int, retries:int=0) -> Optional[bytes]:
         name = self.dataPrefix + nid + Name.from_str( "/epoch-"+str(seqNum) )
         while retries+1 > 0:
@@ -46,8 +47,8 @@ class SVSyncShared(SVSyncBase):
                 logging.warning(f'SVS_Socket: retrying fetching data')
         return None
     def publishData(self, data:bytes) -> None:
-        name = self.dataPrefix + self.nid + Name.from_str( "/epoch-"+str(self.logic.getCurrentSeqNum()+1) )
+        name = self.dataPrefix + self.nid + Name.from_str( "/epoch-"+str(self.core.getSeqNum()+1) )
         data_packet = make_data(name, MetaInfo(freshness_period=5000), content=data)
-        logging.info(f'SVS_Socket: publishing self data {Name.to_str(name)}')
+        logging.info(f'SVSync: publishing data {Name.to_str(name)}')
         self.storage.put_data_packet(name, data_packet)
-        self.logic.updateState()
+        self.core.updateStateVector(self.core.getSeqNum()+1)
