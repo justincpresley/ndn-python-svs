@@ -12,4 +12,4 @@ class SVSync(SVSyncBase):
 
 class SVSyncShared(SVSyncBase):
     def __init__(self, app:NDNApp, groupPrefix:Name, nid:Name, updateCallback:Callable) -> None:
-        super().__init__(app, groupPrefix, groupPrefix, groupPrefix, nid, updateCallback)
+        super().__init__(app, groupPrefix, groupPrefix+[Component.from_str("s")], groupPrefix+ [Component.from_str("d")], nid, updateCallback)
