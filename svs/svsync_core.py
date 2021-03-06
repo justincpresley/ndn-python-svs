@@ -94,7 +94,7 @@ class SVSyncCore:
         else:
             delay = self.briefInterval + round( uniform(-self.briefRandomPercent,self.briefRandomPercent)*self.briefInterval )
             if self.scheduler.get_time_left() > delay:
-                self.scheduler.make_time_left(delay)
+                self.scheduler.set_cycle(delay)
         logging.info(f'SVSyncCore: state {self.state.name}')
         logging.info(f'SVSyncCore: vector {self.vector.to_str()}')
     def updateStateVector(self, seqNum:int, nid:Name=None) -> None:

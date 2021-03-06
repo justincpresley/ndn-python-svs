@@ -12,6 +12,7 @@ from ndn.encoding import Name
 # Custom Imports
 sys.path.insert(0,'.')
 from svs.svsync import SVSync
+from svs.svsync_shared import SVSyncShared
 from svs.svsync_core import MissingData
 
 def parse_cmd_args() -> dict:
@@ -57,7 +58,7 @@ class SVS_Thread(threading.Thread):
         self.loop.create_task(loop_task())
         self.loop.run_forever()
     async def function(self) -> None:
-        self.svs = SVSync(self.app, self.group_prefix, self.nid, self.missing_callback)
+        self.svs = SVSyncShared(self.app, self.group_prefix, self.nid, self.missing_callback, True)
     def missing_callback(self, missing_list:List[MissingData]) -> None:
         aio.ensure_future(self.on_missing_data(missing_list))
     async def on_missing_data(self, missing_list:List[MissingData]) -> None:
