@@ -9,13 +9,14 @@ from ndn.types import InterestNack, InterestTimeout, InterestCanceled, Validatio
 from .state_vector import StateVector
 from .svsync_core import SVSyncCore
 from .svsync_storage import SVSyncStorage
+from .svsync_storage_base import SVSyncStorageBase
 
 # Abstract Class to Derive Different SVSyncs from
 class SVSyncBase():
-    def __init__(self, app:NDNApp, groupPrefix:Name, syncPrefix:Name, dataPrefix:Name, nid:Name, updateCallback:Callable) -> None:
+    def __init__(self, app:NDNApp, groupPrefix:Name, syncPrefix:Name, dataPrefix:Name, nid:Name, updateCallback:Callable, storage:Optional[SVSyncStorageBase]=None) -> None:
         logging.info(f'SVSync: started svsync')
         self.app = app
-        self.storage = SVSyncStorage()
+        self.storage = SVSyncStorage() if not storage else storage
         self.groupPrefix = groupPrefix
         self.syncPrefix = syncPrefix
         self.dataPrefix = dataPrefix
