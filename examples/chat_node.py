@@ -11,8 +11,8 @@ from ndn.app import NDNApp
 from ndn.encoding import Name
 # Custom Imports
 sys.path.insert(0,'.')
-from svs.svs_socket import SVS_Socket
-from svs.svs_logic import MissingData
+from svs.svsync import SVSync
+from svs.svsync_core import MissingData
 
 def parse_cmd_args() -> dict:
     # Command Line Parser
@@ -57,7 +57,7 @@ class SVS_Thread(threading.Thread):
         self.loop.create_task(loop_task())
         self.loop.run_forever()
     async def function(self) -> None:
-        self.svs = SVS_Socket(self.app, self.group_prefix, self.nid, self.missing_callback)
+        self.svs = SVSync(self.app, self.group_prefix, self.nid, self.missing_callback)
     def missing_callback(self, missing_list:List[MissingData]) -> None:
         aio.ensure_future(self.on_missing_data(missing_list))
     async def on_missing_data(self, missing_list:List[MissingData]) -> None:
@@ -71,7 +71,7 @@ class SVS_Thread(threading.Thread):
                     sys.stdout.flush()
                     print(content_str)
                 i.lowSeqNum = i.lowSeqNum + 1
-    def get_svs(self) -> Optional[SVS_Socket]:
+    def get_svs(self) -> Optional[SVSync]:
         return self.svs
     def has_failed(self) -> None:
         return self.failed
