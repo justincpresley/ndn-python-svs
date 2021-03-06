@@ -3,14 +3,14 @@ import io
 import re
 from setuptools import setup, find_packages
 
-with io.open("src/svs/__init__.py", "rt", encoding="utf8") as f:
+with io.open("src/ndn/svs/__init__.py", "rt", encoding="utf8") as f:
     version = re.search(r'__version__ = "(.*?)"', f.read()).group(1)
 
 requirements = ['python-ndn>=0.3a1']
 setup(
     name='ndn-svs',
     version=version,
-    description='The NDN State Vector Sync (SVS) protocol',
+    description='The NDN State Vector Sync (SVS) Protocol in Python 3',
     url='https://github.com/justincpresley/ndn-python-svs',
     author='Justin C Presley',
     author_email='justincpresley@gmail.com',
