@@ -31,7 +31,7 @@ setup(
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
     ],
-    keywords='NDN SVS StateVectorProtocol',
+    keywords='NDN SVS',
     packages=find_packages('src'),
     package_dir={'': 'src'},
     install_requires=requirements,

@@ -1,7 +1,7 @@
 import sys
 import pytest
 sys.path.insert(0,'.')
-from svs.state_vector import StateVector
+from src.svs.state_vector import StateVector
 
 def test_state_vector_ordering():
     sv1 = StateVector()
