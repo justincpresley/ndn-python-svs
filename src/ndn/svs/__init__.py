@@ -1,5 +1,3 @@
-__version__ = "0.0.2"
-
 from .svs import SVSync
 from .svs_shared import SVSyncShared
 from .svs_base import SVSyncBase
