@@ -10,7 +10,7 @@ from .state_vector import StateVector
 from .svsync_core import SVSyncCore
 from .svsync_storage import SVSyncStorage
 
-# Abstract Class to Derive Different Databases from
+# Abstract Class to Derive Different SVSyncs from
 class SVSyncBase():
     def __init__(self, app:NDNApp, groupPrefix:Name, syncPrefix:Name, dataPrefix:Name, nid:Name, updateCallback:Callable) -> None:
         logging.info(f'SVSync: started svsync')
