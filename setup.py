@@ -6,7 +6,7 @@ from setuptools import setup, find_packages
 with io.open("src/ndn/__init__.py", "rt", encoding="utf8") as f:
     version = re.search(r'__version__ = "(.*?)"', f.read()).group(1)
 
-with io.open("README.md, "rt", encoding="utf8") as f:
+with io.open("README.md", "rt", encoding="utf8") as f:
     long_description = f.read()
 
 requirements = ['python-ndn>=0.3a1']
