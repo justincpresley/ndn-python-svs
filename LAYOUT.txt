@@ -1,15 +1,31 @@
 TODO:
   HMAC
+  Use a External Storage Library
+  Thread Classes
+  Update README / pip library
 
 STRUCTURE
+├── .git
+├── .github
+├── .gitignore
+├── setup.py
 ├── LAYOUT.md
 ├── LICENSE.md
 ├── README.md
 ├── examples
 │   └── chat_node.py
-└── svs
-    ├── svs_socket.py
-    ├── svs_logic.py
-    ├── svs_storage.py
-    ├── async_scheduler.py
-    └── state_vector.py
+├── tests
+│   └── test_state_vector.py
+└── src
+    └── ndn
+        ├── __init__.py
+        └── svs
+            ├── __init__.py
+            ├── svs_base.py
+            ├── svs_core.py
+            ├── svs_shared.py
+            ├── svs_storage_base.py
+            ├── svs_storage.py
+            ├── svs.py
+            ├── async_scheduler.py
+            └── state_vector.py
