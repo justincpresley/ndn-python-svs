@@ -28,7 +28,7 @@ Download the python pip library [ndn-svs](https://pypi.org/project/ndn-svs/)
 
 Clone or Fork the github repository [ndn-python-svs](https://github.com/justincpresley/ndn-python-svs)
 
-#### Examples
+### Examples
 
 To try out the chat demo application from source, follow the below steps.
 
