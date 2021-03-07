@@ -6,14 +6,21 @@ from setuptools import setup, find_packages
 with io.open("src/ndn/__init__.py", "rt", encoding="utf8") as f:
     version = re.search(r'__version__ = "(.*?)"', f.read()).group(1)
 
+with io.open("README.md, "rt", encoding="utf8") as f:
+    long_description = f.read()
+
 requirements = ['python-ndn>=0.3a1']
 setup(
     name='ndn-svs',
     version=version,
     description='The NDN State Vector Sync (SVS) Protocol in Python 3',
+    long_description=long_description,
+    long_description_content_type='text/markdown',
     url='https://github.com/justincpresley/ndn-python-svs',
     author='Justin C Presley',
     author_email='justincpresley@gmail.com',
+    maintainer='Justin C Presley',
+    maintainer_email='justincpresley@gmail.com',
     download_url='https://pypi.python.org/pypi/ndn-svs',
     license='LGPL-2.1 License',
     classifiers=[
