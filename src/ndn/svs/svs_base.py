@@ -6,18 +6,16 @@ from ndn.app import NDNApp
 from ndn.encoding import Name, make_data, MetaInfo, parse_data, InterestParam, BinaryStr, FormalName
 from ndn.types import InterestNack, InterestTimeout, InterestCanceled, ValidationFailure
 # Custom Imports
-from .state_vector import StateVector
 from .svs_core import SVSyncCore
 from .svs_storage import SVSyncStorage
 from .svs_storage_base import SVSyncStorageBase
 
 # Abstract Class to Derive Different SVSyncs from
 class SVSyncBase():
-    def __init__(self, app:NDNApp, groupPrefix:Name, syncPrefix:Name, dataPrefix:Name, nid:Name, updateCallback:Callable, storage:Optional[SVSyncStorageBase]=None) -> None:
+    def __init__(self, app:NDNApp, syncPrefix:Name, dataPrefix:Name, nid:Name, updateCallback:Callable, storage:Optional[SVSyncStorageBase]=None) -> None:
         logging.info(f'SVSync: started svsync')
         self.app = app
         self.storage = SVSyncStorage() if not storage else storage
-        self.groupPrefix = groupPrefix
         self.syncPrefix = syncPrefix
         self.dataPrefix = dataPrefix
         self.nid = nid
@@ -32,7 +30,7 @@ class SVSyncBase():
             logging.info(f'SVSync: served data {bytes(content)}')
             self.app.put_data(int_name, content=bytes(content), freshness_period=500)
     async def fetchData(self, nid:Name, seqNum:int, retries:int=0) -> Optional[bytes]:
-        name = nid + self.groupPrefix + Name.from_str( "/epoch-"+str(seqNum) )
+        name = self.getDataName(nid, seqNum)
         while retries+1 > 0:
             try:
                 logging.info(f'SVSync: fetching data {Name.to_str(name)}')
@@ -55,10 +53,12 @@ class SVSyncBase():
                 logging.info(f'SVSync: retrying fetching data')
         return None
     def publishData(self, data:bytes) -> None:
-        name = self.dataPrefix + Name.from_str( "/epoch-"+str(self.core.getSeqNum()+1) )
+        name = self.getDataName(self.nid, self.core.getSeqNum()+1)
         data_packet = make_data(name, MetaInfo(freshness_period=5000), content=data)
         logging.info(f'SVSync: publishing data {Name.to_str(name)}')
         self.storage.put_data_packet(name, data_packet)
         self.core.updateStateVector(self.core.getSeqNum()+1)
     def getCore(self) -> SVSyncCore:
         return self.core
+    def getDataName(self, nid:Name, seqNum:int) -> Name:
+        raise NotImplementedError

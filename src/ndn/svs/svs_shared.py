@@ -12,13 +12,12 @@ from .svs_storage_base import SVSyncStorageBase
 class SVSyncShared(SVSyncBase):
     def __init__(self, app:NDNApp, groupPrefix:Name, nid:Name, updateCallback:Callable, cacheOthers:bool, storage:Optional[SVSyncStorageBase]=None) -> None:
         self.cacheOthers = cacheOthers
-        preDataPrefix = groupPrefix + [Component.from_str("d")]
-        if not self.cacheOthers:
-            preDataPrefix = preDataPrefix + nid
-        super().__init__(app, groupPrefix, groupPrefix+[Component.from_str("s")], preDataPrefix, nid, updateCallback, storage)
-        self.dataPrefix = groupPrefix + [Component.from_str("d")]
+        self.groupPrefix = groupPrefix
+        preDataPrefix = groupPrefix + [Component.from_str("d")] if self.cacheOthers else groupPrefix + [Component.from_str("d")] + nid
+        preSyncPrefix = groupPrefix + [Component.from_str("s")]
+        super().__init__(app, preSyncPrefix, preDataPrefix, nid, updateCallback, storage)
     async def fetchData(self, nid:Name, seqNum:int, retries:int=0) -> Optional[bytes]:
-        name = self.dataPrefix + nid + Name.from_str( "/epoch-"+str(seqNum) )
+        name = self.getDataName(nid, seqNum)
         while retries+1 > 0:
             try:
                 logging.info(f'SVS_Socket: fetching data {Name.to_str(name)}')
@@ -44,9 +43,5 @@ class SVSyncShared(SVSyncBase):
             if retries+1 > 0:
                 logging.warning(f'SVS_Socket: retrying fetching data')
         return None
-    def publishData(self, data:bytes) -> None:
-        name = self.dataPrefix + self.nid + Name.from_str( "/epoch-"+str(self.core.getSeqNum()+1) )
-        data_packet = make_data(name, MetaInfo(freshness_period=5000), content=data)
-        logging.info(f'SVSync: publishing data {Name.to_str(name)}')
-        self.storage.put_data_packet(name, data_packet)
-        self.core.updateStateVector(self.core.getSeqNum()+1)
+    def getDataName(self, nid:Name, seqNum:int) -> Name:
+        return ( self.groupPrefix + [Component.from_str("d")] + nid + Name.from_str("/epoch-"+str(seqNum)) )

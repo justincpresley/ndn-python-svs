@@ -9,4 +9,9 @@ from .svs_storage_base import SVSyncStorageBase
 
 class SVSync(SVSyncBase):
     def __init__(self, app:NDNApp, groupPrefix:Name, nid:Name, updateCallback:Callable, storage:Optional[SVSyncStorageBase]=None) -> None:
-        super().__init__(app, groupPrefix, groupPrefix, nid+groupPrefix, nid, updateCallback, storage)
+        self.groupPrefix = groupPrefix
+        preSyncPrefix = self.groupPrefix
+        preDataPrefix = nid + self.groupPrefix
+        super().__init__(app, preSyncPrefix, preDataPrefix, nid, updateCallback, storage)
+    def getDataName(self, nid:Name, seqNum:int) -> Name:
+        return ( nid + self.groupPrefix + Name.from_str( "/epoch-"+str(seqNum) ) )
