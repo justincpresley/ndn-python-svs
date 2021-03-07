@@ -25,14 +25,11 @@ setup(
     license='LGPL-2.1 License',
     classifiers=[
         'Development Status :: 4 - Beta',
-
         'Intended Audience :: Developers',
         'Topic :: Software Development :: Libraries',
         'Topic :: Internet',
         'Topic :: System :: Networking',
-
         'License :: OSI Approved :: GNU Lesser General Public License v2 (LGPLv2)',
-
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
