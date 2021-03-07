@@ -3,7 +3,7 @@ from typing import Callable
 import asyncio as aio
 from random import uniform
 import logging
-import time
+from time import time
 
 class AsyncScheduler:
     def __init__(self, function:Callable, interval:int, randomPercent:float) -> None:
@@ -33,4 +33,4 @@ class AsyncScheduler:
     def get_time_left(self) -> int:
         return (self.startTime + self.interval - self.get_current_milli_time())
     def get_current_milli_time(self) -> int:
-        return round(time.time() * 1000)
+        return round(time() * 1000)
