@@ -44,7 +44,7 @@ Before you run the program, you must register the group prefix as multi-cast (ev
 ```
 nfdc strategy set <group-prefix> /localhost/nfd/strategy/multicast/%FD%03
 ```
-The default (unless specified) **group prefix** is `/svs` for our build-in examples.
+The default (unless specified) **group prefix** is `/svs` for any build-in examples.
 
 [More on setting different strategies (like mutli-cast) for prefixes.](https://named-data.net/doc/NFD/current/manpages/nfdc-strategy.html)
 
