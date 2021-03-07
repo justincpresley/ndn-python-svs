@@ -2,7 +2,7 @@
 
 This python library implements the [State Vector Sync (SVS) protocol](https://named-data.github.io/StateVectorSync/) to synchronise states between multiple clients over NDN for distributed realtime applications.
 
-> This is an official implementation but considered 'experimental'.
+> This is an official implementation but considered 'experimental'. If there are any concerns or suggestions, please create [a new issue](https://github.com/justincpresley/ndn-python-svs/issues).
 
 ndn-python-svs uses the [python-ndn](https://github.com/named-data/python-ndn) library for it's implementation.
 
@@ -13,6 +13,18 @@ ndn-python-svs uses the [python-ndn](https://github.com/named-data/python-ndn) l
 * [python-ndn](https://python-ndn.readthedocs.io/en/latest/src/installation.html)
 
 * [nfd](https://named-data.net/doc/NFD/0.5.0/INSTALL.html)
+
+* [pip](https://pip.pypa.io/en/stable/installing/) if From Pip instead of From Source
+
+
+### From Pip
+
+Download the pip library [ndn-svs](https://pypi.org/project/ndn-svs/)
+
+### From Source
+
+Clone or Fork the github repository [ndn-python-svs](https://github.com/justincpresley/ndn-python-svs)
+
 
 ### Examples
 
@@ -32,20 +44,12 @@ The default (unless specified) **group prefix** is `/svs` for our examples.
 
 [More on setting different strategies (like mutli-cast) for prefixes.](https://named-data.net/doc/NFD/current/manpages/nfdc-strategy.html)
 
-### Branches
-
-* [master](https://github.com/justincpresley/ndn-python-svs) : The Default Protocol Only, no other features from other branches
-
-* [preserve](https://github.com/justincpresley/ndn-python-svs/tree/preserve) : Does preserve cache via database `~/.ndn/svspy` between runs
-
-* [share](https://github.com/justincpresley/ndn-python-svs/tree/share) : Able to cache other node's messages in case one goes down
-
 ## License and Authors
 
-ndn-python-svs is an open source project that is licensed. See [`LICENSE.md`](LICENSE.md) for more information.
+ndn-python-svs is an open source project that is licensed. See [`LICENSE.md`](https://github.com/justincpresley/ndn-python-svs/blob/master/LICENSE.md) for more information.
 
-Please note: This is only a reimplementation in python and does not claim any credit towards the [actual design of SVS](https://named-data.github.io/StateVectorSync/).
+Please note: This is only a implementation in python and does not claim any credit towards the [actual design of SVS](https://named-data.github.io/StateVectorSync/).
 
-The Names of all authors associated with this reimplementation project are below:
+The Names of all authors associated with this implementation project are below:
 
   * *Justin C Presley* (justincpresley)
