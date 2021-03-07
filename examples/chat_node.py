@@ -28,8 +28,7 @@ def parse_cmd_args() -> dict:
     # Getting all Arguments
     vars = parser.parse_args()
     args = {}
-    if vars.group_prefix != None:
-        args["group_prefix"] = vars.group_prefix
+    args["group_prefix"] = vars.group_prefix if vars.group_prefix!=None else "/svs"
     args["node_id"] = vars.node_name
     return args
 
@@ -100,33 +99,13 @@ class Program:
                 sys.exit()
 
 def main() -> int:
-    default_args = {
-        'node_id'      : None,
-        'group_prefix' : '/svs',
-        'logging_level': 'INFO',
-        'logging_file' : 'SVS.log'
-    }
-    cmd_args = parse_cmd_args()
-    args = default_args.copy()
-    args.update(cmd_args)
+    args = parse_cmd_args()
     args["node_id"] = Name.to_str(Name.from_str(args["node_id"]))
     args["group_prefix"] = Name.to_str(Name.from_str(args["group_prefix"]))
 
-    log_levels = {
-        'CRITICAL':logging.CRITICAL,
-        'ERROR'   :logging.ERROR,
-        'WARNING' :logging.WARNING,
-        'INFO'    :logging.INFO,
-        'DEBUG'   :logging.DEBUG
-    }
-    if args["logging_file"] != None:
-        logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', \
-            filename=args["node_id"][1:].replace("/","_")+"."+args["logging_file"], \
-            filemode='w+', \
-            level=log_levels[args["logging_level"]])
-    else:
-        logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', \
-            level=log_levels[args["logging_level"]])
+    logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', \
+        filename=args["node_id"][1:].replace("/","_")+".log", \
+        filemode='w+', level=logging.INFO)
 
     prog = Program(args)
     prog.run()
