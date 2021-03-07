@@ -38,7 +38,7 @@ python3 examples/chat_node.py -n NODE_NAME [-gp GROUP_PREFIX] [-h]
 ```
 You may create as many of these as possible and all clients will sync up using SVS.
 
-### For all usage
+### For all Usage
 
 Before you run the program, you must register the group prefix as multi-cast (even if you did not specifically define the group prefix):
 ```
