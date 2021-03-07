@@ -2,7 +2,7 @@ TODO:
   HMAC
   Use a External Storage Library
   Thread Classes
-  Update README / pip library
+  Update README
 
 STRUCTURE
 ├── .git
