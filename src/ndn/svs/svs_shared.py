@@ -5,12 +5,12 @@ import logging
 from ndn.app import NDNApp
 from ndn.encoding import Name, Component, make_data, MetaInfo
 from ndn.types import InterestNack, InterestTimeout, InterestCanceled, ValidationFailure
+from ndn_python_repo import Storage
 # Custom Imports
 from .svs_base import SVSyncBase
-from .svs_storage_base import SVSyncStorageBase
 
 class SVSyncShared(SVSyncBase):
-    def __init__(self, app:NDNApp, groupPrefix:Name, nid:Name, updateCallback:Callable, cacheOthers:bool, storage:Optional[SVSyncStorageBase]=None) -> None:
+    def __init__(self, app:NDNApp, groupPrefix:Name, nid:Name, updateCallback:Callable, cacheOthers:bool, storage:Optional[Storage]=None) -> None:
         self.cacheOthers = cacheOthers
         self.groupPrefix = groupPrefix
         preDataPrefix = groupPrefix + [Component.from_str("d")] if self.cacheOthers else groupPrefix + [Component.from_str("d")] + nid

@@ -5,14 +5,14 @@ from typing import Optional, Callable
 from ndn.app import NDNApp
 from ndn.encoding import Name, make_data, MetaInfo, parse_data, InterestParam, BinaryStr, FormalName
 from ndn.types import InterestNack, InterestTimeout, InterestCanceled, ValidationFailure
+from ndn_python_repo import Storage
 # Custom Imports
 from .svs_core import SVSyncCore
 from .svs_storage import SVSyncStorage
-from .svs_storage_base import SVSyncStorageBase
 
 # Abstract Class to Derive Different SVSyncs from
 class SVSyncBase():
-    def __init__(self, app:NDNApp, syncPrefix:Name, dataPrefix:Name, nid:Name, updateCallback:Callable, storage:Optional[SVSyncStorageBase]=None) -> None:
+    def __init__(self, app:NDNApp, syncPrefix:Name, dataPrefix:Name, nid:Name, updateCallback:Callable, storage:Optional[Storage]=None) -> None:
         logging.info(f'SVSync: started svsync')
         self.app = app
         self.storage = SVSyncStorage() if not storage else storage

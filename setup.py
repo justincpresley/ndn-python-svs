@@ -9,7 +9,7 @@ with io.open("src/ndn/__init__.py", "rt", encoding="utf8") as f:
 with io.open("README.md", "rt", encoding="utf8") as f:
     long_description = f.read()
 
-requirements = ['python-ndn>=0.3a1']
+requirements = ['python-ndn>=0.3a1','ndn-python-repo>=0.2a5']
 setup(
     name='ndn-svs',
     version=version,
@@ -22,6 +22,10 @@ setup(
     maintainer='Justin C Presley',
     maintainer_email='justincpresley@gmail.com',
     download_url='https://pypi.python.org/pypi/ndn-svs',
+    project_urls={
+        "Bug Tracker": "https://github.com/justincpresley/ndn-python-svs/issues",
+        "Source Code": "https://github.com/justincpresley/ndn-python-svs",
+    },
     license='LGPL-2.1 License',
     classifiers=[
         'Development Status :: 4 - Beta',

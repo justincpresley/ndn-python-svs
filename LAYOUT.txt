@@ -1,6 +1,5 @@
 TODO:
   HMAC
-  Use a External Storage Library
   Thread Classes
   Update Examples
 

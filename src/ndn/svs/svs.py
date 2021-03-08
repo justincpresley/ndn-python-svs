@@ -3,12 +3,12 @@ from typing import Callable, Optional
 # NDN Imports
 from ndn.app import NDNApp
 from ndn.encoding import Name
+from ndn_python_repo import Storage
 # Custom Imports
 from .svs_base import SVSyncBase
-from .svs_storage_base import SVSyncStorageBase
 
 class SVSync(SVSyncBase):
-    def __init__(self, app:NDNApp, groupPrefix:Name, nid:Name, updateCallback:Callable, storage:Optional[SVSyncStorageBase]=None) -> None:
+    def __init__(self, app:NDNApp, groupPrefix:Name, nid:Name, updateCallback:Callable, storage:Optional[Storage]=None) -> None:
         self.groupPrefix = groupPrefix
         preSyncPrefix = self.groupPrefix
         preDataPrefix = nid + self.groupPrefix
