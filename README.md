@@ -6,7 +6,7 @@ This python library implements the [State Vector Sync (SVS) protocol](https://na
 
 > This is an official implementation but considered 'experimental'. If there are any concerns or suggestions, please create [a new issue](https://github.com/justincpresley/ndn-python-svs/issues).
 
-ndn-python-svs uses the [python-ndn](https://github.com/named-data/python-ndn) library for it's implementation.
+ndn-python-svs uses the [python-ndn](https://github.com/named-data/python-ndn) library for it's ndn client implementation.
 
 ---
 
@@ -14,15 +14,20 @@ ndn-python-svs uses the [python-ndn](https://github.com/named-data/python-ndn) l
 
 ### Prerequisites
 
-* [python-ndn](https://python-ndn.readthedocs.io/en/latest/src/installation.html)
+* [python-ndn](https://python-ndn.readthedocs.io/en/latest/src/installation.html) and [ndn-python-repo](https://ndn-python-repo.readthedocs.io/en/latest/src/install.html)
 
 * [nfd](https://named-data.net/doc/NFD/0.5.0/INSTALL.html)
-
-* [pip](https://pip.pypa.io/en/stable/installing/) if downloading via python pip
 
 ### From Pip
 
 Download the python pip library [ndn-svs](https://pypi.org/project/ndn-svs/)
+
+The API is defined [here](https://named-data.github.io/StateVectorSync/API.html). In addition though, you may add `_Thread` to the end of any SVSync class to push SVS to a thread. The thread classes are derived from `threading.Thread` and use the same arguments as the normal classes. However, instead of passing the NDNApp as the first argument, you pass the face and keychain at the end of the parameters.
+
+To import, everything is defined under `ndn.svs`. For example:
+```
+from ndn.svs import SVSyncShared
+```
 
 ### From Source
 
@@ -38,7 +43,7 @@ python3 examples/chat_node.py -n NODE_NAME [-gp GROUP_PREFIX] [-h]
 ```
 You may create as many of these as possible and all clients will sync up using SVS.
 
-### For All Usage
+### For All Usage of SVS
 
 Before you run the program, you must register the group prefix as multi-cast (even if you did not specifically define the group prefix):
 ```
