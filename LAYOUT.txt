@@ -1,7 +1,5 @@
 TODO:
-  HMAC
-  Thread Classes
-  Update Examples
+  Other security validators/signers
 
 STRUCTURE
 ├── .git
@@ -21,10 +19,12 @@ STRUCTURE
         └── svs
             ├── __init__.py
             ├── svs_base.py
+            ├── svs_thread_base.py
+            ├── svs_storage.py
             ├── svs_core.py
             ├── svs_shared.py
-            ├── svs_storage_base.py
-            ├── svs_storage.py
+            ├── svs_shared_thread.py
             ├── svs.py
+            ├── svs_thread.py
             ├── async_scheduler.py
             └── state_vector.py
