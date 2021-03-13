@@ -10,6 +10,7 @@ STRUCTURE
 ├── LICENSE.md
 ├── README.md
 ├── examples
+│   ├── basic_use.py
 │   └── chat_node.py
 ├── tests
 │   └── test_state_vector.py
