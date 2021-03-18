@@ -11,5 +11,5 @@
 /*.egg-info
 /src/*.egg-info
 
-# Notes
-NOTES
+# Ignore Folder
+ignore/*
