@@ -10,6 +10,7 @@ import sys
 import pytest
 sys.path.insert(0,'.')
 from src.ndn.svs.state_vector import StateVector
+from ndn.encoding import Component
 
 def test_state_vector_ordering():
     sv1 = StateVector()
@@ -64,3 +65,10 @@ def test_state_vector_set():
     sv.set("a", 100)
 
     assert sv.get("a") == 100
+
+def test_decode():
+    enc_sv = b'\xCA\x03\x6F\x6E\x65\xCB\x01\x01\xCA\x03\x74\x77\x6F\xCB\x01\x02'
+    enc_sv = Component.from_bytes(enc_sv, 201)
+    sv = StateVector(enc_sv)
+    assert sv.get("one") == 1
+    assert sv.get("two") == 2
