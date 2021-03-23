@@ -71,11 +71,6 @@ def test_state_vector_set():
 
 
 def test_state_vector_decode():
-    """
-    Test if the TLVs complient with the NDN-SVS spec can be parsed and interprete
-    correctly
-    :return:
-    """
     enc_sv = b'\xCA\x03\x6F\x6E\x65\xCB\x01\x01\xCA\x03\x74\x77\x6F\xCB\x01\x02'
     enc_sv = Component.from_bytes(enc_sv, StateVectorModelTypes.VECTOR.value)
 
@@ -85,10 +80,6 @@ def test_state_vector_decode():
 
 
 def test_state_vector_encode():
-    """
-    Test if the TLV encoding of the state vector is complient with the NDN-SVS Spec
-    :return:
-    """
     sv = StateVector()
     sv.set("one", 1)
     sv.set("two", 2)
