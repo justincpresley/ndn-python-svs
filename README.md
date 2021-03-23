@@ -69,4 +69,8 @@ The Names of all authors associated with this implementation project are below:
 
   * *Justin C Presley* (justincpresley)
 
+Special Mentions:
+
+  * *Xinyu Ma* (zjkmxy) helped formed the TLV structure used in SVS
+
 ---
