@@ -6,8 +6,12 @@
     @Pip-Library: https://pypi.org/project/ndn-svs/
 """
 
+# Basic Libraries
 import sys
 import pytest
+# NDN Imports
+from ndn.encoding import Component, Name
+# Custom Imports
 sys.path.insert(0,'.')
 from src.ndn.svs.state_vector import StateVector
 
@@ -64,3 +68,23 @@ def test_state_vector_set():
     sv.set("a", 100)
 
     assert sv.get("a") == 100
+
+def test_state_vector_decode():
+    sv = StateVector()
+    sv.set("one", 1)
+    sv.set("two", 2)
+
+    enc_sv = b'\xCA\x03\x6F\x6E\x65\xCB\x01\x01\xCA\x03\x74\x77\x6F\xCB\x01\x02'
+    enc_sv = Component.from_bytes(enc_sv, 201)
+
+    sv = StateVector(enc_sv)
+    assert sv.get("one") == 1
+    assert sv.get("two") == 2
+
+def test_state_vector_component_functionality():
+    sv = StateVector()
+    sv.set("one", 1)
+    sv.set("two", 2)
+
+    name = Name.from_str("/state_vector/test") + [sv.to_component()]
+    assert name == Name.from_str(Name.to_str(name))
