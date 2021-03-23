@@ -17,7 +17,7 @@ with io.open("src/ndn/__init__.py", "rt", encoding="utf8") as f:
 with io.open("README.md", "rt", encoding="utf8") as f:
     long_description = f.read()
 
-requirements = ['python-ndn>=0.3a1','ndn-python-repo>=0.2a5']
+requirements = ['python-ndn>=0.3a1','ndn-python-repo>=0.2a5','pytest>=6.2.2','pycryptodomex>=3.10.1']
 setup(
     name='ndn-svs',
     version=version,
