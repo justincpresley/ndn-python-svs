@@ -71,6 +71,7 @@ def test_state_vector_set():
 
 
 def test_state_vector_decode():
+    # hard coded bytes of component vector based on SVS protocol
     enc_sv = b'\xCA\x03\x6F\x6E\x65\xCB\x01\x01\xCA\x03\x74\x77\x6F\xCB\x01\x02'
     enc_sv = Component.from_bytes(enc_sv, StateVectorModelTypes.VECTOR.value)
 
@@ -85,12 +86,14 @@ def test_state_vector_encode():
     sv.set("two", 2)
 
     enc_sv = sv.encode()
-    assert enc_sv == b'\xC9\x10\xCA\x03\x6F\x6E\x65\xCB\x01\x01\xCA\x03\x74\x77\x6F\xCB\x01\x02'
+    # does this state vector's byte value equal a hard coded byte value based on the state vector's protocol
+    assert enc_sv == b'\xC9\x10\xCA\x03\x6F\x6E\x65\xCB\x01\x01\xCA\x03\x74\x77\x6F\xCB\x01\x02' 
 
 def test_state_vector_component_functionality():
     sv = StateVector()
     sv.set("one", 1)
     sv.set("two", 2)
-
+    
+    # does the state vector component act as a compoent in a name
     name = Name.from_str("/state_vector/test") + [sv.to_component()]
     assert name == Name.from_str(Name.to_str(name))
