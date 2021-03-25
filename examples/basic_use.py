@@ -19,7 +19,7 @@ from ndn.encoding import Name
 sys.path.insert(0,'.')
 from src.ndn.svs.svs import SVSync
 from src.ndn.svs.svs_shared import SVSyncShared
-from src.ndn.svs.svs_core import MissingData
+from src.ndn.svs.core import MissingData
 
 app = NDNApp()
 

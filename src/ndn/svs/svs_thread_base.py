@@ -19,7 +19,7 @@ from ndn.security import Keychain
 from ndn_python_repo import Storage
 # Custom Imports
 from .svs_base import SVSyncBase
-from .svs_core import MissingData, SVSyncCore
+from .core import MissingData, SVSyncCore
 
 # Class Type: an abstract API thread class
 # Class Purpose:

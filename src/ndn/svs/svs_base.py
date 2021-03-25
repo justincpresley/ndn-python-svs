@@ -13,8 +13,8 @@ from ndn.encoding import Name, make_data, MetaInfo, parse_data, InterestParam, B
 from ndn.types import InterestNack, InterestTimeout, InterestCanceled, ValidationFailure
 from ndn_python_repo import Storage
 # Custom Imports
-from .svs_core import SVSyncCore
-from .svs_storage import SVSyncStorage
+from .core import SVSyncCore
+from .storage import SVSyncStorage
 
 # Class Type: an abstract API class
 # Class Purpose:

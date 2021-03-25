@@ -15,7 +15,7 @@ from ndn.encoding import Name
 sys.path.insert(0,'.')
 from src.ndn.svs.svs_thread_base import SVSyncBase_Thread
 from src.ndn.svs.svs_shared_thread import SVSyncShared_Thread
-from src.ndn.svs.svs_core import MissingData
+from src.ndn.svs.core import MissingData
 
 def parse_cmd_args() -> dict:
     # Command Line Parser
