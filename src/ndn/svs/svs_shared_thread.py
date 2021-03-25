@@ -16,6 +16,11 @@ from ndn_python_repo import Storage
 from .svs_thread_base import SVSyncBase_Thread
 from .svs_shared import SVSyncShared
 
+# Class Type: an API thread class
+# Class Purpose:
+#   to push SVS to a separate thread so SVS does not become encounter a block.
+#   to allow the user to interact with SVS, fetch and publish.
+#   to allow caching other node's data in case one node goes down.
 class SVSyncShared_Thread(SVSyncBase_Thread):
     def __init__(self, groupPrefix:Name, nid:Name, updateCallback:Callable, cacheOthers:bool, storage:Optional[Storage]=None, face:Optional[Face]=None, keychain:Optional[Keychain]=None) -> None:
         super().__init__(groupPrefix, nid, updateCallback, storage, face, keychain)

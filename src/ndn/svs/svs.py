@@ -13,6 +13,9 @@ from ndn_python_repo import Storage
 # Custom Imports
 from .svs_base import SVSyncBase
 
+# Class Type: an API class
+# Class Purpose:
+#   to allow the user to interact with SVS, fetch and publish.
 class SVSync(SVSyncBase):
     def __init__(self, app:NDNApp, groupPrefix:Name, nid:Name, updateCallback:Callable, storage:Optional[Storage]=None) -> None:
         self.groupPrefix = groupPrefix

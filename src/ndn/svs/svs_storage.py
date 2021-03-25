@@ -12,6 +12,10 @@ from typing import Optional
 from ndn.encoding import Name, parse_data, NonStrictName
 from ndn.name_tree import NameTrie
 
+# Class Type: a ndn class
+# Class Purpose:
+#   to provide a general cache class for SVS.
+#   to cache data without a database.
 class SVSyncStorage:
     cache = NameTrie()
     def time_ms(self) -> int:

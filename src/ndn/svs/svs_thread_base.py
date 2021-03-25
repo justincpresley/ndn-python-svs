@@ -21,6 +21,11 @@ from ndn_python_repo import Storage
 from .svs_base import SVSyncBase
 from .svs_core import MissingData, SVSyncCore
 
+# Class Type: an abstract API thread class
+# Class Purpose:
+#   to push SVS to a separate thread so SVS does not become encounter a block.
+#   to derive different SVSync_Thread classes from.
+#   to allow the user to interact with SVS, fetch and publish.
 class SVSyncBase_Thread(Thread):
     def __init__(self, groupPrefix:Name, nid:Name, updateCallback:Callable, storage:Optional[Storage]=None, face:Optional[Face]=None, keychain:Optional[Keychain]=None) -> None:
         logging.info(f'SVSync_Thread: Created thread to push SVS to.')

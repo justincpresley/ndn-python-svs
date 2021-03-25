@@ -15,6 +15,10 @@ from ndn_python_repo import Storage
 # Custom Imports
 from .svs_base import SVSyncBase
 
+# Class Type: an derived API class
+# Class Purpose:
+#   to allow the user to interact with SVS, fetch and publish.
+#   to allow caching other node's data in case one node goes down.
 class SVSyncShared(SVSyncBase):
     def __init__(self, app:NDNApp, groupPrefix:Name, nid:Name, updateCallback:Callable, cacheOthers:bool, storage:Optional[Storage]=None) -> None:
         self.cacheOthers = cacheOthers

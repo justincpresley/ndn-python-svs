@@ -18,6 +18,9 @@ from ndn.types import InterestNack, InterestTimeout, InterestCanceled, Validatio
 from .state_vector import StateVector
 from .scheduler import AsyncScheduler
 
+# Class Type: a struct
+# Class Purpose:
+#   to hold the range of missing data for a specific node.
 class MissingData:
     __slots__ = ('nid','lowSeqNum','highSeqNum')
     def __init__(self, nid:str, lowSeqNum:int, highSeqNum:int) -> None:
@@ -25,10 +28,18 @@ class MissingData:
         self.lowSeqNum  = lowSeqNum
         self.highSeqNum = highSeqNum
 
+# Class Type: an enumeration struct
+# Class Purpose:
+#   to differ core states.
 class SVSyncCore_State(Enum):
     STEADY     = 0
     SUPRESSION = 1
 
+# Class Type: a ndn class
+# Class Purpose:
+#   manage sync interests that are sent out.
+#   to hear about other sync interests
+#   to find out about new data from other nodes.
 class SVSyncCore:
     def __init__(self, app:NDNApp, syncPrefix:Name, nid:Name, updateCallback:Callable) -> None:
         logging.info(f'SVSyncCore: started svsync core')

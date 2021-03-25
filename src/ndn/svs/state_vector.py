@@ -12,13 +12,24 @@ import struct
 from ndn.encoding import Component, TlvModel, BytesField, UintField, RepeatedField, ModelField
 from ndn.encoding import get_tl_num_size, write_tl_num, parse_tl_num
 
+# Class Type: an enumeration struct
+# Class Purpose:
+#   to differ tlv model types.
 class StateVectorModelTypes(Enum):
     VECTOR    = 201
     KEY       = 202
     VALUE     = 203
+
+# Class Type: an enumeration struct
+# Class Purpose:
+#   to hold info about a singular node within the vector.
 class StateVectorComponentModel(TlvModel):
     node_id = BytesField(StateVectorModelTypes.KEY.value)
     seq_num = UintField(StateVectorModelTypes.VALUE.value)
+
+# Class Type: an custom tlv model class
+# Class Purpose:
+#   to contain all the info of a state vector.
 class StateVectorModel:
     value:List[StateVectorComponentModel]
     def __init__(self) -> None:
@@ -83,6 +94,9 @@ class StateVectorModel:
             ret.value.append(comp)
         return ret
 
+# Class Type: an API class
+# Class Purpose:
+#   to allow an easier time to interact with the StateVectorModel class.
 class StateVector:
     def __init__(self, component:Component=None) -> None:
         self.vector = StateVectorModel() if not component else StateVectorModel.parse(component)

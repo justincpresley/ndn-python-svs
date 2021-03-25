@@ -11,6 +11,9 @@ from random import uniform
 import logging
 from time import time
 
+# Class Type: an async class
+# Class Purpose:
+#   to call a specific function based on an interval.
 class AsyncScheduler:
     def __init__(self, function:Callable, interval:int, randomPercent:float) -> None:
         logging.info(f'AsyncScheduler: started scheduler for an async function')
