@@ -1,10 +1,8 @@
-"""
-    @Author: Justin C Presley
-    @Author-Email: justincpresley@gmail.com
-    @Project: NDN State Vector Sync Protocol
-    @Source-Code: https://github.com/justincpresley/ndn-python-svs
-    @Pip-Library: https://pypi.org/project/ndn-svs/
-"""
+#    @Author: Justin C Presley
+#    @Author-Email: justincpresley@gmail.com
+#    @Project: NDN State Vector Sync Protocol
+#    @Source-Code: https://github.com/justincpresley/ndn-python-svs
+#    @Pip-Library: https://pypi.org/project/ndn-svs/
 
 # Basic Libraries
 import asyncio as aio
@@ -18,7 +16,7 @@ from ndn.encoding import Name, InterestParam, BinaryStr, FormalName
 from ndn.types import InterestNack, InterestTimeout, InterestCanceled, ValidationFailure
 # Custom Imports
 from .state_vector import StateVector
-from .async_scheduler import AsyncScheduler
+from .scheduler import AsyncScheduler
 
 class MissingData:
     __slots__ = ('nid','lowSeqNum','highSeqNum')
