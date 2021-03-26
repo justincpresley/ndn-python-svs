@@ -67,7 +67,11 @@ class Program:
             except KeyboardInterrupt:
                 sys.exit()
 
-def main() -> int:
+def main(args:dict) -> int:
+    prog = Program(args)
+    prog.run()
+
+if __name__ == "__main__":
     args = parse_cmd_args()
     args["node_id"] = Name.to_str(Name.from_str(args["node_id"]))
     args["group_prefix"] = Name.to_str(Name.from_str(args["group_prefix"]))
@@ -77,8 +81,4 @@ def main() -> int:
         filename=args["node_id"][1:].replace("/","_")+".log", \
         filemode='w+', level=logging.INFO)
 
-    prog = Program(args)
-    prog.run()
-
-if __name__ == "__main__":
-    sys.exit(main())
+    sys.exit(main(args))

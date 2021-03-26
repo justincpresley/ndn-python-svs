@@ -69,7 +69,11 @@ class Program:
                     print(content_str)
                 i.lowSeqNum = i.lowSeqNum + 1
 
-async def main() -> int:
+async def main(args:dict) -> int:
+    prog = Program(args)
+    await prog.run()
+
+if __name__ == "__main__":
     args = parse_cmd_args()
     args["node_id"] = Name.to_str(Name.from_str(args["node_id"]))
     args["group_prefix"] = Name.to_str(Name.from_str(args["group_prefix"]))
@@ -78,11 +82,7 @@ async def main() -> int:
         filename=args["node_id"][1:].replace("/","_")+".log", \
         filemode='w+', level=logging.INFO)
 
-    prog = Program(args)
-    await prog.run()
-
-if __name__ == "__main__":
     try:
-        app.run_forever(after_start=main())
+        app.run_forever(after_start=main(args))
     except FileNotFoundError:
         print('Error: could not connect to NFD for SVS.')
