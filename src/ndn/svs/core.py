@@ -12,7 +12,7 @@ from random import uniform
 from typing import Callable, Optional
 # NDN Imports
 from ndn.app import NDNApp
-from ndn.encoding import Name, InterestParam, BinaryStr, FormalName
+from ndn.encoding import Name, InterestParam, BinaryStr, FormalName, SignaturePtrs
 from ndn.types import InterestNack, InterestTimeout, InterestCanceled, ValidationFailure
 # Custom Imports
 from .state_vector import StateVector
@@ -54,7 +54,7 @@ class SVSyncCore:
         self.randomPercent = 0.1
         self.briefInterval = 200 # time in milliseconds
         self.briefRandomPercent = 0.5
-        self.app.route(self.syncPrefix)(self.onSyncInterest)
+        self.app.route(self.syncPrefix, need_sig_ptrs=True)(self.onSyncInterest)
         logging.info(f'SVSyncCore: started listening to {Name.to_str(self.syncPrefix)}')
         self.scheduler = AsyncScheduler(self.sendSyncInterest, self.interval, self.randomPercent)
         self.scheduler.skip_interval()
@@ -97,7 +97,7 @@ class SVSyncCore:
 
         # return bools
         return (myVectorNew, otherVectorNew)
-    def onSyncInterest(self, int_name:FormalName, int_param:InterestParam, _app_param:Optional[BinaryStr]) -> None:
+    def onSyncInterest(self, int_name:FormalName, int_param:InterestParam, _app_param:Optional[BinaryStr], sig_ptrs:SignaturePtrs) -> None:
         logging.info(f'SVSyncCore: received sync {Name.to_str(int_name)}')
         incomingVector = StateVector(int_name[-1])
 
