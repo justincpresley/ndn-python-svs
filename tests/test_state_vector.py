@@ -13,6 +13,13 @@ from ndn.encoding import Component, Name
 sys.path.insert(0,'.')
 from src.ndn.svs.state_vector import StateVector, StateVectorModelTypes
 
+# File Type: pytest Testing
+# Testing Classes: StateVector
+# Testing Purposes:
+#   to ensure Component compatibility.
+#   to ensure defined SVS protocol compatibility.
+#   to test that all API functions from StateVector work as intended.
+
 def test_state_vector_ordering():
     sv1 = StateVector()
     sv1.set("c", 5)
@@ -67,7 +74,6 @@ def test_state_vector_set():
 
     assert sv.get("a") == 100
 
-
 def test_state_vector_decode():
     # hard coded bytes of component vector based on SVS protocol
     enc_sv = b'\xCA\x03\x6F\x6E\x65\xCB\x01\x01\xCA\x03\x74\x77\x6F\xCB\x01\x02'
@@ -76,7 +82,6 @@ def test_state_vector_decode():
     sv = StateVector(enc_sv)
     assert sv.get("one") == 1
     assert sv.get("two") == 2
-
 
 def test_state_vector_encode():
     sv = StateVector()
