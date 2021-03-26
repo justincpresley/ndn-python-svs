@@ -4,6 +4,8 @@ TODO:
 STRUCTURE
 ├── .git
 ├── .github
+│   └── workflows
+│       └── tests.yaml
 ├── .gitignore
 ├── setup.py
 ├── LAYOUT.md
