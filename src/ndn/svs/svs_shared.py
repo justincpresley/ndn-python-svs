@@ -10,6 +10,7 @@ import logging
 # NDN Imports
 from ndn.app import NDNApp
 from ndn.encoding import Name, Component, make_data, MetaInfo
+from ndn.encoding import parse_data
 from ndn.types import InterestNack, InterestTimeout, InterestCanceled, ValidationFailure
 from ndn_python_repo import Storage
 # Custom Imports

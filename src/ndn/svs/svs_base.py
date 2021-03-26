@@ -9,7 +9,8 @@ import logging
 from typing import Optional, Callable
 # NDN Imports
 from ndn.app import NDNApp
-from ndn.encoding import Name, make_data, MetaInfo, parse_data, InterestParam, BinaryStr, FormalName
+from ndn.encoding import Name, MetaInfo, InterestParam, BinaryStr, FormalName
+from ndn.encoding import make_data, parse_data
 from ndn.types import InterestNack, InterestTimeout, InterestCanceled, ValidationFailure
 from ndn_python_repo import Storage
 # Custom Imports

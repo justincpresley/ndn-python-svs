@@ -50,7 +50,7 @@ class Program:
         while True:
             num = num+1
             try:
-                await aio.sleep(8)
+                await aio.sleep(7)
                 print("YOU: "+str(num))
                 self.svs.publishData(str(num).encode())
             except KeyboardInterrupt:
