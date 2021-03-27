@@ -36,11 +36,10 @@ class SVSyncBase():
         self.app.route(self.dataPrefix)(self.onDataInterest)
         logging.info(f'SVSync: started listening to {Name.to_str(self.dataPrefix)}')
     def onDataInterest(self, int_name:FormalName, int_param:InterestParam, _app_param:Optional[BinaryStr]) -> None:
-        data_bytes = self.storage.get_data_packet(int_name, int_param.can_be_prefix)
-        if data_bytes:
-            _, _, content, _ = parse_data(data_bytes)
-            logging.info(f'SVSync: served data {bytes(content)}')
-            self.app.put_data(int_name, content=bytes(content), freshness_period=500, signer=self.secOptions.dataSig.signer)
+        data_pkt = self.storage.get_data_packet(int_name, int_param.can_be_prefix)
+        if data_pkt:
+            logging.info(f'SVSync: served data {Name.to_str(int_name)}')
+            self.app.put_raw_packet(data_pkt)
     async def fetchData(self, nid:Name, seqNum:int, retries:int=0) -> Optional[bytes]:
         name = self.getDataName(nid, seqNum)
         while retries+1 > 0:
@@ -70,7 +69,7 @@ class SVSyncBase():
         return None
     def publishData(self, data:bytes) -> None:
         name = self.getDataName(self.nid, self.core.getSeqNum()+1)
-        data_packet = make_data(name, MetaInfo(freshness_period=5000), content=data)
+        data_packet = make_data(name, MetaInfo(freshness_period=5000), content=data, signer=self.secOptions.dataSig.signer)
         logging.info(f'SVSync: publishing data {Name.to_str(name)}')
         self.storage.put_data_packet(name, data_packet)
         self.core.updateStateVector(self.core.getSeqNum()+1)

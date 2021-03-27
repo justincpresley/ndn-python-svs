@@ -106,8 +106,8 @@ class SVSyncCore:
         isValidated = await self.secOptions.syncVal.validate(int_name, sig_ptrs)
         if not isValidated:
             return
-            
-        incomingVector = StateVector(int_name[-1])
+
+        incomingVector = StateVector(int_name[-2])
 
         myVectorNew, incomingVectorNew = self.mergeStateVector(incomingVector)
         self.state = SVSyncCore_State.SUPRESSION if myVectorNew else SVSyncCore_State.STEADY
