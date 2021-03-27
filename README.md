@@ -41,7 +41,7 @@ python3 examples/chat_node.py -n NODE_NAME [-gp GROUP_PREFIX] [-h]
 ```
 You may create as many of these as possible and all clients will sync up using SVS.
 
-## Usage of SVS
+## Usage
 
 ### Group Prefix Strategy
 
@@ -53,7 +53,7 @@ The default (unless specified) **group prefix** is `/svs` for any build-in examp
 
 [More on setting different strategies (like mutli-cast) for prefixes.](https://named-data.net/doc/NFD/current/manpages/nfdc-strategy.html)
 
-### API of SVS
+### API
 
 The API is defined [here](https://named-data.github.io/StateVectorSync/API.html). In addition though, you may add `_Thread` to the end of any SVSync class to push SVS to a thread (SVSync normally runs on the current thread and requires a non-blocking program). The thread classes are derived from `threading.Thread` and use the same arguments as the normal classes. However, instead of passing the NDNApp as the first argument, you pass the face and keychain at the end of the parameters. Please call `wait()` after `start()` to allow the thread to fully intalize SVS. Also refer to the thread example for defining the missing data callback function. Otherwise, the thread class acts just the same as the normal class.
 
