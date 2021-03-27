@@ -5,4 +5,4 @@
 #    @Pip-Library: https://pypi.org/project/ndn-svs/
 
 # Version of SVS according to pip
-__version__ = "0.2.0"
+__version__ = "0.2.1"
