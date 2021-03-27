@@ -1,5 +1,6 @@
 TODO:
-  Other security validators/signers
+  Ensure Security works
+  Add more Documentation
 
 STRUCTURE
 ├── .git
@@ -24,6 +25,7 @@ STRUCTURE
             ├── svs_base.py
             ├── svs_thread_base.py
             ├── storage.py
+            ├── security.py
             ├── core.py
             ├── svs_shared.py
             ├── svs_shared_thread.py
