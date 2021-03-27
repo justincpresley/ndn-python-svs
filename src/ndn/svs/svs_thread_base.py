@@ -20,6 +20,7 @@ from ndn_python_repo import Storage
 # Custom Imports
 from .svs_base import SVSyncBase
 from .core import MissingData, SVSyncCore
+from .security import SecurityOptions
 
 # Class Type: an abstract API thread class
 # Class Purpose:
@@ -27,7 +28,7 @@ from .core import MissingData, SVSyncCore
 #   to derive different SVSync_Thread classes from.
 #   to allow the user to interact with SVS, fetch and publish.
 class SVSyncBase_Thread(Thread):
-    def __init__(self, groupPrefix:Name, nid:Name, updateCallback:Callable, storage:Optional[Storage]=None, face:Optional[Face]=None, keychain:Optional[Keychain]=None) -> None:
+    def __init__(self, groupPrefix:Name, nid:Name, updateCallback:Callable, storage:Optional[Storage]=None, securityOptions:Optional[SecurityOptions]=None, face:Optional[Face]=None, keychain:Optional[Keychain]=None) -> None:
         logging.info(f'SVSync_Thread: Created thread to push SVS to.')
         Thread.__init__(self)
         self.groupPrefix = groupPrefix
@@ -36,6 +37,7 @@ class SVSyncBase_Thread(Thread):
         self.storage = storage
         self.face = face
         self.keychain = keychain
+        self.secOptions = securityOptions
         self.svs = None
         self.loop = None
         self.app = None
@@ -66,7 +68,7 @@ class SVSyncBase_Thread(Thread):
     def getSVSync(self) -> SVSyncBase:
         return self.svs
     async def fetchData(self, nid:Name, seqNum:int, retries:int=0) -> Optional[bytes]:
-        await self.svs.fetchData(nid, seqNum, retries)
+        return await self.svs.fetchData(nid, seqNum, retries)
     def publishData(self, data:bytes) -> None:
         self.svs.publishData(data)
     def getCore(self) -> SVSyncCore:

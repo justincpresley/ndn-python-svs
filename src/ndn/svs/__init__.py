@@ -20,3 +20,4 @@ from .core import SVSyncCore
 # Additional SVS useful classes
 from .core import MissingData
 from .state_vector import StateVector
+from .security import SigningInfo, ValidatingInfo, SecurityOptions

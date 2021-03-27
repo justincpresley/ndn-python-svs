@@ -17,6 +17,7 @@ from ndn.types import InterestNack, InterestTimeout, InterestCanceled, Validatio
 # Custom Imports
 from .state_vector import StateVector
 from .scheduler import AsyncScheduler
+from .security import SecurityOptions
 
 # Class Type: a struct
 # Class Purpose:
@@ -41,13 +42,14 @@ class SVSyncCore_State(Enum):
 #   to hear about other sync interests
 #   to find out about new data from other nodes.
 class SVSyncCore:
-    def __init__(self, app:NDNApp, syncPrefix:Name, nid:Name, updateCallback:Callable) -> None:
+    def __init__(self, app:NDNApp, syncPrefix:Name, nid:Name, updateCallback:Callable, secOptions:SecurityOptions) -> None:
         logging.info(f'SVSyncCore: started svsync core')
         self.state = SVSyncCore_State.STEADY
         self.app = app
         self.nid = nid
         self.updateCallback = updateCallback
         self.syncPrefix = syncPrefix
+        self.secOptions = secOptions
         self.vector = StateVector()
         self.seqNum = 0
         self.interval = 30000 # time in milliseconds
@@ -63,7 +65,7 @@ class SVSyncCore:
         logging.info(f'SVSyncCore: sent sync {Name.to_str(name)}')
         try:
             data_name, meta_info, content = await self.app.express_interest(
-                name, must_be_fresh=True, can_be_prefix=True, lifetime=1000)
+                name, signer=self.secOptions.syncSig.signer, must_be_fresh=True, can_be_prefix=True, lifetime=1000)
         except (InterestNack, InterestTimeout, InterestCanceled, ValidationFailure) as e:
             pass
     def sendSyncInterest(self) -> None:
@@ -99,6 +101,12 @@ class SVSyncCore:
         return (myVectorNew, otherVectorNew)
     def onSyncInterest(self, int_name:FormalName, int_param:InterestParam, _app_param:Optional[BinaryStr], sig_ptrs:SignaturePtrs) -> None:
         logging.info(f'SVSyncCore: received sync {Name.to_str(int_name)}')
+        aio.get_event_loop().create_task(self.onSyncInterestHelper(int_name, int_param, _app_param, sig_ptrs))
+    async def onSyncInterestHelper(self, int_name:FormalName, int_param:InterestParam, _app_param:Optional[BinaryStr], sig_ptrs:SignaturePtrs) -> None:
+        isValidated = await self.secOptions.syncVal.validate(int_name, sig_ptrs)
+        if not isValidated:
+            return
+            
         incomingVector = StateVector(int_name[-1])
 
         myVectorNew, incomingVectorNew = self.mergeStateVector(incomingVector)

@@ -18,7 +18,6 @@ from ndn.encoding import Name
 # Custom Imports
 sys.path.insert(0,'.')
 from src.ndn.svs.svs import SVSync
-from src.ndn.svs.svs_shared import SVSyncShared
 from src.ndn.svs.core import MissingData
 
 app = NDNApp()
@@ -43,18 +42,19 @@ def parse_cmd_args() -> dict:
 class Program:
     def __init__(self, args:dict) -> None:
         self.args = args
-        self.svs = SVSyncShared(app, Name.from_str(self.args["group_prefix"]), Name.from_str(self.args["node_id"]), self.missing_callback, True)
+        self.svs = SVSync(app, Name.from_str(self.args["group_prefix"]), Name.from_str(self.args["node_id"]), self.missing_callback)
         print(f'SVS client started | {self.args["group_prefix"]} - {self.args["node_id"]} |')
     async def run(self) -> None:
         num = 0
         while True:
             num = num+1
             try:
-                await aio.sleep(7)
+
                 print("YOU: "+str(num))
                 self.svs.publishData(str(num).encode())
             except KeyboardInterrupt:
                 sys.exit()
+            await aio.sleep(5)
     def missing_callback(self, missing_list:List[MissingData]) -> None:
         aio.ensure_future(self.on_missing_data(missing_list))
     async def on_missing_data(self, missing_list:List[MissingData]) -> None:

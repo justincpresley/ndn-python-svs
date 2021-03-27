@@ -9,20 +9,21 @@ import logging
 from typing import Optional, Callable
 # NDN Imports
 from ndn.app import NDNApp
-from ndn.encoding import Name, MetaInfo, InterestParam, BinaryStr, FormalName
+from ndn.encoding import Name, MetaInfo, InterestParam, BinaryStr, FormalName, SignatureType
 from ndn.encoding import make_data, parse_data
 from ndn.types import InterestNack, InterestTimeout, InterestCanceled, ValidationFailure
 from ndn_python_repo import Storage
 # Custom Imports
 from .core import SVSyncCore
 from .storage import SVSyncStorage
+from .security import SecurityOptions, SigningInfo, ValidatingInfo
 
 # Class Type: an abstract API class
 # Class Purpose:
 #   to derive different SVSync from.
 #   to allow the user to interact with SVS, fetch and publish.
 class SVSyncBase():
-    def __init__(self, app:NDNApp, syncPrefix:Name, dataPrefix:Name, nid:Name, updateCallback:Callable, storage:Optional[Storage]=None) -> None:
+    def __init__(self, app:NDNApp, syncPrefix:Name, dataPrefix:Name, nid:Name, updateCallback:Callable, storage:Optional[Storage]=None, securityOptions:Optional[SecurityOptions]=None) -> None:
         logging.info(f'SVSync: started svsync')
         self.app = app
         self.storage = SVSyncStorage() if not storage else storage
@@ -30,7 +31,8 @@ class SVSyncBase():
         self.dataPrefix = dataPrefix
         self.nid = nid
         self.updateCallback = updateCallback
-        self.core = SVSyncCore(self.app, self.syncPrefix, self.nid, self.updateCallback)
+        self.secOptions = securityOptions if securityOptions != None else SecurityOptions(SigningInfo(SignatureType.DIGEST_SHA256), ValidatingInfo(ValidatingInfo.get_validator(SignatureType.DIGEST_SHA256)), SigningInfo(SignatureType.DIGEST_SHA256), [])
+        self.core = SVSyncCore(self.app, self.syncPrefix, self.nid, self.updateCallback, self.secOptions)
         self.app.route(self.dataPrefix)(self.onDataInterest)
         logging.info(f'SVSync: started listening to {Name.to_str(self.dataPrefix)}')
     def onDataInterest(self, int_name:FormalName, int_param:InterestParam, _app_param:Optional[BinaryStr]) -> None:
@@ -38,7 +40,7 @@ class SVSyncBase():
         if data_bytes:
             _, _, content, _ = parse_data(data_bytes)
             logging.info(f'SVSync: served data {bytes(content)}')
-            self.app.put_data(int_name, content=bytes(content), freshness_period=500)
+            self.app.put_data(int_name, content=bytes(content), freshness_period=500, signer=self.secOptions.dataSig.signer)
     async def fetchData(self, nid:Name, seqNum:int, retries:int=0) -> Optional[bytes]:
         name = self.getDataName(nid, seqNum)
         while retries+1 > 0:
@@ -46,6 +48,9 @@ class SVSyncBase():
                 logging.info(f'SVSync: fetching data {Name.to_str(name)}')
                 _, _, _, pkt = await self.app.express_interest(name, need_raw_packet=True, must_be_fresh=True, can_be_prefix=False, lifetime=6000)
                 ex_int_name, meta_info, content, sig_ptrs = parse_data(pkt)
+                isValidated = self.secOptions.validate(ex_int_name, sig_ptrs)
+                if not isValidated:
+                    return None
                 logging.info(f'SVSync: received data {bytes(content)}')
                 return bytes(content) if content else None
             except InterestNack as e:
