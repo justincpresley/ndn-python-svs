@@ -62,8 +62,9 @@ class Program:
                 val = input("")
                 sys.stdout.write("\033[F"+"\033[K")
                 sys.stdout.flush()
-                print("YOU: "+val)
-                self.svs_thread.publishData(val.encode())
+                if val != "" and val != " ":
+                    print("YOU: "+val)
+                    self.svs_thread.publishData(val.encode())
             except KeyboardInterrupt:
                 sys.exit()
 
