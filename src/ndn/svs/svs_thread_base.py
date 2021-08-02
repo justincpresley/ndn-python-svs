@@ -43,7 +43,7 @@ class SVSyncBase_Thread(Thread):
         self.app = None
         self.failed = False
     def wait(self):
-        while self.svs == None:
+        while self.svs is None:
             time.sleep(0.001)
             if self.failed:
                 sys.exit()

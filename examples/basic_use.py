@@ -33,10 +33,10 @@ def parse_cmd_args() -> dict:
     optionalArgs.add_argument("-gp","--groupprefix",action="store",dest="group_prefix",required=False,help="overrides config | routable group prefix to listen from")
     informationArgs.add_argument("-h","--help",action="help",default=SUPPRESS,help="show this help message and exit")
     # Getting all Arguments
-    vars = parser.parse_args()
+    argvars = parser.parse_args()
     args = {}
-    args["group_prefix"] = vars.group_prefix if vars.group_prefix!=None else "/svs"
-    args["node_id"] = vars.node_name
+    args["group_prefix"] = argvars.group_prefix if argvars.group_prefix is not None else "/svs"
+    args["node_id"] = argvars.node_name
     return args
 
 class Program:
@@ -49,7 +49,6 @@ class Program:
         while True:
             num = num+1
             try:
-
                 print("YOU: "+str(num))
                 self.svs.publishData(str(num).encode())
             except KeyboardInterrupt:
@@ -62,8 +61,8 @@ class Program:
             nid = Name.from_str(i.nid)
             while i.lowSeqNum <= i.highSeqNum:
                 content_str = await self.svs.fetchData(nid, i.lowSeqNum)
-                if content_str != None:
-                    content_str = i.nid + ": " + content_str.decode();
+                if content_str is not None:
+                    content_str = i.nid + ": " + content_str.decode()
                     sys.stdout.write("\033[K")
                     sys.stdout.flush()
                     print(content_str)

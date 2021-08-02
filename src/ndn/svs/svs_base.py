@@ -31,7 +31,7 @@ class SVSyncBase():
         self.dataPrefix = dataPrefix
         self.nid = nid
         self.updateCallback = updateCallback
-        self.secOptions = securityOptions if securityOptions != None else SecurityOptions(SigningInfo(SignatureType.DIGEST_SHA256), ValidatingInfo(ValidatingInfo.get_validator(SignatureType.DIGEST_SHA256)), SigningInfo(SignatureType.DIGEST_SHA256), [])
+        self.secOptions = securityOptions if securityOptions is not None else SecurityOptions(SigningInfo(SignatureType.DIGEST_SHA256), ValidatingInfo(ValidatingInfo.get_validator(SignatureType.DIGEST_SHA256)), SigningInfo(SignatureType.DIGEST_SHA256), [])
         self.core = SVSyncCore(self.app, self.syncPrefix, self.nid, self.updateCallback, self.secOptions)
         self.app.route(self.dataPrefix)(self.onDataInterest)
         logging.info(f'SVSync: started listening to {Name.to_str(self.dataPrefix)}')

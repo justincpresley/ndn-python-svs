@@ -109,7 +109,7 @@ class StateVector:
             svc.node_id = nid.encode()
 
             index = len(self.vector.value)
-            for i in range(len(self.vector.value)):
+            for i, item in enumerate(self.vector.value):
                 if bytes(self.vector.value[i].node_id).decode().lower() > nid.lower():
                     index = i
                     break

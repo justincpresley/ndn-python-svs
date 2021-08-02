@@ -14,14 +14,14 @@ from ndn.security import Sha256WithEcdsaSigner, Sha256WithRsaSigner, HmacSha256S
 #   to hold all signature information including the signer and info used to make the signer
 class SigningInfo:
     __slots__ = ('signer','type','keyName','privKey')
-    def __init__(self, type:SignatureType, keyName:Optional[str]=None, privKey:Optional[bytes]=None) -> None:
-        self.type = type
+    def __init__(self, stype:SignatureType, keyName:Optional[str]=None, privKey:Optional[bytes]=None) -> None:
+        self.type = stype
         self.signer = None
 
         if self.type != SignatureType.DIGEST_SHA256 and self.type != SignatureType.NOT_SIGNED:
-            if privKey == None or privKey == b'':
+            if privKey is None or privKey == b'':
                 raise KeyError(f'Private Key has to be Defined in Signing Info with this Type.')
-            if keyName == None or keyName == "":
+            if keyName is None or keyName == "":
                 raise KeyError(f'Key Name has to be Defined in Signing Info with this Type.')
             self.keyName = keyName
             self.privKey = privKey
@@ -53,22 +53,21 @@ class ValidatingInfo:
         return result
 
     @staticmethod
-    def get_validator(type:SignatureType, keyName:Optional[str]=None, pubKey:Optional[bytes]=None):
-        if type != SignatureType.DIGEST_SHA256 and type != SignatureType.NOT_SIGNED:
-            if pubKey == None or pubKey == b'':
+    def get_validator(stype:SignatureType, keyName:Optional[str]=None, pubKey:Optional[bytes]=None):
+        if stype != SignatureType.DIGEST_SHA256 and stype != SignatureType.NOT_SIGNED:
+            if pubKey is None or pubKey == b'':
                 raise KeyError(f'Public Key has to be Defined when Generating a Validator with this Type.')
-            if keyName == None or keyName == "":
+            if keyName is None or keyName == "":
                 raise KeyError(f'Key Name has to be Defined when Generating a Validator with this Type.')
-        if type == SignatureType.SHA256_WITH_ECDSA:
+        if stype == SignatureType.SHA256_WITH_ECDSA:
             return ValidatingInfo._ecdsa_checker(Name.from_str(keyName), pubKey)
-        elif type == SignatureType.SHA256_WITH_RSA:
+        if stype == SignatureType.SHA256_WITH_RSA:
             return ValidatingInfo._rsa_checker(Name.from_str(keyName), pubKey)
-        elif type == SignatureType.HMAC_WITH_SHA256:
+        if stype == SignatureType.HMAC_WITH_SHA256:
             return ValidatingInfo._hmac_checker(Name.from_str(keyName), pubKey)
-        elif type == SignatureType.DIGEST_SHA256:
+        if stype == SignatureType.DIGEST_SHA256:
             return ValidatingInfo._digest_checker()
-        else:
-            return None
+        return None
     @staticmethod
     def _ecdsa_checker(key_name:FormalName, key_bits:Union[bytes, str]) -> Validator:
         async def wrapper(name:FormalName, sig:SignaturePtrs) -> bool:
@@ -94,8 +93,7 @@ class ValidatingInfo:
                         return False
                 logging.debug('Digest check %s -> %s' % (enc.Name.to_str(name), ret))
                 return ret
-            else:
-                return False
+            return False
         return wrapper
     @staticmethod
     def _rsa_checker(key_name:FormalName, key_bits:Union[bytes, str]) -> Validator:
@@ -122,8 +120,7 @@ class ValidatingInfo:
                         return False
                 logging.debug('Digest check %s -> %s' % (enc.Name.to_str(name), ret))
                 return ret
-            else:
-                return False
+            return False
         return wrapper
     @staticmethod
     def _hmac_checker(key_name:FormalName, secret:bytes) -> Validator:
@@ -148,8 +145,7 @@ class ValidatingInfo:
                         return False
                 logging.debug('Digest check %s -> %s' % (enc.Name.to_str(name), ret))
                 return ret
-            else:
-                return False
+            return False
         return wrapper
     @staticmethod
     def _digest_checker() -> Validator:
@@ -168,9 +164,9 @@ class SecurityOptions:
         self.dataValDict = dataValidatingInfoDict
     async def validate(self, name:FormalName, sig_ptrs:SignaturePtrs):
         val = None
-        if sig_ptrs.signature_info.signature_type == None:
+        if sig_ptrs.signature_info.signature_type is None:
             return True
-        elif sig_ptrs.signature_info.signature_type == 1:
+        if sig_ptrs.signature_info.signature_type == 1:
             val = ValidatingInfo(ValidatingInfo.get_validator(SignatureType.DIGEST_SHA256))
         else:
             keyname = Name.to_str(sig_ptrs.signature_info.key_locator.name)
@@ -179,5 +175,4 @@ class SecurityOptions:
                     val = self.dataValDict[keyname]
         if val:
             return await val.validate(data_name, sig_ptrs)
-        else:
-            return False # We do not have the key for this keyname (cant error check it)
+        return False # We do not have the key for this keyname (cant error check it)
