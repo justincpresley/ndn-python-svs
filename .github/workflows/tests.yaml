@@ -3,7 +3,7 @@ name: Python SVS Tests
 on:
   push:
     branches:
-      - master
+      - enhanced
 
 jobs:
   build:
