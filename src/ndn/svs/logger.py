@@ -12,13 +12,13 @@ class SVSyncLogger(object):
     _configured = False
 
     @staticmethod
-    def config(consoleLogging:bool, fileForLogging:Optional[str], level:int, format:Optional[str]=None) -> None:
+    def config(consoleLogging:bool, fileForLogging:Optional[str], level:int, lformat:Optional[str]=None) -> None:
         if not SVSyncLogger._configured:
             SVSyncLogger._configured = True
             SVSyncLogger._loggerLevel = level
             SVSyncLogger._consoleLogging = consoleLogging
             SVSyncLogger._fileForLogging = fileForLogging
-            SVSyncLogger._loggerFormat = format if format else SVSyncLogger._loggerFormat
+            SVSyncLogger._loggerFormat = lformat if lformat else SVSyncLogger._loggerFormat
 
             SVSyncLogger._logger = logging.getLogger(SVSyncLogger._loggerName)
             SVSyncLogger._logger.setLevel(SVSyncLogger._loggerLevel)
