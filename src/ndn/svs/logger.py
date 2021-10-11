@@ -1,7 +1,17 @@
+#    @Author: Justin C Presley
+#    @Author-Email: justincpresley@gmail.com
+#    @Project: NDN State Vector Sync Protocol
+#    @Source-Code: https://github.com/justincpresley/ndn-python-svs
+#    @Pip-Library: https://pypi.org/project/ndn-svs/
+
+# Basic Libraries
 import logging
 import sys
 from typing import Optional
 
+# Class Type: a logging class
+# Class Purpose:
+#   to properly handle all logging within this library
 class SVSyncLogger(object):
     _loggerName = "ndn-svs"
     _loggerLevel = logging.DEBUG
