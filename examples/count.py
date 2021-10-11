@@ -74,9 +74,7 @@ if __name__ == "__main__":
     args["node_id"] = Name.to_str(Name.from_str(args["node_id"]))
     args["group_prefix"] = Name.to_str(Name.from_str(args["group_prefix"]))
 
-    logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', \
-        filename=args["node_id"][1:].replace("/","_")+".log", \
-        filemode='w+', level=logging.INFO)
+    SVSyncLogger.config(True, None, logging.INFO)
 
     try:
         app.run_forever(after_start=main(args))

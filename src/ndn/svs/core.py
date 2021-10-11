@@ -6,7 +6,6 @@
 
 # Basic Libraries
 import asyncio as aio
-import logging
 from enum import Enum
 from random import uniform
 from typing import Callable, Optional, Tuple
@@ -21,6 +20,7 @@ from .meta_data import MetaData
 from .state_vector import StateVector
 from .scheduler import AsyncScheduler
 from .security import SecurityOptions
+from .logger import SVSyncLogger
 
 # Class Type: an enumeration struct
 # Class Purpose:
@@ -36,7 +36,7 @@ class SVSyncCoreState(Enum):
 #   to find out about new data from other nodes.
 class SVSyncCore:
     def __init__(self, app:NDNApp, syncPrefix:Name, groupPrefix:Name, nid:Name, updateCallback:Callable, secOptions:SecurityOptions) -> None:
-        logging.info(f'SVSyncCore: started svsync core')
+        SVSyncLogger.info(f'SVSyncCore: started svsync core')
         self.state = SVSyncCoreState.STEADY
         self.app = app
         self.nid = nid
@@ -52,12 +52,12 @@ class SVSyncCore:
         self.briefInterval = 200 # time in milliseconds
         self.briefRandomPercent = 0.5
         self.app.route(self.syncPrefix, need_sig_ptrs=True)(self.onSyncInterest)
-        logging.info(f'SVSyncCore: started listening to {Name.to_str(self.syncPrefix)}')
+        SVSyncLogger.info(f'SVSyncCore: started listening to {Name.to_str(self.syncPrefix)}')
         self.scheduler = AsyncScheduler(self.sendSyncInterest, self.interval, self.randomPercent)
         self.scheduler.skip_interval()
     async def asyncSendSyncInterest(self) -> None:
         name = self.syncPrefix + [self.table.getMetaData().encode()] + [ self.table.getPart(0) ]
-        logging.info(f'SVSyncCore: sync {Name.to_str(name)}')
+        SVSyncLogger.info(f'SVSyncCore: sync {Name.to_str(name)}')
         try:
             data_name, meta_info, content = await self.app.express_interest(
                 name, signer=self.secOptions.syncSig.signer, must_be_fresh=True, can_be_prefix=True, lifetime=1000)
@@ -74,12 +74,12 @@ class SVSyncCore:
 
         incomingVector = StateVector(int_name[-2])
         incomingMetadata = MetaData(int_name[-3])
-        logging.info(f'SVSyncCore: >> I: received sync')
-        logging.info(f'SVSyncCore:       rmeta {bytes(incomingMetadata.source).decode()} - {incomingMetadata.tseqno} total, {incomingMetadata.nopcks} pcks')
-        logging.info(f'SVSyncCore:       {incomingVector.to_str()}')
+        SVSyncLogger.info(f'SVSyncCore: >> I: received sync')
+        SVSyncLogger.info(f'SVSyncCore:       rmeta {bytes(incomingMetadata.source).decode()} - {incomingMetadata.tseqno} total, {incomingMetadata.nopcks} pcks')
+        SVSyncLogger.info(f'SVSyncCore:       {incomingVector.to_str()}')
 
         missingList = self.table.processStateVector(incomingVector, oldData=False)
-        logging.info(f'SVSyncCore:       {missingList}')
+        SVSyncLogger.info(f'SVSyncCore:       {missingList}')
         self.table.updateMetaData()
         if missingList:
             self.updateCallback(missingList)
@@ -95,9 +95,9 @@ class SVSyncCore:
             delay = self.briefInterval + round( uniform(-self.briefRandomPercent,self.briefRandomPercent)*self.briefInterval )
             if self.scheduler.get_time_left() > delay:
                 self.scheduler.set_cycle(delay)
-        logging.info(f'SVSyncCore: state {self.state.name}')
-        logging.info(f'SVSyncCore: parts-{self.table.getPartCuts()} | 1stlength-{len(self.table.getPart(0))}')
-        logging.info(f'SVSyncCore: table {self.table.getCompleteStateVector().to_str()}')
+        SVSyncLogger.info(f'SVSyncCore: state {self.state.name}')
+        SVSyncLogger.info(f'SVSyncCore: parts-{self.table.getPartCuts()} | 1stlength-{len(self.table.getPart(0))}')
+        SVSyncLogger.info(f'SVSyncCore: table {self.table.getCompleteStateVector().to_str()}')
 
         if equalize and not self.balancer.isBusy():
             await self.balancer.equalize(incomingMetadata)

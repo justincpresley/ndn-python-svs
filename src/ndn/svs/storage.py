@@ -5,12 +5,13 @@
 #    @Pip-Library: https://pypi.org/project/ndn-svs/
 
 # Basic Libraries
-import logging
 from time import time
 from typing import Optional
 # NDN Imports
 from ndn.encoding import Name, parse_data, NonStrictName
 from ndn.name_tree import NameTrie
+# Custom Imports
+from .logger import SVSyncLogger
 
 # Class Type: a ndn class
 # Class Purpose:
@@ -27,21 +28,21 @@ class SVSyncStorage:
             expire_time_ms += meta_info.freshness_period
         name = Name.normalize(name)
         self.cache[name] = (data_packet, expire_time_ms)
-        logging.info(f'SVSyncStorage: cache save {Name.to_str(name)}')
+        SVSyncLogger.info(f'SVSyncStorage: cache save {Name.to_str(name)}')
     def get_data_packet(self, name:NonStrictName, can_be_prefix:bool=False, must_be_fresh:bool=False) -> Optional[bytes]:
         name = Name.normalize(name)
         try:
             if not can_be_prefix:
                 data, expire_time_ms = self.cache[name]
                 if not must_be_fresh or expire_time_ms > self.time_ms():
-                    logging.info('SVSyncStorage: get from cache')
+                    SVSyncLogger.info('SVSyncStorage: get from cache')
                     return data
             else:
                 it = self.cache.itervalues(prefix=name, shallow=True)
                 while True:
                     data, expire_time_ms = next(it)
                     if not must_be_fresh or expire_time_ms > self.time_ms():
-                        logging.info('SVSyncStorage: get from cache')
+                        SVSyncLogger.info('SVSyncStorage: get from cache')
                         return data
         except (KeyError, StopIteration):
             return None

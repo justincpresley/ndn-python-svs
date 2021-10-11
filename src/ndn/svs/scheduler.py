@@ -8,15 +8,16 @@
 from typing import Callable
 import asyncio as aio
 from random import uniform
-import logging
 from time import time
+# Custom Imports
+from .logger import SVSyncLogger
 
 # Class Type: an async class
 # Class Purpose:
 #   to call a specific function based on an interval.
 class AsyncScheduler:
     def __init__(self, function:Callable, interval:int, randomPercent:float) -> None:
-        logging.info(f'AsyncScheduler: started scheduler for an async function')
+        SVSyncLogger.info(f'AsyncScheduler: started scheduler for an async function')
         self.function = function
         self.defaultInterval = interval # milliseconds
         self.randomPercent = randomPercent # float 0-1

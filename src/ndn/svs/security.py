@@ -5,7 +5,6 @@
 #    @Pip-Library: https://pypi.org/project/ndn-svs/
 
 # Basic Libraries
-import logging
 from Cryptodome.Hash import SHA256, HMAC
 from Cryptodome.PublicKey import ECC, RSA
 from Cryptodome.Signature import DSS, pkcs1_15
@@ -14,6 +13,8 @@ from typing import Union, Optional, Dict
 from ndn.types import Validator
 from ndn.encoding import FormalName, SignaturePtrs, Name, SignatureType
 from ndn.security import Sha256WithEcdsaSigner, Sha256WithRsaSigner, HmacSha256Signer, DigestSha256Signer, sha256_digest_checker
+# Custom Imports
+from .logger import SVSyncLogger
 
 # Class Type: a struct
 # Class Purpose:
@@ -97,7 +98,7 @@ class ValidatingInfo:
                         return True
                     except ValueError:
                         return False
-                logging.debug('Digest check %s -> %s' % (enc.Name.to_str(name), ret))
+                SVSyncLogger.debug('Digest check %s -> %s' % (enc.Name.to_str(name), ret))
                 return ret
             return False
         return wrapper
@@ -124,7 +125,7 @@ class ValidatingInfo:
                         return True
                     except ValueError:
                         return False
-                logging.debug('Digest check %s -> %s' % (enc.Name.to_str(name), ret))
+                SVSyncLogger.debug('Digest check %s -> %s' % (enc.Name.to_str(name), ret))
                 return ret
             return False
         return wrapper
@@ -149,7 +150,7 @@ class ValidatingInfo:
                         return True
                     except ValueError:
                         return False
-                logging.debug('Digest check %s -> %s' % (enc.Name.to_str(name), ret))
+                SVSyncLogger.debug('Digest check %s -> %s' % (enc.Name.to_str(name), ret))
                 return ret
             return False
         return wrapper

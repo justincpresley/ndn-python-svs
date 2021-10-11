@@ -7,7 +7,6 @@
 # Basic Libraries
 import asyncio as aio
 import sys
-import logging
 import time
 from threading import Thread
 from typing import Optional, List, Callable
@@ -22,6 +21,7 @@ from .svs_base import SVSyncBase
 from .core import SVSyncCore
 from .missing_data import MissingData
 from .security import SecurityOptions
+from .logger import SVSyncLogger
 
 # Class Type: an abstract API thread class
 # Class Purpose:
@@ -30,7 +30,7 @@ from .security import SecurityOptions
 #   to allow the user to interact with SVS, fetch and publish.
 class SVSyncBase_Thread(Thread):
     def __init__(self, groupPrefix:Name, nid:Name, updateCallback:Callable, storage:Optional[Storage]=None, securityOptions:Optional[SecurityOptions]=None, face:Optional[Face]=None, keychain:Optional[Keychain]=None) -> None:
-        logging.info(f'SVSync_Thread: Created thread to push SVS to.')
+        SVSyncLogger.info(f'SVSync_Thread: Created thread to push SVS to.')
         Thread.__init__(self)
         self.groupPrefix = groupPrefix
         self.nid = nid

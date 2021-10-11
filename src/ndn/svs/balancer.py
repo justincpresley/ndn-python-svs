@@ -6,7 +6,6 @@
 
 # Basic Libraries
 import asyncio as aio
-import logging
 from typing import Optional, Callable
 # NDN Imports
 from ndn.app import NDNApp
@@ -17,6 +16,7 @@ from .security import SecurityOptions
 from .state_table import StateTable
 from .state_vector import StateVector
 from .meta_data import MetaData
+from .logger import SVSyncLogger
 
 # Class Type: a ndn class
 # Class Purpose:
@@ -34,7 +34,7 @@ class SVSyncBalancer:
         self.busy = False
         self.balancePrefix = self.nid + self.groupPrefix + Name.from_str("/sync")
         self.app.route(self.balancePrefix, need_sig_ptrs=True)(self.onStateInterest)
-        logging.info(f'SVSyncBalancer: started listening to {Name.to_str(self.balancePrefix)}')
+        SVSyncLogger.info(f'SVSyncBalancer: started listening to {Name.to_str(self.balancePrefix)}')
     async def equalize(self, incoming_md:MetaData) -> None:
         self.busy = True
         if incoming_md.tseqno <= self.table.getMetaData().tseqno:
@@ -50,20 +50,20 @@ class SVSyncBalancer:
             self.table.updateMetaData()
             if incoming_md.tseqno <= self.table.getMetaData().tseqno:
                 break
-        logging.info(f'SVSyncBalancer: nmeta {bytes(self.table.getMetaData().source).decode()} - {self.table.getMetaData().tseqno} total, {self.table.getMetaData().nopcks} pcks')
-        logging.info(f'SVSyncBalancer: ntable {self.table.getCompleteStateVector().to_str()}')
+        SVSyncLogger.info(f'SVSyncBalancer: nmeta {bytes(self.table.getMetaData().source).decode()} - {self.table.getMetaData().tseqno} total, {self.table.getMetaData().nopcks} pcks')
+        SVSyncLogger.info(f'SVSyncBalancer: ntable {self.table.getCompleteStateVector().to_str()}')
         self.busy = False
     def onStateInterest(self, int_name:FormalName, int_param:InterestParam, _app_param:Optional[BinaryStr], sig_ptrs:SignaturePtrs) -> None:
-        logging.info(f'SVSyncBalancer: received balance {Name.to_str(int_name)}')
+        SVSyncLogger.info(f'SVSyncBalancer: received balance {Name.to_str(int_name)}')
         aio.get_event_loop().create_task(self.onStateInterestHelper(int_name, int_param, _app_param, sig_ptrs))
     async def onStateInterestHelper(self, int_name:FormalName, int_param:InterestParam, _app_param:Optional[BinaryStr], sig_ptrs:SignaturePtrs) -> None:
         sv = bytes(self.table.getPart(Component.to_number(int_name[-1])))
-        logging.info(f'SVSyncBalancer: sending balance {sv}')
+        SVSyncLogger.info(f'SVSyncBalancer: sending balance {sv}')
         self.app.put_data(int_name, content=sv, freshness_period=1000)
     async def getStatePckValue(self, source:Name, nopck:int) -> Optional[StateVector]:
         name = source + self.groupPrefix + Name.from_str("/sync") + [Component.from_number(nopck, Component.TYPE_SEQUENCE_NUM)]
         try:
-            logging.info(f'SVSyncBalancer: balancing from {Name.to_str(name)}')
+            SVSyncLogger.info(f'SVSyncBalancer: balancing from {Name.to_str(name)}')
             data_name, meta_info, content = await self.app.express_interest(
                 name, must_be_fresh=True, can_be_prefix=True, lifetime=1000)
             if bytes(content) == b'':

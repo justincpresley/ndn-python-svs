@@ -28,3 +28,6 @@ from .security import SigningInfo, ValidatingInfo, SecurityOptions
 
 # Tool classes
 from .scheduler import AsyncScheduler
+
+# Logging class
+from .logger import SVSyncLogger

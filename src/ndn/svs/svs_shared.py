@@ -6,7 +6,6 @@
 
 # Basic Libraries
 from typing import Callable, Optional
-import logging
 # NDN Imports
 from ndn.app import NDNApp
 from ndn.encoding import Name, Component, parse_data
@@ -15,6 +14,7 @@ from ndn_python_repo import Storage
 # Custom Imports
 from .svs_base import SVSyncBase
 from .security import SecurityOptions
+from .logger import SVSyncLogger
 
 # Class Type: an derived API class
 # Class Purpose:
@@ -30,30 +30,30 @@ class SVSyncShared(SVSyncBase):
         name = self.getDataName(nid, seqNum)
         while retries+1 > 0:
             try:
-                logging.info(f'SVSync: fetching data {Name.to_str(name)}')
+                SVSyncLogger.info(f'SVSync: fetching data {Name.to_str(name)}')
                 _, _, _, pkt = await self.app.express_interest(name, need_raw_packet=True, must_be_fresh=True, can_be_prefix=False, lifetime=6000)
                 ex_int_name, meta_info, content, sig_ptrs = parse_data(pkt)
                 isValidated = await self.secOptions.validate(ex_int_name, sig_ptrs)
                 if not isValidated:
                     return None
-                logging.info(f'SVSync: received data {bytes(content)}')
+                SVSyncLogger.info(f'SVSync: received data {bytes(content)}')
                 if content and self.cacheOthers:
                     self.storage.put_data_packet(name, pkt)
                 return bytes(content) if content else None
             except InterestNack as e:
-                logging.warning(f'SVSync: nacked with reason={e.reason}')
+                SVSyncLogger.warning(f'SVSync: nacked with reason={e.reason}')
             except InterestTimeout:
-                logging.warning(f'SVSync: timeout')
+                SVSyncLogger.warning(f'SVSync: timeout')
             except InterestCanceled:
-                logging.warning(f'SVSync: canceled')
+                SVSyncLogger.warning(f'SVSync: canceled')
             except ValidationFailure:
-                logging.warning(f'SVSync: data failed to validate')
+                SVSyncLogger.warning(f'SVSync: data failed to validate')
             except Exception as e:
-                logging.warning(f'SVSync: unknown error has occured: {e}')
+                SVSyncLogger.warning(f'SVSync: unknown error has occured: {e}')
 
             retries = retries - 1
             if retries+1 > 0:
-                logging.warning(f'SVSync: retrying fetching data')
+                SVSyncLogger.warning(f'SVSync: retrying fetching data')
         return None
     def getDataName(self, nid:Name, seqNum:int) -> Name:
         return ( self.groupPrefix + [Component.from_str("d")] + nid + Name.from_str(str(seqNum)) )
