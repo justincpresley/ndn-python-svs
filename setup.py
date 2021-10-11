@@ -15,7 +15,7 @@ with io.open("src/ndn/__init__.py", "rt", encoding="utf8") as f:
 with io.open("README.md", "rt", encoding="utf8") as f:
     long_description = f.read()
 
-requirements = ['python-ndn>=0.3a1','ndn-python-repo>=0.2a5','pytest>=6.2.2','pycryptodomex>=3.10.1']
+requirements = ['python-ndn>=0.3a1.post4','ndn-python-repo>=0.2a5','pytest>=6.2.5','pycryptodomex>=3.11.0']
 setup(
     name='ndn-svs',
     version=version,
@@ -40,7 +40,6 @@ setup(
         'Topic :: Internet',
         'Topic :: System :: Networking',
         'License :: OSI Approved :: GNU Lesser General Public License v2 (LGPLv2)',
-        'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
@@ -49,5 +48,5 @@ setup(
     packages=find_packages('src'),
     package_dir={'': 'src'},
     install_requires=requirements,
-    python_requires=">=3.6",
+    python_requires=">=3.7",
     zip_safe=False)

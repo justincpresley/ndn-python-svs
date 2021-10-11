@@ -25,18 +25,8 @@ def test_state_vector_ordering():
     sv1.set("c", 5)
     sv1.set("a", 6)
     sv1.set("B", 10)
-    sv1.set("z", 15)
-    sv1.set("x", 5225)
 
-    sv2 = StateVector()
-    sv2.set("z", 15)
-    sv2.set("x", 5225)
-    sv2.set("a", 6)
-    sv2.set("B", 10)
-    sv2.set("c", 5)
-
-    assert sv1.to_str() == sv2.to_str()
-    assert sv1.encode() == sv2.encode()
+    assert sv1.to_str() == "B:10 a:6 c:5"
 
 def test_state_vector_component():
     sv = StateVector()
@@ -73,6 +63,7 @@ def test_state_vector_set():
     sv.set("a", 100)
 
     assert sv.get("a") == 100
+    assert sv.get("c") == None
 
 def test_state_vector_decode():
     # hard coded bytes of component vector based on SVS protocol
@@ -84,13 +75,13 @@ def test_state_vector_decode():
     assert sv.get("two") == 2
 
 def test_state_vector_encode():
-    sv = StateVector()
+    sv = StateVector(None)
     sv.set("one", 1)
     sv.set("two", 2)
 
     enc_sv = sv.encode()
     # does this state vector's byte value equal a hard coded byte value based on the state vector's protocol
-    assert enc_sv == b'\xC9\x10\xCA\x03\x6F\x6E\x65\xCB\x01\x01\xCA\x03\x74\x77\x6F\xCB\x01\x02'
+    assert enc_sv == b'\xc9\x10\xca\x03two\xcb\x01\x02\xca\x03one\xcb\x01\x01'
 
 def test_state_vector_component_functionality():
     sv = StateVector()
@@ -100,3 +91,14 @@ def test_state_vector_component_functionality():
     # does the state vector component act as a compoent in a name
     name = Name.from_str("/state_vector/test") + [sv.to_component()]
     assert name == Name.from_str(Name.to_str(name))
+
+def test_state_vector_total():
+    sv = StateVector(None)
+    sv.set("c", 5)
+    sv.set("a", 6)
+    sv.set("B", 10)
+    sv.set("z", 15)
+    sv.set("x", 5225)
+
+    assert sv.total() == 5261
+

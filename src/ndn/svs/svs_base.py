@@ -23,16 +23,17 @@ from .security import SecurityOptions, SigningInfo, ValidatingInfo
 #   to derive different SVSync from.
 #   to allow the user to interact with SVS, fetch and publish.
 class SVSyncBase():
-    def __init__(self, app:NDNApp, syncPrefix:Name, dataPrefix:Name, nid:Name, updateCallback:Callable, storage:Optional[Storage]=None, securityOptions:Optional[SecurityOptions]=None) -> None:
+    def __init__(self, app:NDNApp, syncPrefix:Name, dataPrefix:Name, groupPrefix:Name, nid:Name, updateCallback:Callable, storage:Optional[Storage]=None, securityOptions:Optional[SecurityOptions]=None) -> None:
         logging.info(f'SVSync: started svsync')
         self.app = app
         self.storage = SVSyncStorage() if not storage else storage
         self.syncPrefix = syncPrefix
         self.dataPrefix = dataPrefix
+        self.groupPrefix = groupPrefix
         self.nid = nid
         self.updateCallback = updateCallback
         self.secOptions = securityOptions if securityOptions is not None else SecurityOptions(SigningInfo(SignatureType.DIGEST_SHA256), ValidatingInfo(ValidatingInfo.get_validator(SignatureType.DIGEST_SHA256)), SigningInfo(SignatureType.DIGEST_SHA256), [])
-        self.core = SVSyncCore(self.app, self.syncPrefix, self.nid, self.updateCallback, self.secOptions)
+        self.core = SVSyncCore(self.app, self.syncPrefix, self.groupPrefix, self.nid, self.updateCallback, self.secOptions)
         self.app.route(self.dataPrefix)(self.onDataInterest)
         logging.info(f'SVSync: started listening to {Name.to_str(self.dataPrefix)}')
     def onDataInterest(self, int_name:FormalName, int_param:InterestParam, _app_param:Optional[BinaryStr]) -> None:
@@ -47,7 +48,7 @@ class SVSyncBase():
                 logging.info(f'SVSync: fetching data {Name.to_str(name)}')
                 _, _, _, pkt = await self.app.express_interest(name, need_raw_packet=True, must_be_fresh=True, can_be_prefix=False, lifetime=6000)
                 ex_int_name, meta_info, content, sig_ptrs = parse_data(pkt)
-                isValidated = self.secOptions.validate(ex_int_name, sig_ptrs)
+                isValidated = await self.secOptions.validate(ex_int_name, sig_ptrs)
                 if not isValidated:
                     return None
                 logging.info(f'SVSync: received data {bytes(content)}')
@@ -72,7 +73,7 @@ class SVSyncBase():
         data_packet = make_data(name, MetaInfo(freshness_period=5000), content=data, signer=self.secOptions.dataSig.signer)
         logging.info(f'SVSync: publishing data {Name.to_str(name)}')
         self.storage.put_data_packet(name, data_packet)
-        self.core.updateStateVector(self.core.getSeqNum()+1)
+        self.core.updateMyState(self.core.getSeqNum()+1)
     def getCore(self) -> SVSyncCore:
         return self.core
     def getDataName(self, nid:Name, seqNum:int) -> Name:

@@ -5,35 +5,35 @@
 #    @Pip-Library: https://pypi.org/project/ndn-svs/
 
 # Basic Libraries
-from typing import List
+from typing import List, Optional
 from enum import Enum
 import struct
 # NDN Imports
-from ndn.encoding import Component, TlvModel, BytesField, UintField, RepeatedField, ModelField
+from ndn.encoding import Component
+from ndn.encoding import TlvModel, BytesField, UintField
 from ndn.encoding import get_tl_num_size, write_tl_num, parse_tl_num
 
 # Class Type: an enumeration struct
 # Class Purpose:
 #   to differ tlv model types.
 class StateVectorModelTypes(Enum):
-    VECTOR    = 201
-    KEY       = 202
-    VALUE     = 203
+    VECTOR = 201
+    KEY = 202
+    VALUE = 203
 
-# Class Type: an enumeration struct
+# Class Type: a struct
 # Class Purpose:
 #   to hold info about a singular node within the vector.
 class StateVectorComponentModel(TlvModel):
-    node_id = BytesField(StateVectorModelTypes.KEY.value)
-    seq_num = UintField(StateVectorModelTypes.VALUE.value)
+    nid = BytesField(StateVectorModelTypes.KEY.value)
+    seqno = UintField(StateVectorModelTypes.VALUE.value)
 
 # Class Type: an custom tlv model class
 # Class Purpose:
 #   to contain all the info of a state vector.
 class StateVectorModel:
-    value:List[StateVectorComponentModel]
-    def __init__(self) -> None:
-        value = []
+    def __init__(self, list:List[StateVectorComponentModel]=[]) -> None:
+        self.value = list
     def encode(self) -> bytearray:
         component_wires = [v.encode() for v in self.value]
         length = sum(len(w) for w in component_wires)
@@ -89,51 +89,75 @@ class StateVectorModel:
             pos += length
             # Append the component
             comp = StateVectorComponentModel()
-            comp.node_id = node_id
-            comp.seq_num = value
+            comp.nid = node_id
+            comp.seqno = value
             ret.value.append(comp)
         return ret
 
-# Class Type: an API class
+# Class Type: a class
 # Class Purpose:
 #   to allow an easier time to interact with the StateVectorModel class.
 class StateVector:
     def __init__(self, component:Component=None) -> None:
-        self.vector = StateVectorModel() if not component else StateVectorModel.parse(component)
-        self.vector.value = [] if not component else self.vector.value
-    def set(self, nid:str, seqNum:int) -> None:
-        sort = True if not self.has(nid) else False
-        if sort:
+        self.vector = StateVectorModel()
+        self.vector.value = []
+        if component:
+            temp_vector = StateVectorModel.parse(component)
+            for i in temp_vector.value:
+                self.set(bytes(i.nid).decode(), i.seqno, True)
+    def set(self, nid:str, seqno:int, oldData:bool=False) -> None:
+        index = self.index(nid)
+        if index == None:
             svc = StateVectorComponentModel()
-            svc.seq_num = seqNum
-            svc.node_id = nid.encode()
-
-            index = len(self.vector.value)
-            for i, item in enumerate(self.vector.value):
-                if bytes(self.vector.value[i].node_id).decode().lower() > nid.lower():
-                    index = i
-                    break
-            self.vector.value.insert(index, svc)
+            svc.seqno = seqno
+            svc.nid = nid.encode()
+            if not oldData:
+                self.vector.value.insert(0,svc)
+            else:
+                self.vector.value.append(svc)
         else:
-            for i in self.vector.value:
-                if bytes(i.node_id).decode() == nid:
-                    i.seq_num = seqNum
-                    return
-    def get(self, nid:str) -> int:
+            self.vector.value[index].seqno = seqno
+            if not oldData:
+                self.vector.value.insert(0, self.vector.value.pop(index))
+        return
+    def get(self, nid:str) -> Optional[int]:
         for i in self.vector.value:
-            if bytes(i.node_id).decode() == nid:
-                return i.seq_num
-        return 0
+            if bytes(i.nid).decode() == nid:
+                return i.seqno
+        return None
     def has(self, nid:str) -> bool:
-        return ( nid in self.keys() )
+        return False if self.index(nid) == None else True
+    def index(self, nid:str) -> Optional[int]:
+        for index, value in enumerate(self.vector.value):
+            if bytes(value.nid).decode() == nid:
+                return index
+        return None
     def to_str(self) -> str:
         stream = ""
         for i in self.vector.value:
-            stream = stream + bytes(i.node_id).decode() + ":" + str(i.seq_num) + " "
+            stream = stream + bytes(i.nid).decode() + ":" + str(i.seqno) + " "
         return stream.rstrip()
     def encode(self) -> bytes:
         return self.vector.encode()
     def keys(self) -> List[str]:
-        return [bytes(i.node_id).decode() for i in self.vector.value]
+        return [bytes(i.nid).decode() for i in self.vector.value]
+    def list(self) -> List[StateVectorComponentModel]:
+        return self.vector.value
     def to_component(self) -> Component:
         return self.encode()
+    def length(self) -> int:
+        return len(self.encode())
+    def partition(self, start:int, end:int) -> Component:
+        part = self.vector.value[start:end]
+        if part == []:
+            return StateVectorModel().encode()
+        return StateVectorModel(part).encode()
+    def entry(self, index:int) -> Optional[StateVectorComponentModel]:
+        try:
+            return self.vector.value[index]
+        except (IndexError, ValueError):
+            return None
+    def total(self) -> int:
+        return sum(i.seqno for i in self.vector.value)
+    def entry_lengths(self) -> List[int]:
+        return [len(i.encode()) for i in self.vector.value]

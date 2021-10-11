@@ -9,30 +9,23 @@ import asyncio as aio
 import logging
 from enum import Enum
 from random import uniform
-from typing import Callable, Optional
+from typing import Callable, Optional, Tuple
 # NDN Imports
 from ndn.app import NDNApp
 from ndn.encoding import Name, InterestParam, BinaryStr, FormalName, SignaturePtrs
 from ndn.types import InterestNack, InterestTimeout, InterestCanceled, ValidationFailure
 # Custom Imports
+from .balancer import SVSyncBalancer
+from .state_table import StateTable
+from .meta_data import MetaData
 from .state_vector import StateVector
 from .scheduler import AsyncScheduler
 from .security import SecurityOptions
 
-# Class Type: a struct
-# Class Purpose:
-#   to hold the range of missing data for a specific node.
-class MissingData:
-    __slots__ = ('nid','lowSeqNum','highSeqNum')
-    def __init__(self, nid:str, lowSeqNum:int, highSeqNum:int) -> None:
-        self.nid        = nid
-        self.lowSeqNum  = lowSeqNum
-        self.highSeqNum = highSeqNum
-
 # Class Type: an enumeration struct
 # Class Purpose:
 #   to differ core states.
-class SVSyncCore_State(Enum):
+class SVSyncCoreState(Enum):
     STEADY     = 0
     SUPRESSION = 1
 
@@ -42,15 +35,17 @@ class SVSyncCore_State(Enum):
 #   to hear about other sync interests
 #   to find out about new data from other nodes.
 class SVSyncCore:
-    def __init__(self, app:NDNApp, syncPrefix:Name, nid:Name, updateCallback:Callable, secOptions:SecurityOptions) -> None:
+    def __init__(self, app:NDNApp, syncPrefix:Name, groupPrefix:Name, nid:Name, updateCallback:Callable, secOptions:SecurityOptions) -> None:
         logging.info(f'SVSyncCore: started svsync core')
-        self.state = SVSyncCore_State.STEADY
+        self.state = SVSyncCoreState.STEADY
         self.app = app
         self.nid = nid
         self.updateCallback = updateCallback
         self.syncPrefix = syncPrefix
+        self.groupPrefix = groupPrefix
         self.secOptions = secOptions
-        self.vector = StateVector()
+        self.table = StateTable(self.nid)
+        self.balancer = SVSyncBalancer(self.app, self.groupPrefix, self.nid, self.table, self.updateCallback, self.secOptions)
         self.seqNum = 0
         self.interval = 30000 # time in milliseconds
         self.randomPercent = 0.1
@@ -61,8 +56,8 @@ class SVSyncCore:
         self.scheduler = AsyncScheduler(self.sendSyncInterest, self.interval, self.randomPercent)
         self.scheduler.skip_interval()
     async def asyncSendSyncInterest(self) -> None:
-        name = self.syncPrefix + [ self.vector.to_component() ]
-        logging.info(f'SVSyncCore: sent sync {Name.to_str(name)}')
+        name = self.syncPrefix + [self.table.getMetaData().encode()] + [ self.table.getPart(0) ]
+        logging.info(f'SVSyncCore: sync {Name.to_str(name)}')
         try:
             data_name, meta_info, content = await self.app.express_interest(
                 name, signer=self.secOptions.syncSig.signer, must_be_fresh=True, can_be_prefix=True, lifetime=1000)
@@ -70,37 +65,7 @@ class SVSyncCore:
             pass
     def sendSyncInterest(self) -> None:
         aio.get_event_loop().create_task(self.asyncSendSyncInterest())
-    def mergeStateVector(self, otherVector:StateVector) -> None:
-        myVectorNew = False
-        otherVectorNew = False
-        missingList = []
-
-        # check if other vector has a newer state
-        for key in otherVector.keys():
-            mySeq = self.vector.get(key)
-            otherSeq = otherVector.get(key)
-
-            if mySeq < otherSeq:
-                otherVectorNew = True
-                temp = MissingData(key, mySeq+1, otherSeq)
-                self.vector.set(key, otherSeq)
-                missingList.append(temp)
-
-        # callback if missing data found
-        if missingList:
-            self.updateCallback(missingList)
-
-        # check if my vector has a newer state
-        for key in self.vector.keys():
-            mySeq = self.vector.get(key)
-            otherSeq = otherVector.get(key)
-            if otherVector.get(key) < self.vector.get(key):
-                myVectorNew = True
-
-        # return bools
-        return (myVectorNew, otherVectorNew)
     def onSyncInterest(self, int_name:FormalName, int_param:InterestParam, _app_param:Optional[BinaryStr], sig_ptrs:SignaturePtrs) -> None:
-        logging.info(f'SVSyncCore: received sync {Name.to_str(int_name)}')
         aio.get_event_loop().create_task(self.onSyncInterestHelper(int_name, int_param, _app_param, sig_ptrs))
     async def onSyncInterestHelper(self, int_name:FormalName, int_param:InterestParam, _app_param:Optional[BinaryStr], sig_ptrs:SignaturePtrs) -> None:
         isValidated = await self.secOptions.syncVal.validate(int_name, sig_ptrs)
@@ -108,28 +73,48 @@ class SVSyncCore:
             return
 
         incomingVector = StateVector(int_name[-2])
+        incomingMetadata = MetaData(int_name[-3])
+        logging.info(f'SVSyncCore: >> I: received sync')
+        logging.info(f'SVSyncCore:       rmeta {bytes(incomingMetadata.source).decode()} - {incomingMetadata.tseqno} total, {incomingMetadata.nopcks} pcks')
+        logging.info(f'SVSyncCore:       {incomingVector.to_str()}')
 
-        myVectorNew, incomingVectorNew = self.mergeStateVector(incomingVector)
-        self.state = SVSyncCore_State.SUPRESSION if myVectorNew else SVSyncCore_State.STEADY
+        missingList = self.table.processStateVector(incomingVector, oldData=False)
+        logging.info(f'SVSyncCore:       {missingList}')
+        self.table.updateMetaData()
+        if missingList:
+            self.updateCallback(missingList)
+
+        supress, equalize = self.compareMetaData(incomingMetadata)
+        self.state = SVSyncCoreState.SUPRESSION if supress else SVSyncCoreState.STEADY
 
         # reset the sync timer if STEADY
         # supress the timer if SUPPRESION
-        if self.state == SVSyncCore_State.STEADY:
+        if self.state == SVSyncCoreState.STEADY:
             self.scheduler.set_cycle()
         else:
             delay = self.briefInterval + round( uniform(-self.briefRandomPercent,self.briefRandomPercent)*self.briefInterval )
             if self.scheduler.get_time_left() > delay:
                 self.scheduler.set_cycle(delay)
         logging.info(f'SVSyncCore: state {self.state.name}')
-        logging.info(f'SVSyncCore: vector {self.vector.to_str()}')
-    def updateStateVector(self, seqNum:int, nid:Name=None) -> None:
-        if not nid:
-            nid = self.nid
-        if Name.to_str(nid) == Name.to_str(self.nid):
-            self.seqNum = seqNum
-        self.vector.set(Name.to_str(nid), seqNum)
+        logging.info(f'SVSyncCore: parts-{self.table.getPartCuts()} | 1stlength-{len(self.table.getPart(0))}')
+        logging.info(f'SVSyncCore: table {self.table.getCompleteStateVector().to_str()}')
+
+        if equalize and not self.balancer.isBusy():
+            await self.balancer.equalize(incomingMetadata)
+    def compareMetaData(self, incoming_md:MetaData) -> Tuple[bool, bool]:
+        table_md = self.table.getMetaData()
+        supress, equalize = False, False
+        if table_md.tseqno > incoming_md.tseqno:
+            supress = True
+        elif table_md.tseqno < incoming_md.tseqno:
+            equalize = True
+        return (supress, equalize)
+    def updateMyState(self, seqno:int) -> None:
+        self.table.updateMyState(seqno)
+        self.table.updateMetaData()
         self.scheduler.skip_interval()
+        self.seqNum = self.table.getSeqNum(self.nid)
     def getSeqNum(self) -> int:
         return self.seqNum
-    def getStateVector(self) -> StateVector:
-        return self.vector
+    def getStateTable(self) -> StateTable:
+        return self.table

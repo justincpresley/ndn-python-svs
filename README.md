@@ -47,7 +47,7 @@ You may create as many of these as possible and all clients will sync up using S
 
 Before you run the program, you must register the group prefix as multi-cast (even if you did not specifically define the group prefix):
 ```
-nfdc strategy set <group-prefix> /localhost/nfd/strategy/multicast/%FD%03
+nfdc strategy set <group-prefix> /localhost/nfd/strategy/multicast/%FD%04
 ```
 The default (unless specified) **group prefix** is `/svs` for any build-in examples.
 

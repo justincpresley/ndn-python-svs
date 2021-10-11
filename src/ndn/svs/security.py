@@ -1,3 +1,9 @@
+#    @Author: Justin C Presley
+#    @Author-Email: justincpresley@gmail.com
+#    @Project: NDN State Vector Sync Protocol
+#    @Source-Code: https://github.com/justincpresley/ndn-python-svs
+#    @Pip-Library: https://pypi.org/project/ndn-svs/
+
 # Basic Libraries
 import logging
 from Cryptodome.Hash import SHA256, HMAC
@@ -169,10 +175,13 @@ class SecurityOptions:
         if sig_ptrs.signature_info.signature_type == 1:
             val = ValidatingInfo(ValidatingInfo.get_validator(SignatureType.DIGEST_SHA256))
         else:
-            keyname = Name.to_str(sig_ptrs.signature_info.key_locator.name)
-            for key in self.dataValDict:
-                if key == keyname:
-                    val = self.dataValDict[keyname]
+            try:
+                keyname = Name.to_str(sig_ptrs.signature_info.key_locator.name)
+                for key in self.dataValDict:
+                    if key == keyname:
+                        val = self.dataValDict[keyname]
+            except AttributeError:
+                val = None
         if val:
-            return await val.validate(data_name, sig_ptrs)
-        return False # We do not have the key for this keyname (cant error check it)
+            return await val.validate(name, sig_ptrs)
+        return True # We do not have the key for this keyname (cant error check it)
