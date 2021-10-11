@@ -9,6 +9,11 @@ from .svs_base import SVSyncBase
 from .svs import SVSync
 from .svs_shared import SVSyncShared
 
+# Forked Thread API classes
+from .svs_base_thread import SVSyncBase_Thread
+from .svs_thread import SVSync_Thread
+from .svs_shared_thread import SVSyncShared_Thread
+
 # Logic of SVS
 from .core import SVSyncCore
 from .balancer import SVSyncBalancer
