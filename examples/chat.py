@@ -6,21 +6,14 @@
 
 # Basic Libraries
 from argparse import ArgumentParser, SUPPRESS
-import asyncio as aio
 import sys
-import time
 import logging
-import threading
-from typing import Optional, List
+from typing import List, Callable
 # NDN Imports
-from ndn.app import NDNApp
 from ndn.encoding import Name
 # Custom Imports
 sys.path.insert(0,'.')
-from src.ndn.svs.svs import SVSync
-from src.ndn.svs.core import MissingData
-
-app = NDNApp()
+from src.ndn.svs import *
 
 def parse_cmd_args() -> dict:
     # Command Line Parser
@@ -39,38 +32,43 @@ def parse_cmd_args() -> dict:
     args["node_id"] = argvars.node_name
     return args
 
-class Program:
-    def __init__(self, args:dict) -> None:
-        self.args = args
-        self.svs = SVSync(app, Name.from_str(self.args["group_prefix"]), Name.from_str(self.args["node_id"]), self.missing_callback)
-        print(f'SVS client started | {self.args["group_prefix"]} - {self.args["node_id"]} |')
-    async def run(self) -> None:
-        num = 0
-        while True:
-            num = num+1
-            try:
-                print("YOU: "+str(num))
-                self.svs.publishData(str(num).encode())
-            except KeyboardInterrupt:
-                sys.exit()
-            await aio.sleep(5)
-    def missing_callback(self, missing_list:List[MissingData]) -> None:
-        aio.ensure_future(self.on_missing_data(missing_list))
-    async def on_missing_data(self, missing_list:List[MissingData]) -> None:
+def on_missing_data(thread:SVSyncBase_Thread) -> Callable:
+    async def wrapper(missing_list:List[MissingData]) -> None:
         for i in missing_list:
             nid = Name.from_str(i.nid)
             while i.lowSeqNum <= i.highSeqNum:
-                content_str = await self.svs.fetchData(nid, i.lowSeqNum)
+                content_str = await thread.getSVSync().fetchData(nid, i.lowSeqNum)
                 if content_str is not None:
                     content_str = i.nid + ": " + content_str.decode()
                     sys.stdout.write("\033[K")
                     sys.stdout.flush()
                     print(content_str)
                 i.lowSeqNum = i.lowSeqNum + 1
+    return wrapper
 
-async def main(args:dict) -> int:
+class Program:
+    def __init__(self, args:dict) -> None:
+        self.args = args
+        self.svs_thread = SVSync_Thread(Name.from_str(self.args["group_prefix"]),Name.from_str(self.args["node_id"]), on_missing_data)
+        self.svs_thread.daemon = True
+        self.svs_thread.start()
+        self.svs_thread.wait()
+        print(f'SVS chat client started | {self.args["group_prefix"]} - {self.args["node_id"]} |')
+    def run(self) -> None:
+        while True:
+            try:
+                val = input("")
+                sys.stdout.write("\033[F"+"\033[K")
+                sys.stdout.flush()
+                if val != "" and val != " ":
+                    print("YOU: "+val)
+                    self.svs_thread.publishData(val.encode())
+            except KeyboardInterrupt:
+                sys.exit()
+
+def main(args:dict) -> int:
     prog = Program(args)
-    await prog.run()
+    prog.run()
 
 if __name__ == "__main__":
     args = parse_cmd_args()
@@ -81,7 +79,4 @@ if __name__ == "__main__":
         filename=args["node_id"][1:].replace("/","_")+".log", \
         filemode='w+', level=logging.INFO)
 
-    try:
-        app.run_forever(after_start=main(args))
-    except FileNotFoundError:
-        print('Error: could not connect to NFD for SVS.')
+    sys.exit(main(args))
