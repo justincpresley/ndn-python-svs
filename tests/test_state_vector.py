@@ -101,4 +101,3 @@ def test_state_vector_total():
     sv.set("x", 5225)
 
     assert sv.total() == 5261
-
