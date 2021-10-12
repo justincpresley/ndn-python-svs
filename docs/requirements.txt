@@ -1,0 +1,6 @@
+ndn-python-repo>=0.2a5
+python-ndn>=0.3a1.post4
+pytest>=6.2.5
+pycryptodomex>=3.11.0
+sphinx-autodoc-typehints>=1.12.0
+sphinx-rtd-theme>=0.5.2
