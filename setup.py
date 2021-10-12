@@ -8,14 +8,18 @@
 import io
 import re
 from setuptools import setup, find_packages
+from typing import List
 
-with io.open("src/ndn/__init__.py", "rt", encoding="utf8") as f:
+with io.open("docs/version.py", "rt", encoding="utf8") as f:
     version = re.search(r'__version__ = "(.*?)"', f.read()).group(1)
 
 with io.open("README.md", "rt", encoding="utf8") as f:
     long_description = f.read()
 
-requirements = ['python-ndn>=0.3a1.post4','ndn-python-repo>=0.2a5','pytest>=6.2.5','pycryptodomex>=3.11.0']
+def _parse_requirements(filename: str) -> List[str]:
+    with open(filename, 'r') as f:
+        return [s for s in [ line.split('#', 1)[0].strip(' \t\n') for line in f ] if s != '']
+
 setup(
     name='ndn-svs',
     version=version,
@@ -47,6 +51,6 @@ setup(
     keywords='NDN SVS',
     packages=find_packages('src'),
     package_dir={'': 'src'},
-    install_requires=requirements,
+    install_requires=_parse_requirements('docs/requirements.txt'),
     python_requires=">=3.7",
     zip_safe=False)

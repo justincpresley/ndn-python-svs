@@ -1,0 +1,22 @@
+ndn-python-svs
+==============
+
+This python library implements the **StateVectorSync** (SVS) protocol_ to synchronise states between multiple clients over NDN for **distributed realtime applications**.
+
+The Named Data Networking (NDN) StateVectorSync Protocol implementation using python-ndn_ nicknamed ``ndn-python-svs``.
+
+The implementation is on our github-repo_.
+
+There are **two branches**:
+
+* enhanced_: main branch, specification with added enhancements
+* traditional_: original StateVectorSync protocol specification
+
+Please see our documentation_.
+
+.. _protocol: https://named-data.github.io/StateVectorSync/
+.. _python-ndn: https://github.com/named-data/python-ndn
+.. _documentation: https://ndn-python-svs.readthedocs.io
+.. _github-repo: https://github.com/justincpresley/ndn-python-svs
+.. _enhanced: https://github.com/justincpresley/ndn-python-svs/tree/enhanced
+.. _traditional: https://github.com/justincpresley/ndn-python-svs/tree/traditional
