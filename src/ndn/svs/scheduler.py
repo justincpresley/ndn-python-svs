@@ -18,11 +18,7 @@ from .logger import SVSyncLogger
 class AsyncScheduler:
     def __init__(self, function:Callable, interval:int, randomPercent:float) -> None:
         SVSyncLogger.info(f'AsyncScheduler: started scheduler for an async function')
-        self.function = function
-        self.defaultInterval = interval # milliseconds
-        self.randomPercent = randomPercent # float 0-1
-        self.startTime = None
-        self.stop = False
+        self.function, self.defaultInterval, self.randomPercent, self.startTime, self.stop = function, interval, randomPercent, None, False
         self.interval = self.defaultInterval + round( uniform(-self.randomPercent,self.randomPercent)*self.defaultInterval )
         self.task = aio.get_event_loop().create_task(self.target())
     async def target(self) -> None:

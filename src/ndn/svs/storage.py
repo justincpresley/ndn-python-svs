@@ -39,7 +39,7 @@ class SVSyncStorage:
                     return data
             else:
                 it = self.cache.itervalues(prefix=name, shallow=True)
-                while True:
+                while 1:
                     data, expire_time_ms = next(it)
                     if not must_be_fresh or expire_time_ms > self.time_ms():
                         SVSyncLogger.info('SVSyncStorage: get from cache')

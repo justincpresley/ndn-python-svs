@@ -17,14 +17,10 @@ from .missing_data import MissingData
 # Class Purpose:
 #   to allow an easier time to form sync interest and handle all states
 class StateTable:
-    MTU = 8800
+    MTU = 7000
     def __init__(self, mynid:Name) -> None:
-        self.table = StateVector(None)
-        self.meta = MetaData()
+        self.table, self.meta, self.parts = StateVector(), MetaData(), [[0,0]]
         self.meta.source = Name.to_str(mynid).encode()
-        self.meta.tseqno = 0
-        self.meta.nopcks = 0
-        self.parts = [[0,0]]
     def processStateVector(self, incoming_sv:StateVector, oldData:bool) -> List[MissingData]:
         listOrder = incoming_sv.list() if oldData else reversed(incoming_sv.list())
         missingList = []
@@ -70,7 +66,7 @@ class StateTable:
             mainlist.append(templist)
         self.parts = mainlist
     def getPartMaximum(self, part:int) -> int:
-        return 99999 # optimize this part for each packet (including interest)
+        return self.MTU # optimize this part for each packet (including interest)
     def getPartCuts(self) -> list:
         return self.parts
     def getSeqNum(self, nid:Name) -> Optional[int]:

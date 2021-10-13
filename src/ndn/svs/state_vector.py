@@ -100,7 +100,6 @@ class StateVectorModel:
 class StateVector:
     def __init__(self, component:Component=None) -> None:
         self.vector = StateVectorModel()
-        self.vector.value = []
         if component:
             temp_vector = StateVectorModel.parse(component)
             for i in temp_vector.value:
@@ -133,10 +132,7 @@ class StateVector:
                 return index
         return None
     def to_str(self) -> str:
-        stream = ""
-        for i in self.vector.value:
-            stream = stream + bytes(i.nid).decode() + ":" + str(i.seqno) + " "
-        return stream.rstrip()
+        return " ".join([( bytes(i.nid).decode() + ":" + str(i.seqno) ) for i in self.vector.value])
     def encode(self) -> bytes:
         return self.vector.encode()
     def keys(self) -> List[str]:
@@ -148,10 +144,7 @@ class StateVector:
     def length(self) -> int:
         return len(self.encode())
     def partition(self, start:int, end:int) -> Component:
-        part = self.vector.value[start:end]
-        if part == []:
-            return StateVectorModel().encode()
-        return StateVectorModel(part).encode()
+        return StateVectorModel(self.vector.value[start:end]).encode()
     def entry(self, index:int) -> Optional[StateVectorComponentModel]:
         try:
             return self.vector.value[index]

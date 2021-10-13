@@ -10,6 +10,4 @@
 class MissingData:
     __slots__ = ('nid','lowSeqNum','highSeqNum')
     def __init__(self, nid:str, lowSeqNum:int, highSeqNum:int) -> None:
-        self.nid        = nid
-        self.lowSeqNum  = lowSeqNum
-        self.highSeqNum = highSeqNum
+        self.nid, self.lowSeqNum, self.highSeqNum = nid, lowSeqNum, highSeqNum

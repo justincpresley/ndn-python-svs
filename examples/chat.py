@@ -38,7 +38,7 @@ def on_missing_data(thread:SVSyncBase_Thread) -> Callable:
             nid = Name.from_str(i.nid)
             while i.lowSeqNum <= i.highSeqNum:
                 content_str = await thread.getSVSync().fetchData(nid, i.lowSeqNum)
-                if content_str is not None:
+                if content_str:
                     content_str = i.nid + ": " + content_str.decode()
                     sys.stdout.write("\033[K")
                     sys.stdout.flush()
@@ -60,7 +60,7 @@ class Program:
                 val = input("")
                 sys.stdout.write("\033[F"+"\033[K")
                 sys.stdout.flush()
-                if val != "" and val != " ":
+                if val.strip() != "":
                     print("YOU: "+val)
                     self.svs_thread.publishData(val.encode())
             except KeyboardInterrupt:

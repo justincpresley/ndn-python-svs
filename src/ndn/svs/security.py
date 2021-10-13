@@ -22,8 +22,7 @@ from .logger import SVSyncLogger
 class SigningInfo:
     __slots__ = ('signer','type','keyName','privKey')
     def __init__(self, stype:SignatureType, keyName:Optional[str]=None, privKey:Optional[bytes]=None) -> None:
-        self.type = stype
-        self.signer = None
+        self.type, self.signer, self.keyName, self.privKey = stype, None, "", b''
 
         if self.type != SignatureType.DIGEST_SHA256 and self.type != SignatureType.NOT_SIGNED:
             if privKey is None or privKey == b'':
@@ -32,9 +31,6 @@ class SigningInfo:
                 raise KeyError(f'Key Name has to be Defined in Signing Info with this Type.')
             self.keyName = keyName
             self.privKey = privKey
-        else:
-            self.keyName = ""
-            self.privKey = b''
 
         if self.type == SignatureType.SHA256_WITH_ECDSA:
             self.signer = Sha256WithEcdsaSigner(Name.from_str(self.keyName), self.privKey)
@@ -54,10 +50,9 @@ class ValidatingInfo:
     def __init__(self, validator:Optional[Validator]) -> None:
         self.validator  = validator
     async def validate(self, name:FormalName, sig_ptrs:SignaturePtrs) -> bool:
-        result = True
         if self.validator:
-            result = await self.validator(name, sig_ptrs)
-        return result
+            return await self.validator(name, sig_ptrs)
+        return True
 
     @staticmethod
     def get_validator(stype:SignatureType, keyName:Optional[str]=None, pubKey:Optional[bytes]=None):
@@ -165,10 +160,7 @@ class SecurityOptions:
     __slots__ = ('syncSig','syncVal','dataSig','dataValDict')
     # It is not neccessary to include digest or nosignature validators in the dataValidatingInfoDict.
     def __init__(self, syncSigningInfo:SigningInfo, syncValidatingInfo:ValidatingInfo, dataSigningInfo:SigningInfo, dataValidatingInfoDict:Dict[str, ValidatingInfo]) -> None:
-        self.syncSig = syncSigningInfo
-        self.syncVal = syncValidatingInfo
-        self.dataSig = dataSigningInfo
-        self.dataValDict = dataValidatingInfoDict
+        self.syncSig, self.syncVal, self.dataSig, self.dataValDict = syncSigningInfo, syncValidatingInfo, dataSigningInfo, dataValidatingInfoDict
     async def validate(self, name:FormalName, sig_ptrs:SignaturePtrs):
         val = None
         if sig_ptrs.signature_info.signature_type is None:

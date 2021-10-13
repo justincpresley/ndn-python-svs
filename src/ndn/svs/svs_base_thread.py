@@ -32,17 +32,7 @@ class SVSyncBase_Thread(Thread):
     def __init__(self, groupPrefix:Name, nid:Name, updateCallback:Callable, storage:Optional[Storage]=None, securityOptions:Optional[SecurityOptions]=None, face:Optional[Face]=None, keychain:Optional[Keychain]=None) -> None:
         SVSyncLogger.info(f'SVSync_Thread: Created thread to push SVS to.')
         Thread.__init__(self)
-        self.groupPrefix = groupPrefix
-        self.nid = nid
-        self.updateCallback = updateCallback
-        self.storage = storage
-        self.face = face
-        self.keychain = keychain
-        self.secOptions = securityOptions
-        self.svs = None
-        self.loop = None
-        self.app = None
-        self.failed = False
+        self.groupPrefix, self.nid, self.updateCallback, self.storage, self.face, self.keychain, self.secOptions, self.svs, self.loop, self.app, self.failed = groupPrefix, nid, updateCallback, storage, face, keychain, secOptions, None, None, None, False
     def wait(self):
         while self.svs is None:
             time.sleep(0.001)

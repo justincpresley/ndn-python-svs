@@ -25,13 +25,7 @@ from .logger import SVSyncLogger
 #   to find out about new data from other nodes.
 class SVSyncBalancer:
     def __init__(self, app:NDNApp, groupPrefix:Name, nid:Name, table:StateTable, updateCallback:Callable, secOptions:SecurityOptions) -> None:
-        self.app = app
-        self.groupPrefix = groupPrefix
-        self.nid = nid
-        self.table = table
-        self.updateCallback = updateCallback
-        self.secOptions = secOptions
-        self.busy = False
+        self.app, self.groupPrefix, self.nid, self.table, self.updateCallback, self.secOptions, self.busy = app, groupPrefix, nid, table, updateCallback, secOptions, False
         self.balancePrefix = self.nid + self.groupPrefix + Name.from_str("/sync")
         self.app.route(self.balancePrefix, need_sig_ptrs=True)(self.onStateInterest)
         SVSyncLogger.info(f'SVSyncBalancer: started listening to {Name.to_str(self.balancePrefix)}')
@@ -42,7 +36,7 @@ class SVSyncBalancer:
             return
         for i in range(incoming_md.nopcks):
             incoming_sv = await self.getStatePckValue(Name.from_str(bytes(incoming_md.source).decode()), i+1)
-            if incoming_sv == None:
+            if not incoming_sv:
                 break
             missingList = self.table.processStateVector(incoming_sv, oldData=True)
             if missingList:
@@ -66,9 +60,7 @@ class SVSyncBalancer:
             SVSyncLogger.info(f'SVSyncBalancer: balancing from {Name.to_str(name)}')
             data_name, meta_info, content = await self.app.express_interest(
                 name, must_be_fresh=True, can_be_prefix=True, lifetime=1000)
-            if bytes(content) == b'':
-                return None
-            return StateVector(bytes(content), self.sortByLatest)
+            return StateVector(bytes(content), self.sortByLatest) if bytes(content) != b'' else None
         except (InterestNack, InterestTimeout, InterestCanceled, ValidationFailure) as e:
             return None
     def isBusy(self) -> bool:

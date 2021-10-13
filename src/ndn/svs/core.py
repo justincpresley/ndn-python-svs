@@ -35,22 +35,15 @@ class SVSyncCoreState(Enum):
 #   to hear about other sync interests
 #   to find out about new data from other nodes.
 class SVSyncCore:
+    interval = 30000
+    randomPercent = 0.1
+    briefInterval = 200
+    briefRandomPercent = 0.5
     def __init__(self, app:NDNApp, syncPrefix:Name, groupPrefix:Name, nid:Name, updateCallback:Callable, secOptions:SecurityOptions) -> None:
         SVSyncLogger.info(f'SVSyncCore: started svsync core')
-        self.state = SVSyncCoreState.STEADY
-        self.app = app
-        self.nid = nid
-        self.updateCallback = updateCallback
-        self.syncPrefix = syncPrefix
-        self.groupPrefix = groupPrefix
-        self.secOptions = secOptions
+        self.app, self.nid, self.updateCallback, self.syncPrefix, self.groupPrefix, self.secOptions, self.state, self.seqNum = app, nid, updateCallback, syncPrefix, groupPrefix, secOptions, SVSyncCoreState.STEADY, 0
         self.table = StateTable(self.nid)
         self.balancer = SVSyncBalancer(self.app, self.groupPrefix, self.nid, self.table, self.updateCallback, self.secOptions)
-        self.seqNum = 0
-        self.interval = 30000 # time in milliseconds
-        self.randomPercent = 0.1
-        self.briefInterval = 200 # time in milliseconds
-        self.briefRandomPercent = 0.5
         self.app.route(self.syncPrefix, need_sig_ptrs=True)(self.onSyncInterest)
         SVSyncLogger.info(f'SVSyncCore: started listening to {Name.to_str(self.syncPrefix)}')
         self.scheduler = AsyncScheduler(self.sendSyncInterest, self.interval, self.randomPercent)
@@ -72,8 +65,7 @@ class SVSyncCore:
         if not isValidated:
             return
 
-        incomingVector = StateVector(int_name[-2])
-        incomingMetadata = MetaData(int_name[-3])
+        incomingVector, incomingMetadata = StateVector(int_name[-2]), MetaData(int_name[-3])
         SVSyncLogger.info(f'SVSyncCore: >> I: received sync')
         SVSyncLogger.info(f'SVSyncCore:       rmeta {bytes(incomingMetadata.source).decode()} - {incomingMetadata.tseqno} total, {incomingMetadata.nopcks} pcks')
         SVSyncLogger.info(f'SVSyncCore:       {incomingVector.to_str()}')
@@ -102,8 +94,7 @@ class SVSyncCore:
         if equalize and not self.balancer.isBusy():
             await self.balancer.equalize(incomingMetadata)
     def compareMetaData(self, incoming_md:MetaData) -> Tuple[bool, bool]:
-        table_md = self.table.getMetaData()
-        supress, equalize = False, False
+        table_md, supress, equalize = self.table.getMetaData(), False, False
         if table_md.tseqno > incoming_md.tseqno:
             supress = True
         elif table_md.tseqno < incoming_md.tseqno:

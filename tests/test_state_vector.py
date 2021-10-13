@@ -101,3 +101,16 @@ def test_state_vector_total():
     sv.set("x", 5225)
 
     assert sv.total() == 5261
+
+def test_state_vector_partition():
+    sv = StateVector(None)
+    sv.set("c", 5)
+    sv.set("a", 6)
+    sv.set("B", 10)
+    sv.set("z", 15)
+    sv.set("x", 5225)
+
+    nsv = StateVector(sv.partition(0,0))
+    osv = StateVector(None)
+
+    assert osv.to_str() == nsv.to_str()

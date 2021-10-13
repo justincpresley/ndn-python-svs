@@ -25,13 +25,8 @@ from .logger import SVSyncLogger
 class SVSyncBase():
     def __init__(self, app:NDNApp, syncPrefix:Name, dataPrefix:Name, groupPrefix:Name, nid:Name, updateCallback:Callable, storage:Optional[Storage]=None, securityOptions:Optional[SecurityOptions]=None) -> None:
         SVSyncLogger.info(f'SVSync: started svsync')
-        self.app = app
+        self.app, self.syncPrefix, self.dataPrefix, self.groupPrefix, self.nid, self.updateCallback = app, syncPrefix, dataPrefix, groupPrefix, nid, updateCallback
         self.storage = SVSyncStorage() if not storage else storage
-        self.syncPrefix = syncPrefix
-        self.dataPrefix = dataPrefix
-        self.groupPrefix = groupPrefix
-        self.nid = nid
-        self.updateCallback = updateCallback
         self.secOptions = securityOptions if securityOptions is not None else SecurityOptions(SigningInfo(SignatureType.DIGEST_SHA256), ValidatingInfo(ValidatingInfo.get_validator(SignatureType.DIGEST_SHA256)), SigningInfo(SignatureType.DIGEST_SHA256), [])
         self.core = SVSyncCore(self.app, self.syncPrefix, self.groupPrefix, self.nid, self.updateCallback, self.secOptions)
         self.app.route(self.dataPrefix)(self.onDataInterest)
