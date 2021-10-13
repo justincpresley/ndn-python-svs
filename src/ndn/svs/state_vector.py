@@ -32,7 +32,7 @@ class StateVectorComponentModel(TlvModel):
 # Class Purpose:
 #   to contain all the info of a state vector.
 class StateVectorModel:
-    def __init__(self, value:List[StateVectorComponentModel]=[]) -> None:
+    def __init__(self, value:List[StateVectorComponentModel]) -> None:
         self.value = value
     def encode(self) -> bytearray:
         component_wires = [v.encode() for v in self.value]
@@ -57,7 +57,7 @@ class StateVectorModel:
         if pos + length != len(buf):
             return None
         # Decode components
-        ret = StateVectorModel()
+        ret = StateVectorModel([])
         ret.value = []
         while pos < len(buf):
             # Node ID
@@ -99,7 +99,7 @@ class StateVectorModel:
 #   to allow an easier time to interact with the StateVectorModel class.
 class StateVector:
     def __init__(self, component:Component=None) -> None:
-        self.vector = StateVectorModel()
+        self.vector = StateVectorModel([])
         if component:
             temp_vector = StateVectorModel.parse(component)
             for i in temp_vector.value:
