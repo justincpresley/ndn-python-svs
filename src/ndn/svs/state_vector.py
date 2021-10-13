@@ -7,7 +7,7 @@
 # Basic Libraries
 from typing import List, Optional
 from enum import Enum
-import struct
+from struct import unpack_from
 # NDN Imports
 from ndn.encoding import Component
 from ndn.encoding import TlvModel, BytesField, UintField
@@ -77,13 +77,13 @@ class StateVectorModel:
             length, l = parse_tl_num(buf, pos)
             pos += l
             if length == 1:
-                value = struct.unpack_from('!B', buf, pos)[0]
+                value = unpack_from('!B', buf, pos)[0]
             elif length == 2:
-                value = struct.unpack_from('!H', buf, pos)[0]
+                value = unpack_from('!H', buf, pos)[0]
             elif length == 4:
-                value = struct.unpack_from('!I', buf, pos)[0]
+                value = unpack_from('!I', buf, pos)[0]
             elif length == 8:
-                value = struct.unpack_from('!Q', buf, pos)[0]
+                value = unpack_from('!Q', buf, pos)[0]
             else:
                 return None
             pos += length

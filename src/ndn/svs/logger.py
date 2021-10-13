@@ -6,7 +6,7 @@
 
 # Basic Libraries
 import logging
-import sys
+from sys import stdout
 from typing import Optional
 
 # Class Type: a logging class
@@ -34,7 +34,7 @@ class SVSyncLogger(object):
             SVSyncLogger._logger.setLevel(SVSyncLogger._loggerLevel)
             fm = logging.Formatter(SVSyncLogger._loggerFormat)
             if SVSyncLogger._consoleLogging:
-                console_handler = logging.StreamHandler(sys.stdout)
+                console_handler = logging.StreamHandler(stdout)
                 console_handler.setFormatter(fm)
                 SVSyncLogger._logger.addHandler(console_handler)
             if SVSyncLogger._fileForLogging:
