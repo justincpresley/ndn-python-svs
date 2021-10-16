@@ -49,7 +49,7 @@ def on_missing_data(thread:SVSyncBase_Thread) -> Callable:
 class Program:
     def __init__(self, args:dict) -> None:
         self.args = args
-        self.svs_thread = SVSyncShared_Thread(Name.from_str(self.args["group_prefix"]),Name.from_str(self.args["node_id"]), on_missing_data, self.args["cache_data"])
+        self.svs_thread = SVSyncShared_Thread(Name.from_str(self.args["group_prefix"]), Name.from_str(self.args["node_id"]), on_missing_data, self.args["cache_data"])
         self.svs_thread.daemon = True
         self.svs_thread.start()
         self.svs_thread.wait()
