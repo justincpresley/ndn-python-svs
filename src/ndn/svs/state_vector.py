@@ -4,6 +4,8 @@
 #    @Source-Code: https://github.com/justincpresley/ndn-python-svs
 #    @Pip-Library: https://pypi.org/project/ndn-svs/
 
+from __future__ import annotations
+
 # Basic Libraries
 from enum import Enum
 from struct import unpack_from
