@@ -11,8 +11,8 @@ from ndn.app import NDNApp
 from ndn.encoding import Name
 from ndn_python_repo import Storage
 # Custom Imports
-from .svs_base import SVSyncBase
 from .security import SecurityOptions
+from .svs_base import SVSyncBase
 
 # Class Type: an API class
 # Class Purpose:

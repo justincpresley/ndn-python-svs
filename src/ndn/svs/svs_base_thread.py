@@ -12,16 +12,16 @@ from threading import Thread
 from typing import Optional, List, Callable
 # NDN Imports
 from ndn.app import NDNApp
-from ndn.transport.stream_socket import Face
 from ndn.encoding import Name
 from ndn.security import Keychain
+from ndn.transport.stream_socket import Face
 from ndn_python_repo import Storage
 # Custom Imports
-from .svs_base import SVSyncBase
 from .core import SVSyncCore
+from .logger import SVSyncLogger
 from .missing_data import MissingData
 from .security import SecurityOptions
-from .logger import SVSyncLogger
+from .svs_base import SVSyncBase
 
 # Class Type: an abstract API thread class
 # Class Purpose:

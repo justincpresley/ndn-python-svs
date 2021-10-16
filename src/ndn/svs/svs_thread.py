@@ -7,14 +7,14 @@
 # Basic Libraries
 from typing import Optional, Callable
 # NDN Imports
-from ndn.transport.stream_socket import Face
 from ndn.encoding import Name
 from ndn.security import Keychain
+from ndn.transport.stream_socket import Face
 from ndn_python_repo import Storage
 # Custom Imports
-from .svs_base_thread import SVSyncBase_Thread
-from .svs import SVSync
 from .security import SecurityOptions
+from .svs import SVSync
+from .svs_base_thread import SVSyncBase_Thread
 
 # Class Type: an API thread class
 # Class Purpose:

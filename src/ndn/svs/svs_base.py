@@ -14,9 +14,9 @@ from ndn.types import InterestNack, InterestTimeout, InterestCanceled, Validatio
 from ndn_python_repo import Storage
 # Custom Imports
 from .core import SVSyncCore
-from .storage import SVSyncStorage
-from .security import SecurityOptions, SigningInfo, ValidatingInfo
 from .logger import SVSyncLogger
+from .security import SecurityOptions, SigningInfo, ValidatingInfo
+from .storage import SVSyncStorage
 
 # Class Type: an abstract API class
 # Class Purpose:

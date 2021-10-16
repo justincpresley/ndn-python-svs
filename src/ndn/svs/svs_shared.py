@@ -12,9 +12,9 @@ from ndn.encoding import Name, Component, parse_data
 from ndn.types import InterestNack, InterestTimeout, InterestCanceled, ValidationFailure
 from ndn_python_repo import Storage
 # Custom Imports
-from .svs_base import SVSyncBase
-from .security import SecurityOptions
 from .logger import SVSyncLogger
+from .security import SecurityOptions
+from .svs_base import SVSyncBase
 
 # Class Type: an derived API class
 # Class Purpose:

@@ -9,9 +9,9 @@ from typing import List, Optional
 # NDN Imports
 from ndn.encoding import Component, Name
 # Custom Imports
-from .state_vector import StateVector
 from .meta_data import MetaData
 from .missing_data import MissingData
+from .state_vector import StateVector
 
 # Class Type: a class
 # Class Purpose:

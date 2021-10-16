@@ -5,10 +5,10 @@
 #    @Pip-Library: https://pypi.org/project/ndn-svs/
 
 # Basic Libraries
-from typing import Callable
 import asyncio as aio
 from random import uniform
 from time import time
+from typing import Callable
 # Custom Imports
 from .logger import SVSyncLogger
 

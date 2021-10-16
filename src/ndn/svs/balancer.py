@@ -12,11 +12,11 @@ from ndn.app import NDNApp
 from ndn.encoding import Name, Component, InterestParam, BinaryStr, FormalName, SignaturePtrs
 from ndn.types import InterestNack, InterestTimeout, InterestCanceled, ValidationFailure
 # Custom Imports
+from .logger import SVSyncLogger
+from .meta_data import MetaData
 from .security import SecurityOptions
 from .state_table import StateTable
 from .state_vector import StateVector
-from .meta_data import MetaData
-from .logger import SVSyncLogger
 
 # Class Type: a ndn class
 # Class Purpose:

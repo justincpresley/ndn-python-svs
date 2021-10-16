@@ -5,8 +5,7 @@
 #    @Pip-Library: https://pypi.org/project/ndn-svs/
 
 # NDN Imports
-from ndn.encoding import Component
-from ndn.encoding import TlvModel, UintField, BytesField, DecodeError
+from ndn.encoding import Component, TlvModel, UintField, BytesField, DecodeError
 
 # Class Type: a tlv structure for encoding
 # Class Purpose:
