@@ -24,7 +24,7 @@ from .logger import SVSyncLogger
 #   to allow the user to interact with SVS, fetch and publish.
 class SVSyncBase():
     def __init__(self, app:NDNApp, syncPrefix:Name, dataPrefix:Name, groupPrefix:Name, nid:Name, updateCallback:Callable, storage:Optional[Storage]=None, securityOptions:Optional[SecurityOptions]=None) -> None:
-        SVSyncLogger.info(f'SVSync: started svsync')
+        SVSyncLogger.info("SVSync: started svsync")
         self.app, self.syncPrefix, self.dataPrefix, self.groupPrefix, self.nid, self.updateCallback = app, syncPrefix, dataPrefix, groupPrefix, nid, updateCallback
         self.storage = SVSyncStorage() if not storage else storage
         self.secOptions = securityOptions if securityOptions is not None else SecurityOptions(SigningInfo(SignatureType.DIGEST_SHA256), ValidatingInfo(ValidatingInfo.get_validator(SignatureType.DIGEST_SHA256)), SigningInfo(SignatureType.DIGEST_SHA256), [])
@@ -51,17 +51,17 @@ class SVSyncBase():
             except InterestNack as e:
                 SVSyncLogger.warning(f'SVSync: nacked with reason={e.reason}')
             except InterestTimeout:
-                SVSyncLogger.warning(f'SVSync: timeout')
+                SVSyncLogger.warning("SVSync: timeout")
             except InterestCanceled:
-                SVSyncLogger.warning(f'SVSync: canceled')
+                SVSyncLogger.warning("SVSync: canceled")
             except ValidationFailure:
-                SVSyncLogger.warning(f'SVSync: data failed to validate')
+                SVSyncLogger.warning("SVSync: data failed to validate")
             except Exception as e:
                 SVSyncLogger.warning(f'SVSync: unknown error has occured: {e}')
 
             retries = retries - 1
             if retries+1 > 0:
-                SVSyncLogger.info(f'SVSync: retrying fetching data')
+                SVSyncLogger.info("SVSync: retrying fetching data")
         return None
     def publishData(self, data:bytes) -> None:
         name = self.getDataName(self.nid, self.core.getSeqNum()+1)

@@ -15,7 +15,7 @@ from ndn.app import NDNApp
 from ndn.encoding import Name
 # Custom Imports
 sys.path.insert(0,'.')
-from src.ndn.svs import *
+from src.ndn.svs import SVSync, SVSyncLogger, MissingData
 
 app = NDNApp()
 

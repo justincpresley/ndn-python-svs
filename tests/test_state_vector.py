@@ -6,7 +6,6 @@
 
 # Basic Libraries
 import sys
-import pytest
 # NDN Imports
 from ndn.encoding import Component, Name
 # Custom Imports

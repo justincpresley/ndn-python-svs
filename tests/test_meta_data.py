@@ -6,9 +6,6 @@
 
 # Basic Libraries
 import sys
-import pytest
-# NDN Imports
-from ndn.encoding import Component, Name
 # Custom Imports
 sys.path.insert(0,'.')
 from src.ndn.svs.meta_data import MetaData

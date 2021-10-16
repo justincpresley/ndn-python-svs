@@ -26,9 +26,9 @@ class SigningInfo:
 
         if self.type != SignatureType.DIGEST_SHA256 and self.type != SignatureType.NOT_SIGNED:
             if privKey is None or privKey == b'':
-                raise KeyError(f'Private Key has to be Defined in Signing Info with this Type.')
+                raise KeyError("Private Key has to be Defined in Signing Info with this Type.")
             if keyName is None or keyName == "":
-                raise KeyError(f'Key Name has to be Defined in Signing Info with this Type.')
+                raise KeyError("Key Name has to be Defined in Signing Info with this Type.")
             self.keyName = keyName
             self.privKey = privKey
 
@@ -58,9 +58,9 @@ class ValidatingInfo:
     def get_validator(stype:SignatureType, keyName:Optional[str]=None, pubKey:Optional[bytes]=None):
         if stype != SignatureType.DIGEST_SHA256 and stype != SignatureType.NOT_SIGNED:
             if pubKey is None or pubKey == b'':
-                raise KeyError(f'Public Key has to be Defined when Generating a Validator with this Type.')
+                raise KeyError("Public Key has to be Defined when Generating a Validator with this Type.")
             if keyName is None or keyName == "":
-                raise KeyError(f'Key Name has to be Defined when Generating a Validator with this Type.')
+                raise KeyError("Key Name has to be Defined when Generating a Validator with this Type.")
         if stype == SignatureType.SHA256_WITH_ECDSA:
             return ValidatingInfo._ecdsa_checker(Name.from_str(keyName), pubKey)
         if stype == SignatureType.SHA256_WITH_RSA:
@@ -93,7 +93,7 @@ class ValidatingInfo:
                         return True
                     except ValueError:
                         return False
-                SVSyncLogger.debug('Digest check %s -> %s' % (enc.Name.to_str(name), ret))
+                SVSyncLogger.debug(f'Digest check {Name.to_str(name)} -> {ret}')
                 return ret
             return False
         return wrapper
@@ -120,7 +120,7 @@ class ValidatingInfo:
                         return True
                     except ValueError:
                         return False
-                SVSyncLogger.debug('Digest check %s -> %s' % (enc.Name.to_str(name), ret))
+                SVSyncLogger.debug(f'Digest check {Name.to_str(name)} -> {ret}')
                 return ret
             return False
         return wrapper
@@ -145,7 +145,7 @@ class ValidatingInfo:
                         return True
                     except ValueError:
                         return False
-                SVSyncLogger.debug('Digest check %s -> %s' % (enc.Name.to_str(name), ret))
+                SVSyncLogger.debug(f'Digest check {Name.to_str(name)} -> {ret}')
                 return ret
             return False
         return wrapper

@@ -40,7 +40,7 @@ class SVSyncCore:
     briefInterval = 200
     briefRandomPercent = 0.5
     def __init__(self, app:NDNApp, syncPrefix:Name, groupPrefix:Name, nid:Name, updateCallback:Callable, secOptions:SecurityOptions) -> None:
-        SVSyncLogger.info(f'SVSyncCore: started svsync core')
+        SVSyncLogger.info("SVSyncCore: started svsync core")
         self.app, self.nid, self.updateCallback, self.syncPrefix, self.groupPrefix, self.secOptions, self.state, self.seqNum = app, nid, updateCallback, syncPrefix, groupPrefix, secOptions, SVSyncCoreState.STEADY, 0
         self.table = StateTable(self.nid)
         self.balancer = SVSyncBalancer(self.app, self.groupPrefix, self.nid, self.table, self.updateCallback, self.secOptions)
@@ -54,7 +54,7 @@ class SVSyncCore:
         try:
             data_name, meta_info, content = await self.app.express_interest(
                 name, signer=self.secOptions.syncSig.signer, must_be_fresh=True, can_be_prefix=True, lifetime=1000)
-        except (InterestNack, InterestTimeout, InterestCanceled, ValidationFailure) as e:
+        except (InterestNack, InterestTimeout, InterestCanceled, ValidationFailure):
             pass
     def sendSyncInterest(self) -> None:
         aio.get_event_loop().create_task(self.asyncSendSyncInterest())
@@ -66,7 +66,7 @@ class SVSyncCore:
             return
 
         incomingVector, incomingMetadata = StateVector(int_name[-2]), MetaData(int_name[-3])
-        SVSyncLogger.info(f'SVSyncCore: >> I: received sync')
+        SVSyncLogger.info("SVSyncCore: >> I: received sync")
         SVSyncLogger.info(f'SVSyncCore:       rmeta {bytes(incomingMetadata.source).decode()} - {incomingMetadata.tseqno} total, {incomingMetadata.nopcks} pcks')
         SVSyncLogger.info(f'SVSyncCore:       {incomingVector.to_str()}')
 

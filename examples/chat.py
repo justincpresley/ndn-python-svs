@@ -13,7 +13,7 @@ from typing import List, Callable
 from ndn.encoding import Name
 # Custom Imports
 sys.path.insert(0,'.')
-from src.ndn.svs import *
+from src.ndn.svs import SVSyncShared_Thread, SVSyncBase_Thread, SVSyncLogger, MissingData
 
 def parse_cmd_args() -> dict:
     # Command Line Parser

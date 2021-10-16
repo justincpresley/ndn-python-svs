@@ -61,7 +61,7 @@ class SVSyncBalancer:
             data_name, meta_info, content = await self.app.express_interest(
                 name, must_be_fresh=True, can_be_prefix=True, lifetime=1000)
             return StateVector(bytes(content), self.sortByLatest) if bytes(content) != b'' else None
-        except (InterestNack, InterestTimeout, InterestCanceled, ValidationFailure) as e:
+        except (InterestNack, InterestTimeout, InterestCanceled, ValidationFailure):
             return None
     def isBusy(self) -> bool:
         return self.busy

@@ -30,7 +30,7 @@ from .logger import SVSyncLogger
 #   to allow the user to interact with SVS, fetch and publish.
 class SVSyncBase_Thread(Thread):
     def __init__(self, groupPrefix:Name, nid:Name, updateCallback:Callable, storage:Optional[Storage]=None, securityOptions:Optional[SecurityOptions]=None, face:Optional[Face]=None, keychain:Optional[Keychain]=None) -> None:
-        SVSyncLogger.info(f'SVSync_Thread: Created thread to push SVS to.')
+        SVSyncLogger.info("SVSync_Thread: Created thread to push SVS to.")
         Thread.__init__(self)
         self.groupPrefix, self.nid, self.updateCallback, self.storage, self.face, self.keychain, self.secOptions, self.svs, self.loop, self.app, self.failed = groupPrefix, nid, updateCallback, storage, face, keychain, securityOptions, None, None, None, False
     def wait(self):
@@ -44,7 +44,7 @@ class SVSyncBase_Thread(Thread):
             try:
                 self.app.run_forever(after_start=self.function())
             except FileNotFoundError:
-                print(f'Error: could not connect to NFD for SVS.')
+                print("Error: could not connect to NFD for SVS.")
                 self.failed = True
                 sys.exit()
 

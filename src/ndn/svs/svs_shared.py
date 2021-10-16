@@ -43,17 +43,17 @@ class SVSyncShared(SVSyncBase):
             except InterestNack as e:
                 SVSyncLogger.warning(f'SVSync: nacked with reason={e.reason}')
             except InterestTimeout:
-                SVSyncLogger.warning(f'SVSync: timeout')
+                SVSyncLogger.warning("SVSync: timeout")
             except InterestCanceled:
-                SVSyncLogger.warning(f'SVSync: canceled')
+                SVSyncLogger.warning("SVSync: canceled")
             except ValidationFailure:
-                SVSyncLogger.warning(f'SVSync: data failed to validate')
+                SVSyncLogger.warning("SVSync: data failed to validate")
             except Exception as e:
                 SVSyncLogger.warning(f'SVSync: unknown error has occured: {e}')
 
             retries = retries - 1
             if retries+1 > 0:
-                SVSyncLogger.warning(f'SVSync: retrying fetching data')
+                SVSyncLogger.warning("SVSync: retrying fetching data")
         return None
     def getDataName(self, nid:Name, seqNum:int) -> Name:
         return ( self.groupPrefix + [Component.from_str("d")] + nid + Name.from_str(str(seqNum)) )

@@ -17,7 +17,7 @@ from .logger import SVSyncLogger
 #   to call a specific function based on an interval.
 class AsyncScheduler:
     def __init__(self, function:Callable, interval:int, randomPercent:float) -> None:
-        SVSyncLogger.info(f'AsyncScheduler: started scheduler for an async function')
+        SVSyncLogger.info("AsyncScheduler: started scheduler for an async function")
         self.function, self.defaultInterval, self.randomPercent, self.startTime, self.stop = function, interval, randomPercent, None, False
         self.interval = self.defaultInterval + round( uniform(-self.randomPercent,self.randomPercent)*self.defaultInterval )
         self.task = aio.get_event_loop().create_task(self.target())
