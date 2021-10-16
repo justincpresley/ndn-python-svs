@@ -18,7 +18,7 @@ with io.open("README.rst", "rt", encoding="utf8") as f:
 
 def _parse_requirements(filename: str) -> List[str]:
     with open(filename, 'r') as f:
-        return [s for s in [ line.split('#', 1)[0].strip(' \t\n') for line in f ] if s != '']
+        return [s for s in [line.split('#', 1)[0].strip(' \t\n') for line in f ] if s != '']
 
 setup(
     name='ndn-svs',
