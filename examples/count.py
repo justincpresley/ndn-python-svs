@@ -9,7 +9,7 @@ import asyncio as aio
 import logging
 import sys
 from argparse import ArgumentParser, SUPPRESS
-from typing import List
+from typing import List, Optional
 # NDN Imports
 from ndn.app import NDNApp
 from ndn.encoding import Name
@@ -39,11 +39,11 @@ def parse_cmd_args() -> dict:
 class Program:
     def __init__(self, args:dict) -> None:
         self.args = args
-        self.svs = SVSync(app, Name.from_str(self.args["group_prefix"]), Name.from_str(self.args["node_id"]), self.missing_callback)
+        self.svs:SVSync = SVSync(app, Name.from_str(self.args["group_prefix"]), Name.from_str(self.args["node_id"]), self.missing_callback)
         print(f'SVS client started | {self.args["group_prefix"]} - {self.args["node_id"]} |')
     async def run(self) -> None:
-        num = 0
-        while True:
+        num:int = 0
+        while 1:
             num = num+1
             try:
                 print("YOU: "+str(num))
@@ -55,19 +55,20 @@ class Program:
         aio.ensure_future(self.on_missing_data(missing_list))
     async def on_missing_data(self, missing_list:List[MissingData]) -> None:
         for i in missing_list:
-            nid = Name.from_str(i.nid)
+            nid:Name = Name.from_str(i.nid)
             while i.lowSeqNum <= i.highSeqNum:
-                content_str = await self.svs.fetchData(nid, i.lowSeqNum)
-                if content_str is not None:
-                    content_str = i.nid + ": " + content_str.decode()
+                content_str:Optional[bytes] = await self.svs.fetchData(nid, i.lowSeqNum)
+                if content_str:
+                    output_str:str = i.nid + ": " + content_str.decode()
                     sys.stdout.write("\033[K")
                     sys.stdout.flush()
-                    print(content_str)
+                    print(output_str)
                 i.lowSeqNum = i.lowSeqNum + 1
 
 async def main(args:dict) -> int:
     prog = Program(args)
     await prog.run()
+    return 0
 
 if __name__ == "__main__":
     args = parse_cmd_args()

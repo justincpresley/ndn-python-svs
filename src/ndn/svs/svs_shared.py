@@ -56,4 +56,4 @@ class SVSyncShared(SVSyncBase):
                 SVSyncLogger.warning("SVSync: retrying fetching data")
         return None
     def getDataName(self, nid:Name, seqNum:int) -> Name:
-        return ( self.groupPrefix + [Component.from_str("d")] + nid + Name.from_str(str(seqNum)) )
+        return (self.groupPrefix + [Component.from_str("d")] + nid + Name.from_str(str(seqNum)))

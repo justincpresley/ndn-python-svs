@@ -33,13 +33,13 @@ class SVSyncBase_Thread(Thread):
         SVSyncLogger.info("SVSync_Thread: Created thread to push SVS to.")
         Thread.__init__(self)
         self.groupPrefix, self.nid, self.updateCallback, self.storage, self.face, self.keychain, self.secOptions, self.svs, self.loop, self.app, self.failed = groupPrefix, nid, updateCallback, storage, face, keychain, securityOptions, None, None, None, False
-    def wait(self):
+    def wait(self) -> None:
         while self.svs is None:
             time.sleep(0.001)
             if self.failed:
                 sys.exit()
     def run(self) -> None:
-        def loop_task():
+        def loop_task() -> None:
             self.app = NDNApp(self.face, self.keychain)
             try:
                 self.app.run_forever(after_start=self.function())
@@ -56,11 +56,12 @@ class SVSyncBase_Thread(Thread):
         raise NotImplementedError
     def missing_callback(self, missing_list:List[MissingData]) -> None:
         aio.ensure_future(self.updateCallback(self)(missing_list))
-    def getSVSync(self) -> SVSyncBase:
+    def getSVSync(self) -> Optional[SVSyncBase]:
         return self.svs
     async def fetchData(self, nid:Name, seqNum:int, retries:int=0) -> Optional[bytes]:
         return await self.svs.fetchData(nid, seqNum, retries)
     def publishData(self, data:bytes) -> None:
-        self.svs.publishData(data)
-    def getCore(self) -> SVSyncCore:
-        return self.svs.getCore()
+        if self.svs:
+            self.svs.publishData(data)
+    def getCore(self) -> Optional[SVSyncCore]:
+        return self.svs.getCore() if self.svs else None

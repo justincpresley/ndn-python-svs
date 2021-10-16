@@ -8,7 +8,7 @@
 import logging
 import sys
 from argparse import ArgumentParser, SUPPRESS
-from typing import List, Callable
+from typing import List, Callable, Optional
 # NDN Imports
 from ndn.encoding import Name
 # Custom Imports
@@ -35,21 +35,21 @@ def parse_cmd_args() -> dict:
 def on_missing_data(thread:SVSyncBase_Thread) -> Callable:
     async def wrapper(missing_list:List[MissingData]) -> None:
         for i in missing_list:
-            nid = Name.from_str(i.nid)
+            nid:Name = Name.from_str(i.nid)
             while i.lowSeqNum <= i.highSeqNum:
-                content_str = await thread.getSVSync().fetchData(nid, i.lowSeqNum)
+                content_str:Optional[bytes] = await thread.getSVSync().fetchData(nid, i.lowSeqNum)
                 if content_str:
-                    content_str = i.nid + ": " + content_str.decode()
+                    output_str:str = i.nid + ": " + content_str.decode()
                     sys.stdout.write("\033[K")
                     sys.stdout.flush()
-                    print(content_str)
+                    print(output_str)
                 i.lowSeqNum = i.lowSeqNum + 1
     return wrapper
 
 class Program:
     def __init__(self, args:dict) -> None:
         self.args = args
-        self.svs_thread = SVSyncShared_Thread(Name.from_str(self.args["group_prefix"]), Name.from_str(self.args["node_id"]), on_missing_data, self.args["cache_data"])
+        self.svs_thread:SVSyncShared_Thread = SVSyncShared_Thread(Name.from_str(self.args["group_prefix"]), Name.from_str(self.args["node_id"]), on_missing_data, self.args["cache_data"])
         self.svs_thread.daemon = True
         self.svs_thread.start()
         self.svs_thread.wait()
@@ -57,7 +57,7 @@ class Program:
     def run(self) -> None:
         while True:
             try:
-                val = input("")
+                val:str = input("")
                 sys.stdout.write("\033[F"+"\033[K")
                 sys.stdout.flush()
                 if val.strip() != "":
@@ -69,6 +69,7 @@ class Program:
 def main(args:dict) -> int:
     prog = Program(args)
     prog.run()
+    return 0
 
 if __name__ == "__main__":
     args = parse_cmd_args()

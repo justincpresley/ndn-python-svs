@@ -55,12 +55,12 @@ class SVSyncBalancer:
         SVSyncLogger.info(f'SVSyncBalancer: sending balance {sv}')
         self.app.put_data(int_name, content=sv, freshness_period=1000)
     async def getStatePckValue(self, source:Name, nopck:int) -> Optional[StateVector]:
-        name = source + self.groupPrefix + Name.from_str("/sync") + [Component.from_number(nopck, Component.TYPE_SEQUENCE_NUM)]
+        name:Name = source + self.groupPrefix + Name.from_str("/sync") + [Component.from_number(nopck, Component.TYPE_SEQUENCE_NUM)]
         try:
             SVSyncLogger.info(f'SVSyncBalancer: balancing from {Name.to_str(name)}')
             data_name, meta_info, content = await self.app.express_interest(
                 name, must_be_fresh=True, can_be_prefix=True, lifetime=1000)
-            return StateVector(bytes(content), self.sortByLatest) if bytes(content) != b'' else None
+            return StateVector(bytes(content)) if bytes(content) != b'' else None
         except (InterestNack, InterestTimeout, InterestCanceled, ValidationFailure):
             return None
     def isBusy(self) -> bool:

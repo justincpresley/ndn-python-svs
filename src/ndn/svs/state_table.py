@@ -11,7 +11,7 @@ from ndn.encoding import Component, Name
 # Custom Imports
 from .meta_data import MetaData
 from .missing_data import MissingData
-from .state_vector import StateVector
+from .state_vector import StateVector, StateVectorComponentModel
 
 # Class Type: a class
 # Class Purpose:
@@ -22,13 +22,13 @@ class StateTable:
         self.table, self.meta, self.parts = StateVector(), MetaData(), [[0,0]]
         self.meta.source = Name.to_str(mynid).encode()
     def processStateVector(self, incoming_sv:StateVector, oldData:bool) -> List[MissingData]:
-        listOrder = incoming_sv.list() if oldData else reversed(incoming_sv.list())
-        missingList = []
+        listOrder:List[StateVectorComponentModel] = incoming_sv.list() if oldData else reversed(incoming_sv.list())
+        missingList:List[MissingData] = []
         for i in listOrder:
-            tableSeqno = self.table.get(bytes(i.nid).decode()) if self.table.get(bytes(i.nid).decode()) else 0
+            tableSeqno:int = self.table.get(bytes(i.nid).decode()) if self.table.get(bytes(i.nid).decode()) else 0
             if tableSeqno < i.seqno:
                 tableSeqno = tableSeqno + 1
-                temp = MissingData(bytes(i.nid).decode(), tableSeqno, i.seqno)
+                temp:MissingData = MissingData(bytes(i.nid).decode(), tableSeqno, i.seqno)
                 self.table.set(bytes(i.nid).decode(), i.seqno, oldData)
                 missingList.append(temp)
         return missingList
@@ -48,8 +48,7 @@ class StateTable:
     def getCompleteStateVector(self) -> StateVector:
         return self.table
     def calculateParts(self) -> None:
-        part, total = 0, 0
-        mainlist, templist = [], []
+        mainlist, templist, part, total = [], [], 0, 0
         templist.insert(0, 0)
         for index, value in enumerate(self.table.entry_lengths()):
             if total + value > self.getPartMaximum(part):

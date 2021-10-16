@@ -15,7 +15,7 @@ from src.ndn.svs.meta_data import MetaData
 # Testing Purposes:
 #   to ensure encode and component compatibility.
 
-def test_meta_data_encode():
+def test_meta_data_encode() -> None:
     md = MetaData(None)
     md.source = b'/node1/data'
     md.tseqno = 512
@@ -24,7 +24,7 @@ def test_meta_data_encode():
     enc_md = md.encode()
     assert enc_md == b'\x08\x14\xc6\x0b/node1/data\xc7\x02\x02\x00\xc8\x01\x03'
 
-def test_meta_data_past_component():
+def test_meta_data_past_component() -> None:
     md = MetaData(None)
     md.source = b'/node1/data'
     md.tseqno = 512

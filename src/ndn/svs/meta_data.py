@@ -22,11 +22,11 @@ class MetaData:
     __slots__ = ('source','tseqno','nopcks')
     def __init__(self, comp:Component=None) -> None:
         try:
-            model = MetaDataModel.parse(bytes(Component.get_value(comp)))
+            model:MetaDataModel = MetaDataModel.parse(bytes(Component.get_value(comp)))
             self.source, self.tseqno, self.nopcks = model.source, model.tseqno, model.nopcks
         except (ValueError,TypeError,IndexError,DecodeError):
             self.source, self.tseqno, self.nopcks = b'', 0, 0
     def encode(self) -> Component:
-        model = MetaDataModel()
+        model:MetaDataModel = MetaDataModel()
         model.source, model.tseqno, model.nopcks = self.source, self.tseqno, self.nopcks
         return Component.from_bytes(model.encode())

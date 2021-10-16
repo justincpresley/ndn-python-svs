@@ -8,7 +8,7 @@
 import asyncio as aio
 from enum import Enum
 from random import uniform
-from typing import Callable, Optional, Tuple
+from typing import Callable, Optional, Tuple, List
 # NDN Imports
 from ndn.app import NDNApp
 from ndn.encoding import Name, InterestParam, BinaryStr, FormalName, SignaturePtrs
@@ -21,6 +21,7 @@ from .state_vector import StateVector
 from .scheduler import AsyncScheduler
 from .security import SecurityOptions
 from .logger import SVSyncLogger
+from .missing_data import MissingData
 
 # Class Type: an enumeration struct
 # Class Purpose:
@@ -49,7 +50,7 @@ class SVSyncCore:
         self.scheduler = AsyncScheduler(self.sendSyncInterest, self.interval, self.randomPercent)
         self.scheduler.skip_interval()
     async def asyncSendSyncInterest(self) -> None:
-        name = self.syncPrefix + [self.table.getMetaData().encode()] + [ self.table.getPart(0) ]
+        name:Name = self.syncPrefix + [self.table.getMetaData().encode()] + [ self.table.getPart(0) ]
         SVSyncLogger.info(f'SVSyncCore: sync {Name.to_str(name)}')
         try:
             data_name, meta_info, content = await self.app.express_interest(
@@ -61,7 +62,7 @@ class SVSyncCore:
     def onSyncInterest(self, int_name:FormalName, int_param:InterestParam, _app_param:Optional[BinaryStr], sig_ptrs:SignaturePtrs) -> None:
         aio.get_event_loop().create_task(self.onSyncInterestHelper(int_name, int_param, _app_param, sig_ptrs))
     async def onSyncInterestHelper(self, int_name:FormalName, int_param:InterestParam, _app_param:Optional[BinaryStr], sig_ptrs:SignaturePtrs) -> None:
-        isValidated = await self.secOptions.syncVal.validate(int_name, sig_ptrs)
+        isValidated:bool = await self.secOptions.syncVal.validate(int_name, sig_ptrs)
         if not isValidated:
             return
 
@@ -70,7 +71,7 @@ class SVSyncCore:
         SVSyncLogger.info(f'SVSyncCore:       rmeta {bytes(incomingMetadata.source).decode()} - {incomingMetadata.tseqno} total, {incomingMetadata.nopcks} pcks')
         SVSyncLogger.info(f'SVSyncCore:       {incomingVector.to_str()}')
 
-        missingList = self.table.processStateVector(incomingVector, oldData=False)
+        missingList:List[MissingData] = self.table.processStateVector(incomingVector, oldData=False)
         SVSyncLogger.info(f'SVSyncCore:       {missingList}')
         self.table.updateMetaData()
         if missingList:

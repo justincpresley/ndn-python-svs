@@ -32,7 +32,7 @@ class StateVectorComponentModel(TlvModel):
 #   to contain all the info of a state vector.
 class StateVectorModel:
     def __init__(self, value:List[StateVectorComponentModel]) -> None:
-        self.value = value
+        self.value:List[StateVectorComponentModel] = value
     def encode(self) -> bytearray:
         component_wires = [v.encode() for v in self.value]
         length = sum(len(w) for w in component_wires)
@@ -45,7 +45,7 @@ class StateVectorModel:
             pos += len(w)
         return ret
     @staticmethod
-    def parse(buf):
+    def parse(buf:Component) -> Optional[StateVectorModel]:
         # Verify the Type
         typ, pos = parse_tl_num(buf)
         if typ != StateVectorModelTypes.VECTOR.value:
@@ -56,7 +56,7 @@ class StateVectorModel:
         if pos + length != len(buf):
             return None
         # Decode components
-        ret = StateVectorModel([])
+        ret:StateVectorModel = StateVectorModel([])
         ret.value = []
         while pos < len(buf):
             # Node ID
@@ -87,7 +87,7 @@ class StateVectorModel:
                 return None
             pos += length
             # Append the component
-            comp = StateVectorComponentModel()
+            comp:StateVectorComponentModel = StateVectorComponentModel()
             comp.nid = node_id
             comp.seqno = value
             ret.value.append(comp)
@@ -98,15 +98,16 @@ class StateVectorModel:
 #   to allow an easier time to interact with the StateVectorModel class.
 class StateVector:
     def __init__(self, component:Component=None) -> None:
-        self.vector = StateVectorModel([])
+        self.vector:StateVectorModel = StateVectorModel([])
         if component:
-            temp_vector = StateVectorModel.parse(component)
-            for i in temp_vector.value:
-                self.set(bytes(i.nid).decode(), i.seqno, True)
+            temp_vector:Optional[StateVectorModel] = StateVectorModel.parse(component)
+            if temp_vector != None:
+                for i in temp_vector.value:
+                    self.set(bytes(i.nid).decode(), i.seqno, True)
     def set(self, nid:str, seqno:int, oldData:bool=False) -> None:
-        index = self.index(nid)
+        index:Optional[int] = self.index(nid)
         if index == None:
-            svc = StateVectorComponentModel()
+            svc:StateVectorComponentModel = StateVectorComponentModel()
             svc.seqno = seqno
             svc.nid = nid.encode()
             if not oldData:
@@ -117,7 +118,6 @@ class StateVector:
             self.vector.value[index].seqno = seqno
             if not oldData:
                 self.vector.value.insert(0, self.vector.value.pop(index))
-        return
     def get(self, nid:str) -> Optional[int]:
         for i in self.vector.value:
             if bytes(i.nid).decode() == nid:
