@@ -8,7 +8,7 @@ Before you run the program (assuming you have NFD running), you must register th
 
 .. code-block:: bash
 
-    $ nfdc strategy set <group-prefix> /localhost/nfd/strategy/multicast/%FD%04
+    $ nfdc strategy set <group-prefix> /localhost/nfd/strategy/multicast
 
 The default (unless specified) **group prefix** is `/svs` for any build-in examples.
 
