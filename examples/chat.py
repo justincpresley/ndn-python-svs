@@ -66,17 +66,19 @@ class Program:
             except KeyboardInterrupt:
                 sys.exit()
 
-def main(args:dict) -> int:
-    prog = Program(args)
-    prog.run()
-    return 0
-
-if __name__ == "__main__":
+def main() -> int:
     args = parse_cmd_args()
+
     args["node_id"] = Name.to_str(Name.from_str(args["node_id"]))
     args["group_prefix"] = Name.to_str(Name.from_str(args["group_prefix"]))
     args["cache_data"] = True
 
     SVSyncLogger.config(False, None, logging.INFO)
 
-    sys.exit(main(args))
+    prog = Program(args)
+    prog.run()
+
+    return 0
+
+if __name__ == "__main__":
+    sys.exit(main())

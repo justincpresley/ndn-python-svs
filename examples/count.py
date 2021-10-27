@@ -65,12 +65,11 @@ class Program:
                     print(output_str)
                 i.lowSeqNum = i.lowSeqNum + 1
 
-async def main(args:dict) -> int:
+async def start_count(args:dict) -> None:
     prog = Program(args)
     await prog.run()
-    return 0
 
-if __name__ == "__main__":
+def main() -> int:
     args = parse_cmd_args()
     args["node_id"] = Name.to_str(Name.from_str(args["node_id"]))
     args["group_prefix"] = Name.to_str(Name.from_str(args["group_prefix"]))
@@ -78,6 +77,11 @@ if __name__ == "__main__":
     SVSyncLogger.config(True, None, logging.INFO)
 
     try:
-        app.run_forever(after_start=main(args))
+        app.run_forever(after_start=start_count(args))
     except FileNotFoundError:
         print('Error: could not connect to NFD for SVS.')
+
+    return 0
+
+if __name__ == "__main__":
+    sys.exit(main())
