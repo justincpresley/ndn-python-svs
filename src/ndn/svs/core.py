@@ -71,6 +71,14 @@ class SVSyncCore:
         SVSyncLogger.info(f'SVSyncCore:       rmeta {bytes(incomingMetadata.source).decode()} - {incomingMetadata.tseqno} total, {incomingMetadata.nopcks} pcks')
         SVSyncLogger.info(f'SVSyncCore:       {incomingVector.to_str()}')
 
+        # change my seqno if I am behind (incoming has a higher state)
+        try:
+            if incomingVector.get(Name.to_str(self.nid)) > self.seqNum:
+                self.table.updateMyState(incomingVector.get(Name.to_str(self.nid)))
+                self.seqNum = self.table.getSeqNum(self.nid)
+        except TypeError:
+            pass
+
         missingList:List[MissingData] = self.table.processStateVector(incomingVector, oldData=False)
         SVSyncLogger.info(f'SVSyncCore:       {missingList}')
         self.table.updateMetaData()
