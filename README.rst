@@ -10,7 +10,7 @@ The implementation is on our github-repo_.
 
 There are **two branches**:
 
-* enhanced_: main branch, specification with added enhancements
+* enhanced_: main branch, specification with added enhancements (found in the docs)
 * traditional_: original StateVectorSync protocol specification
 
 Please see our documentation_.
