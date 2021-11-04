@@ -16,7 +16,7 @@ This means we can eliminate routing for a quick run.
 
 .. code-block:: bash
 
-    $ nfdc strategy set /<repo-prefix>/group /localhost/nfd/strategy/multicast/%FD%04
+    $ nfdc strategy set /<group-prefix> /localhost/nfd/strategy/multicast
 
 **4. Run the following on 2 or more terminals.**
 
@@ -36,5 +36,12 @@ You should be able to chat away! See how the chat room operates when a node is d
 
 Now that you see the overview of what happens, take a closer look at the mechanisms behind the StateVectorSync Protocol!
 
-Instead of ``examples/chat.py`` try ``examples/count.py``. This should be automatic (no input required) and will allow you
+Instead of ``examples/chat.py`` try ``examples/count.py`` with '-v' (verbose flag). This should be automatic (no input required) and will allow you
 to see the insides of the StateVectorSync Protocol.
+
+
+
+NOTE: If you have install the ndn-svs pip package, you are able to run the example scripts via the console scripts:
+
+    * ndn-svs-chat
+    * ndn-svs-count

@@ -28,12 +28,14 @@ def parse_cmd_args() -> dict:
     # Adding all Command Line Arguments
     requiredArgs.add_argument("-n", "--nodename",action="store",dest="node_name",required=True,help="id of this node in svs")
     optionalArgs.add_argument("-gp","--groupprefix",action="store",dest="group_prefix",required=False,help="overrides config | routable group prefix to listen from")
+    optionalArgs.add_argument("-v","--verbose",action="store_true",dest="verbose",default=False,required=False,help="when set, svsync info is displayed as well")
     informationArgs.add_argument("-h","--help",action="help",default=SUPPRESS,help="show this help message and exit")
     # Getting all Arguments
     argvars = parser.parse_args()
     args = {}
     args["group_prefix"] = argvars.group_prefix if argvars.group_prefix is not None else "/svs"
     args["node_id"] = argvars.node_name
+    args["verbose"] = argvars.verbose
     return args
 
 class Program:
@@ -74,7 +76,7 @@ def main() -> int:
     args["node_id"] = Name.to_str(Name.from_str(args["node_id"]))
     args["group_prefix"] = Name.to_str(Name.from_str(args["group_prefix"]))
 
-    SVSyncLogger.config(True, None, logging.INFO)
+    SVSyncLogger.config(True if args["verbose"] else False, None, logging.INFO)
 
     try:
         app.run_forever(after_start=start_count(args))
