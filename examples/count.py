@@ -21,7 +21,7 @@ app = NDNApp()
 
 def parse_cmd_args() -> dict:
     # Command Line Parser
-    parser = ArgumentParser(add_help=False,description="An SVS Chat Node capable of syncing with others.")
+    parser = ArgumentParser(add_help=False,description="An SVS Integer Counting Node capable of syncing with others.")
     requiredArgs = parser.add_argument_group("required arguments")
     optionalArgs = parser.add_argument_group("optional arguments")
     informationArgs = parser.add_argument_group("information arguments")
