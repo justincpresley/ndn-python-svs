@@ -53,10 +53,4 @@ setup(
     package_dir={'': 'src'},
     install_requires=_parse_requirements('docs/requirements.txt'),
     python_requires=">=3.7",
-    entry_points={
-        'console_scripts': [
-            'ndn-svs-chat = examples.chat:main',
-            'ndn-svs-count = examples.count:main'
-        ]
-    },
     zip_safe=False)

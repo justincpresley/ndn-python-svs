@@ -38,8 +38,3 @@ Now that you see the overview of what happens, take a closer look at the mechani
 
 Instead of ``examples/chat.py`` try ``examples/count.py`` with '-v' (verbose flag). This should be automatic (no input required) and will allow you
 to see the insides of the StateVectorSync Protocol.
-
-NOTE: If you have install the ndn-svs pip package, you are able to run the example scripts via the console scripts:
-
-    * ndn-svs-chat
-    * ndn-svs-count
