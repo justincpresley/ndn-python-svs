@@ -81,7 +81,7 @@ def main() -> int:
 
     try:
         app.run_forever(after_start=start_count(args))
-    except FileNotFoundError:
+    except (FileNotFoundError, ConnectionRefusedError):
         print('Error: could not connect to NFD for SVS.')
 
     return 0

@@ -44,7 +44,7 @@ class SVSyncBase_Thread(Thread):
             self.app = NDNApp(self.face, self.keychain)
             try:
                 self.app.run_forever(after_start=self.function())
-            except FileNotFoundError:
+            except (FileNotFoundError, ConnectionRefusedError):
                 print("Error: could not connect to NFD for SVS.")
                 self.failed = True
                 sys.exit()
