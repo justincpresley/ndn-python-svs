@@ -46,12 +46,11 @@ setup(
         'Topic :: System :: Networking',
         'License :: OSI Approved :: GNU Lesser General Public License v2 (LGPLv2)',
         'Programming Language :: Python :: 3.8',
-        'Programming Language :: Python :: 3.9',
-        'Programming Language :: Python :: 3.10'
+        'Programming Language :: Python :: 3.9'
     ],
     keywords='NDN SVS',
     packages=find_packages('src'),
     package_dir={'': 'src'},
     install_requires=_parse_requirements('docs/requirements.txt'),
-    python_requires=">=3.8",
+    python_requires=">=3.8,<3.10.*",
     zip_safe=False)
