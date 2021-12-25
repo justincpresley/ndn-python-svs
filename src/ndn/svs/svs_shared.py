@@ -11,7 +11,7 @@ from typing import Callable, Optional
 from ndn.app import NDNApp
 from ndn.encoding import Name, Component, parse_data
 from ndn.types import InterestNack, InterestTimeout, InterestCanceled, ValidationFailure
-from ndn_python_repo import Storage
+from ndn.storage import Storage
 # Custom Imports
 from .logger import SVSyncLogger
 from .security import SecurityOptions
@@ -39,7 +39,7 @@ class SVSyncShared(SVSyncBase):
                     return None
                 SVSyncLogger.info(f'SVSync: received data {bytes(content)}')
                 if content and self.cacheOthers:
-                    self.storage.put_data_packet(name, pkt)
+                    self.storage.put_packet(name, pkt)
                 return bytes(content) if content else None
             except InterestNack as e:
                 SVSyncLogger.warning(f'SVSync: nacked with reason={e.reason}')

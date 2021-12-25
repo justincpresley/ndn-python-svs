@@ -25,7 +25,6 @@ from .missing_data import MissingData
 from .security import SigningInfo, ValidatingInfo, SecurityOptions
 from .state_table import StateTable
 from .state_vector import StateVector
-from .storage import SVSyncStorage
 
 # Tool classes
 from .scheduler import AsyncScheduler

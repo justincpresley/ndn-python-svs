@@ -12,12 +12,11 @@ from ndn.app import NDNApp
 from ndn.encoding import Name, MetaInfo, InterestParam, BinaryStr, FormalName, SignatureType
 from ndn.encoding import make_data, parse_data
 from ndn.types import InterestNack, InterestTimeout, InterestCanceled, ValidationFailure
-from ndn_python_repo import Storage
+from ndn.storage import Storage, MemoryStorage
 # Custom Imports
 from .core import SVSyncCore
 from .logger import SVSyncLogger
 from .security import SecurityOptions, SigningInfo, ValidatingInfo
-from .storage import SVSyncStorage
 
 # Class Type: an abstract API class
 # Class Purpose:
@@ -27,13 +26,13 @@ class SVSyncBase():
     def __init__(self, app:NDNApp, syncPrefix:Name, dataPrefix:Name, groupPrefix:Name, nid:Name, updateCallback:Callable, storage:Optional[Storage]=None, securityOptions:Optional[SecurityOptions]=None) -> None:
         SVSyncLogger.info("SVSync: started svsync")
         self.app, self.syncPrefix, self.dataPrefix, self.groupPrefix, self.nid, self.updateCallback = app, syncPrefix, dataPrefix, groupPrefix, nid, updateCallback
-        self.storage = SVSyncStorage() if not storage else storage
+        self.storage = MemoryStorage() if not storage else storage
         self.secOptions = securityOptions if securityOptions is not None else SecurityOptions(SigningInfo(SignatureType.DIGEST_SHA256), ValidatingInfo(ValidatingInfo.get_validator(SignatureType.DIGEST_SHA256)), SigningInfo(SignatureType.DIGEST_SHA256), [])
         self.core = SVSyncCore(self.app, self.syncPrefix, self.groupPrefix, self.nid, self.updateCallback, self.secOptions)
         self.app.route(self.dataPrefix)(self.onDataInterest)
         SVSyncLogger.info(f'SVSync: started listening to {Name.to_str(self.dataPrefix)}')
     def onDataInterest(self, int_name:FormalName, int_param:InterestParam, _app_param:Optional[BinaryStr]) -> None:
-        data_pkt = self.storage.get_data_packet(int_name, int_param.can_be_prefix)
+        data_pkt = self.storage.get_packet(int_name, int_param.can_be_prefix)
         if data_pkt:
             SVSyncLogger.info(f'SVSync: served data {Name.to_str(int_name)}')
             self.app.put_raw_packet(data_pkt)
@@ -68,7 +67,7 @@ class SVSyncBase():
         name = self.getDataName(self.nid, self.core.getSeqNum()+1)
         data_packet = make_data(name, MetaInfo(freshness_period=5000), content=data, signer=self.secOptions.dataSig.signer)
         SVSyncLogger.info(f'SVSync: publishing data {Name.to_str(name)}')
-        self.storage.put_data_packet(name, data_packet)
+        self.storage.put_packet(name, data_packet)
         self.core.updateMyState(self.core.getSeqNum()+1)
     def getCore(self) -> SVSyncCore:
         return self.core
