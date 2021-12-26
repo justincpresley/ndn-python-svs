@@ -16,7 +16,7 @@ from ndn.app import NDNApp
 from ndn.encoding import Name
 from ndn.security import Keychain
 from ndn.transport.stream_socket import Face
-from ndn.storage import Storage
+from ndn.storage import Storage, DiskStorage
 # Custom Imports
 from .core import SVSyncCore
 from .logger import SVSyncLogger
@@ -42,6 +42,8 @@ class SVSyncBase_Thread(Thread):
     def run(self) -> None:
         def loop_task() -> None:
             self.app = NDNApp(self.face, self.keychain)
+            if issubclass(type(self.storage), DiskStorage)
+                self.storage.initialize()
             try:
                 self.app.run_forever(after_start=self.function())
             except (FileNotFoundError, ConnectionRefusedError):
