@@ -83,5 +83,5 @@ if __name__ == "__main__":
 
     try:
         app.run_forever(after_start=main(args))
-    except FileNotFoundError:
+    except (FileNotFoundError, ConnectionRefusedError):
         print('Error: could not connect to NFD for SVS.')
