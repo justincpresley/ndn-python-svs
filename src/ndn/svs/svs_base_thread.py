@@ -42,7 +42,7 @@ class SVSyncBase_Thread(Thread):
     def run(self) -> None:
         def loop_task() -> None:
             self.app = NDNApp(self.face, self.keychain)
-            if issubclass(type(self.storage), DiskStorage)
+            if issubclass(type(self.storage), DiskStorage):
                 self.storage.initialize()
             try:
                 self.app.run_forever(after_start=self.function())

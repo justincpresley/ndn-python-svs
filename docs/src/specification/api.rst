@@ -9,6 +9,8 @@ The thread classes are derived from `threading.Thread` and use the same argument
 Please call `wait()` after `start()` to allow the thread to fully initialize SVS. Also refer to the thread example for defining the missing data callback function.
 Otherwise, the thread class acts just the same as the normal class.
 
+Please note. Thread classes expect a Uninitialized storage while non-thread classes expect the storage to already be initialized.
+
 To make a new thread class based on a new SVS class from the SVSyncBase, make a new thread class derived from the SVSyncBase_Thread.
 In this new created class, you must define this function `async def function(self) -> None:`. Simply set `self.svs` to the new SVSync class.
 
