@@ -13,10 +13,9 @@ from ndn.app import NDNApp
 from ndn.encoding import Name, MetaInfo, InterestParam, BinaryStr, FormalName, SignatureType
 from ndn.encoding import make_data, parse_data
 from ndn.types import InterestNack, InterestTimeout, InterestCanceled, ValidationFailure
-from ndn_python_repo import Storage
+from ndn.storage import Storage, MemoryStorage
 # Custom Imports
 from .core import SVSyncCore
-from .storage import SVSyncStorage
 from .security import SecurityOptions, SigningInfo, ValidatingInfo
 
 # Class Type: an abstract API class
@@ -27,7 +26,7 @@ class SVSyncBase():
     def __init__(self, app:NDNApp, syncPrefix:Name, dataPrefix:Name, nid:Name, updateCallback:Callable, storage:Optional[Storage]=None, securityOptions:Optional[SecurityOptions]=None) -> None:
         logging.info(f'SVSync: started svsync')
         self.app = app
-        self.storage = SVSyncStorage() if not storage else storage
+        self.storage = MemoryStorage() if not storage else storage
         self.syncPrefix = syncPrefix
         self.dataPrefix = dataPrefix
         self.nid = nid

@@ -10,7 +10,7 @@ from typing import Callable, Optional
 # NDN Imports
 from ndn.app import NDNApp
 from ndn.encoding import Name
-from ndn_python_repo import Storage
+from ndn.storage import Storage
 # Custom Imports
 from .svs_base import SVSyncBase
 from .security import SecurityOptions

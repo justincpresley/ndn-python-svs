@@ -5,12 +5,12 @@
 #    @Pip-Library: https://pypi.org/project/ndn-svs
 #    @Documentation: https://ndn-python-svs.readthedocs.io
 
-# All types of API classes
-from .svs_base import SVSyncBase
+# API classes
 from .svs import SVSync
+from .svs_base import SVSyncBase
 
-# All types of API thread classes
-from .svs_thread_base import SVSyncBase_Thread
+# Forked Thread API classes
+from .svs_base_thread import SVSyncBase_Thread
 from .svs_thread import SVSync_Thread
 
 # Logic of SVS
@@ -18,5 +18,8 @@ from .core import SVSyncCore
 
 # Additional SVS useful classes
 from .core import MissingData
-from .state_vector import StateVector
 from .security import SigningInfo, ValidatingInfo, SecurityOptions
+from .state_vector import StateVector
+
+# Tool classes
+from .scheduler import AsyncScheduler
