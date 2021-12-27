@@ -26,7 +26,7 @@ class AsyncScheduler:
         while not self.stop:
             self.startTime = self.get_current_milli_time()
             while not ( self.get_current_milli_time() >= (self.startTime+self.interval) ):
-                await aio.sleep(0.001)
+                await aio.sleep(0.01)
             self.function()
             self.interval = self.defaultInterval + round( uniform(-self.randomPercent,self.randomPercent)*self.defaultInterval )
     def set_cycle(self, delay:int=0, add_to:bool=False) -> None:
