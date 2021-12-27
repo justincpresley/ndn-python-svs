@@ -18,7 +18,7 @@ from .state_vector import StateVector, StateVectorComponentModel
 # Class Purpose:
 #   to allow an easier time to form sync interest and handle all states
 class StateTable:
-    MTU = 7000
+    MTU = 7300
     def __init__(self, mynid:Name) -> None:
         self.table, self.meta, self.parts = StateVector(), MetaData(), [[0,0]]
         self.meta.source = Name.to_str(mynid).encode()

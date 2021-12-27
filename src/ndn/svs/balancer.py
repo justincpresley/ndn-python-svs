@@ -42,8 +42,11 @@ class SVSyncBalancer:
         if incoming_md.tseqno <= self.table.getMetaData().tseqno or self.busy:
             return
         self.busy = True
+        name, interestTasks = Name.from_str(bytes(incoming_md.source).decode()), []
         for i in range(incoming_md.nopcks):
-            await balanceFromState(Name.from_str(bytes(incoming_md.source).decode()), i+1)
+            task = aio.create_task( self.balanceFromState(name, i+1) )
+            interestTasks.append(task)
+        await aio.gather(*interestTasks)
         SVSyncLogger.info(f'SVSyncBalancer: nmeta {bytes(self.table.getMetaData().source).decode()} - {self.table.getMetaData().tseqno} total, {self.table.getMetaData().nopcks} pcks')
         SVSyncLogger.info(f'SVSyncBalancer: ntable {self.table.getCompleteStateVector().to_str()}')
         self.busy = False
