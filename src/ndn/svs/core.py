@@ -93,7 +93,7 @@ class SVSyncCore:
         SVSyncLogger.info(f'SVSyncCore: parts-{self.table.getPartCuts()} | 1stlength-{len(self.table.getPart(0))}')
         SVSyncLogger.info(f'SVSyncCore: table {self.table.getCompleteStateVector().to_str()}')
 
-        if equalize and not self.balancer.isBusy():
+        if equalize:
             await self.balancer.equalize(incomingMetadata)
     def compareMetaData(self, incoming_md:MetaData) -> Tuple[bool, bool]:
         table_md, supress, equalize = self.table.getMetaData(), False, False

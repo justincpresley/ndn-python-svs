@@ -30,21 +30,20 @@ class SVSyncBalancer:
         self.balancePrefix = self.nid + self.groupPrefix + Name.from_str("/sync")
         self.app.route(self.balancePrefix, need_sig_ptrs=True)(self.onStateInterest)
         SVSyncLogger.info(f'SVSyncBalancer: started listening to {Name.to_str(self.balancePrefix)}')
-    async def equalize(self, incoming_md:MetaData) -> None:
-        self.busy = True
-        if incoming_md.tseqno <= self.table.getMetaData().tseqno:
-            self.busy = False
+    async def balanceFromState(self, name:Name, nopck:int) -> None:
+        incoming_sv = await self.expressStateInterest(name, nopck)
+        if not incoming_sv:
             return
+        missingList = self.table.processStateVector(incoming_sv, oldData=True)
+        if missingList:
+            self.updateCallback(missingList)
+        self.table.updateMetaData()
+    async def equalize(self, incoming_md:MetaData) -> None:
+        if incoming_md.tseqno <= self.table.getMetaData().tseqno or self.busy:
+            return
+        self.busy = True
         for i in range(incoming_md.nopcks):
-            incoming_sv = await self.getStatePckValue(Name.from_str(bytes(incoming_md.source).decode()), i+1)
-            if not incoming_sv:
-                break
-            missingList = self.table.processStateVector(incoming_sv, oldData=True)
-            if missingList:
-                self.updateCallback(missingList)
-            self.table.updateMetaData()
-            if incoming_md.tseqno <= self.table.getMetaData().tseqno:
-                break
+            await balanceFromState(Name.from_str(bytes(incoming_md.source).decode()), i+1)
         SVSyncLogger.info(f'SVSyncBalancer: nmeta {bytes(self.table.getMetaData().source).decode()} - {self.table.getMetaData().tseqno} total, {self.table.getMetaData().nopcks} pcks')
         SVSyncLogger.info(f'SVSyncBalancer: ntable {self.table.getCompleteStateVector().to_str()}')
         self.busy = False
@@ -55,7 +54,7 @@ class SVSyncBalancer:
         sv = bytes(self.table.getPart(Component.to_number(int_name[-1])))
         SVSyncLogger.info(f'SVSyncBalancer: sending balance {sv}')
         self.app.put_data(int_name, content=sv, freshness_period=1000)
-    async def getStatePckValue(self, source:Name, nopck:int) -> Optional[StateVector]:
+    async def expressStateInterest(self, source:Name, nopck:int) -> Optional[StateVector]:
         name:Name = source + self.groupPrefix + Name.from_str("/sync") + [Component.from_number(nopck, Component.TYPE_SEQUENCE_NUM)]
         try:
             SVSyncLogger.info(f'SVSyncBalancer: balancing from {Name.to_str(name)}')
