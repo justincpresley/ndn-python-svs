@@ -36,7 +36,7 @@ class SVSyncShared(SVSyncBase):
                 ex_int_name, meta_info, content, sig_ptrs = parse_data(pkt)
                 isValidated = await self.secOptions.validate(ex_int_name, sig_ptrs)
                 if not isValidated:
-                    return None
+                    raise ValidationFailure()
                 SVSyncLogger.info(f'SVSync: received data {bytes(content)}')
                 if content and self.cacheOthers:
                     self.storage.put_packet(name, pkt)

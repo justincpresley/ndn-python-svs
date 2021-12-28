@@ -62,7 +62,7 @@ class Program:
         for i in missing_list:
             nid:Name = Name.from_str(i.nid)
             while i.lowSeqNum <= i.highSeqNum:
-                content_str:Optional[bytes] = await self.svs.fetchData(nid, i.lowSeqNum)
+                content_str:Optional[bytes] = await self.svs.fetchData(nid, i.lowSeqNum, 3)
                 if content_str:
                     output_str:str = i.nid + ": " + content_str.decode()
                     sys.stdout.write("\033[K")
