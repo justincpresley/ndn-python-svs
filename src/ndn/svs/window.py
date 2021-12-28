@@ -13,7 +13,7 @@ from typing import Callable, Tuple
 # Class Type: an async class
 # Class Purpose:
 #   to have a window-based method dealing with asyncio tasks
-class TaskWindow:
+class AsyncWindow:
     class TaskItem:
         __slots__ = ('function','args')
         def __init__(self, function:Callable, args:Tuple) -> None:

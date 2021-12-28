@@ -28,7 +28,7 @@ from .state_vector import StateVector
 
 # Tool classes
 from .scheduler import AsyncScheduler
-from .task_window import TaskWindow
+from .window import AsyncWindow
 
 # Logging class
 from .logger import SVSyncLogger

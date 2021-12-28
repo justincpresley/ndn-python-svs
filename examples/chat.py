@@ -14,7 +14,7 @@ from typing import List, Callable, Optional
 from ndn.encoding import Name
 # Custom Imports
 sys.path.insert(0,'.')
-from src.ndn.svs import SVSyncShared_Thread, SVSyncBase_Thread, SVSyncLogger, MissingData, TaskWindow
+from src.ndn.svs import SVSyncShared_Thread, SVSyncBase_Thread, SVSyncLogger, MissingData, AsyncWindow
 
 def parse_cmd_args() -> dict:
     # Command Line Parser
@@ -34,7 +34,7 @@ def parse_cmd_args() -> dict:
     return args
 
 def on_missing_data(thread:SVSyncBase_Thread) -> Callable:
-    taskwindow = TaskWindow(10)
+    taskwindow = AsyncWindow(10)
     async def wrapper(missing_list:List[MissingData]) -> None:
         async def missingfunc(nid:Name, noseq:int) -> None:
             content_str:Optional[bytes] = await thread.getSVSync().fetchData(nid, noseq)
