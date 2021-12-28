@@ -26,7 +26,7 @@ class TaskWindow:
         self._processQueue()
     async def gather(self) -> None:
         while self.tasks.qsize() != 0 or self.currtasks:
-            await aio.sleep(0)
+            await aio.sleep(0.001)
     async def _task(self, task:TaskItem) -> None:
         await task.function(*task.args)
         self.currtasks.remove(task)
