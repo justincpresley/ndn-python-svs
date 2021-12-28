@@ -14,7 +14,7 @@ from typing import List, Callable, Optional
 from ndn.encoding import Name
 # Custom Imports
 sys.path.insert(0,'.')
-from src.ndn.svs import SVSyncShared_Thread, SVSyncBase_Thread, SVSyncLogger, MissingData
+from src.ndn.svs import SVSyncShared_Thread, SVSyncBase_Thread, SVSyncLogger, MissingData, TaskWindow
 
 def parse_cmd_args() -> dict:
     # Command Line Parser
@@ -34,17 +34,21 @@ def parse_cmd_args() -> dict:
     return args
 
 def on_missing_data(thread:SVSyncBase_Thread) -> Callable:
+    taskwindow = TaskWindow(10)
     async def wrapper(missing_list:List[MissingData]) -> None:
+        async def missingfunc(nid:Name, noseq:int) -> None:
+            content_str:Optional[bytes] = await thread.getSVSync().fetchData(nid, noseq)
+            if content_str:
+                output_str:str = Name.to_str(nid) + ": " + content_str.decode()
+                sys.stdout.write("\033[K")
+                sys.stdout.flush()
+                print(output_str)
         for i in missing_list:
             nid:Name = Name.from_str(i.nid)
             while i.lowSeqNum <= i.highSeqNum:
-                content_str:Optional[bytes] = await thread.getSVSync().fetchData(nid, i.lowSeqNum)
-                if content_str:
-                    output_str:str = i.nid + ": " + content_str.decode()
-                    sys.stdout.write("\033[K")
-                    sys.stdout.flush()
-                    print(output_str)
+                taskwindow.addTask(missingfunc, (nid, i.lowSeqNum))
                 i.lowSeqNum = i.lowSeqNum + 1
+        await taskwindow.gather()
     return wrapper
 
 class Program:

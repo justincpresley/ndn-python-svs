@@ -45,6 +45,8 @@ class Program:
         self.svs:SVSync = SVSync(app, Name.from_str(self.args["group_prefix"]), Name.from_str(self.args["node_id"]), self.missing_callback)
         print(f'SVS client started | {self.args["group_prefix"]} - {self.args["node_id"]} |')
     async def run(self) -> None:
+        # wait 10ms before publishing data to ensure proper asyncio setup
+        await aio.sleep(0.01)
         num:int = 0
         while 1:
             num = num+1

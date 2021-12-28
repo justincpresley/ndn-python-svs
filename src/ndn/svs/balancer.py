@@ -18,6 +18,7 @@ from .meta_data import MetaData
 from .security import SecurityOptions
 from .state_table import StateTable
 from .state_vector import StateVector
+from .task_window import TaskWindow
 
 # Class Type: a ndn class
 # Class Purpose:
@@ -28,10 +29,11 @@ class SVSyncBalancer:
     def __init__(self, app:NDNApp, groupPrefix:Name, nid:Name, table:StateTable, updateCallback:Callable, secOptions:SecurityOptions) -> None:
         self.app, self.groupPrefix, self.nid, self.table, self.updateCallback, self.secOptions, self.busy = app, groupPrefix, nid, table, updateCallback, secOptions, False
         self.balancePrefix = self.nid + self.groupPrefix + Name.from_str("/sync")
+        self.taskWindow:TaskWindow = TaskWindow(10)
         self.app.route(self.balancePrefix, need_sig_ptrs=True)(self.onStateInterest)
         SVSyncLogger.info(f'SVSyncBalancer: started listening to {Name.to_str(self.balancePrefix)}')
     async def balanceFromState(self, name:Name, nopck:int) -> None:
-        incoming_sv = await self.expressStateInterest(name, nopck)
+        incoming_sv:Optional[StateVector] = await self.expressStateInterest(name, nopck)
         if not incoming_sv:
             return
         missingList = self.table.processStateVector(incoming_sv, oldData=True)
@@ -42,11 +44,10 @@ class SVSyncBalancer:
         if incoming_md.tseqno <= self.table.getMetaData().tseqno or self.busy:
             return
         self.busy = True
-        name, interestTasks = Name.from_str(bytes(incoming_md.source).decode()), []
+        name = Name.from_str(bytes(incoming_md.source).decode())
         for i in range(incoming_md.nopcks):
-            task = aio.create_task( self.balanceFromState(name, i+1) )
-            interestTasks.append(task)
-        await aio.gather(*interestTasks)
+            self.taskWindow.addTask(self.balanceFromState, (name, i+1))
+        await self.taskWindow.gather()
         SVSyncLogger.info(f'SVSyncBalancer: nmeta {bytes(self.table.getMetaData().source).decode()} - {self.table.getMetaData().tseqno} total, {self.table.getMetaData().nopcks} pcks')
         SVSyncLogger.info(f'SVSyncBalancer: ntable {self.table.getCompleteStateVector().to_str()}')
         self.busy = False
@@ -60,11 +61,12 @@ class SVSyncBalancer:
     async def expressStateInterest(self, source:Name, nopck:int) -> Optional[StateVector]:
         name:Name = source + self.groupPrefix + Name.from_str("/sync") + [Component.from_number(nopck, Component.TYPE_SEQUENCE_NUM)]
         try:
-            SVSyncLogger.info(f'SVSyncBalancer: balancing from {Name.to_str(name)}')
+            SVSyncLogger.info(f'SVSyncBalancer: balancing by {Name.to_str(name)}')
             data_name, meta_info, content = await self.app.express_interest(
                 name, must_be_fresh=True, can_be_prefix=True, lifetime=1000)
             return StateVector(bytes(content)) if bytes(content) != b'' else None
         except (InterestNack, InterestTimeout, InterestCanceled, ValidationFailure):
+            SVSyncLogger.info(f'SVSyncBalancer: failed to get {Name.to_str(name)}')
             return None
     def isBusy(self) -> bool:
         return self.busy
