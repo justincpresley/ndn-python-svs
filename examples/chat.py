@@ -44,9 +44,8 @@ def on_missing_data(thread:SVSyncBase_Thread) -> Callable:
                 sys.stdout.flush()
                 print(output_str)
         for i in missing_list:
-            nid:Name = Name.from_str(i.nid)
             while i.lowSeqNum <= i.highSeqNum:
-                taskwindow.addTask(missingfunc, (nid, i.lowSeqNum))
+                taskwindow.addTask(missingfunc, (Name.from_str(i.nid), i.lowSeqNum))
                 i.lowSeqNum = i.lowSeqNum + 1
     return wrapper
 
