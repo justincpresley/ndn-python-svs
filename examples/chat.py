@@ -48,7 +48,6 @@ def on_missing_data(thread:SVSyncBase_Thread) -> Callable:
             while i.lowSeqNum <= i.highSeqNum:
                 taskwindow.addTask(missingfunc, (nid, i.lowSeqNum))
                 i.lowSeqNum = i.lowSeqNum + 1
-        await taskwindow.gather()
     return wrapper
 
 class Program:
