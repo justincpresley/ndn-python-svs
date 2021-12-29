@@ -29,7 +29,7 @@ class SVSyncBalancer:
     def __init__(self, app:NDNApp, groupPrefix:Name, nid:Name, table:StateTable, updateCallback:Callable, secOptions:SecurityOptions) -> None:
         self.app, self.groupPrefix, self.nid, self.table, self.updateCallback, self.secOptions, self.busy = app, groupPrefix, nid, table, updateCallback, secOptions, False
         self.balancePrefix = self.nid + self.groupPrefix + Name.from_str("/sync")
-        self.taskWindow:AsyncWindow = AsyncWindow(10)
+        self.taskWindow:AsyncWindow = AsyncWindow(5)
         self.app.route(self.balancePrefix, need_sig_ptrs=True)(self.onStateInterest)
         SVSyncLogger.info(f'SVSyncBalancer: started listening to {Name.to_str(self.balancePrefix)}')
     async def balanceFromState(self, name:Name, nopck:int) -> None:
