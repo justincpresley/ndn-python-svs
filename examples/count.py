@@ -29,6 +29,7 @@ def parse_cmd_args() -> dict:
     # Adding all Command Line Arguments
     requiredArgs.add_argument("-n", "--nodename",action="store",dest="node_name",required=True,help="id of this node in svs")
     optionalArgs.add_argument("-gp","--groupprefix",action="store",dest="group_prefix",required=False,help="overrides config | routable group prefix to listen from")
+    optionalArgs.add_argument("-i","--interval",action="store",dest="interval",type=int,default=5,required=False,help="interval at which data is published")
     optionalArgs.add_argument("-v","--verbose",action="store_true",dest="verbose",default=False,required=False,help="when set, svsync info is displayed as well")
     informationArgs.add_argument("-h","--help",action="help",default=SUPPRESS,help="show this help message and exit")
     # Getting all Arguments
@@ -37,6 +38,7 @@ def parse_cmd_args() -> dict:
     args["group_prefix"] = argvars.group_prefix if argvars.group_prefix is not None else "/svs"
     args["node_id"] = argvars.node_name
     args["verbose"] = argvars.verbose
+    args["interval"] = argvars.interval
     return args
 
 class Program:
@@ -55,7 +57,7 @@ class Program:
                 self.svs.publishData(str(num).encode())
             except KeyboardInterrupt:
                 sys.exit()
-            await aio.sleep(5)
+            await aio.sleep(self.args["interval"])
     def missing_callback(self, missing_list:List[MissingData]) -> None:
         aio.ensure_future(self.on_missing_data(missing_list))
     async def on_missing_data(self, missing_list:List[MissingData]) -> None:
