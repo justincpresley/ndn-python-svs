@@ -37,7 +37,7 @@ def on_missing_data(thread:SVSyncBase_Thread) -> Callable:
     taskwindow = AsyncWindow(10)
     async def wrapper(missing_list:List[MissingData]) -> None:
         async def missingfunc(nid:Name, noseq:int) -> None:
-            content_str:Optional[bytes] = await thread.getSVSync().fetchData(nid, noseq, 3)
+            content_str:Optional[bytes] = await thread.getSVSync().fetchData(nid, noseq, 2)
             if content_str:
                 output_str:str = Name.to_str(nid) + ": " + content_str.decode()
                 sys.stdout.write("\033[K")

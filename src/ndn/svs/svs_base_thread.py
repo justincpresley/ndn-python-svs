@@ -58,7 +58,7 @@ class SVSyncBase_Thread(Thread):
     async def function(self) -> None:
         raise NotImplementedError
     def missing_callback(self, missing_list:List[MissingData]) -> None:
-        aio.ensure_future(self.updateCallback(self)(missing_list))
+        aio.get_event_loop().create_task(self.updateCallback(self)(missing_list))
     def getSVSync(self) -> Optional[SVSyncBase]:
         return self.svs
     async def fetchData(self, nid:Name, seqNum:int, retries:int=0) -> Optional[bytes]:

@@ -47,8 +47,7 @@ class Program:
         self.svs:SVSync = SVSync(app, Name.from_str(self.args["group_prefix"]), Name.from_str(self.args["node_id"]), self.missing_callback)
         print(f'SVS client started | {self.args["group_prefix"]} - {self.args["node_id"]} |')
     async def run(self) -> None:
-        # wait 10ms before publishing data to ensure proper asyncio setup
-        await aio.sleep(0.01)
+        await aio.sleep(0.01) # for same-thread SVS, wait 10ms to ensure proper async setup
         num:int = 0
         while 1:
             num = num+1
@@ -63,7 +62,7 @@ class Program:
     async def on_missing_data(self, missing_list:List[MissingData]) -> None:
         for i in missing_list:
             while i.lowSeqNum <= i.highSeqNum:
-                content_str:Optional[bytes] = await self.svs.fetchData(Name.from_str(i.nid), i.lowSeqNum, 3)
+                content_str:Optional[bytes] = await self.svs.fetchData(Name.from_str(i.nid), i.lowSeqNum, 2)
                 if content_str:
                     output_str:str = i.nid + ": " + content_str.decode()
                     sys.stdout.write("\033[K")
@@ -80,7 +79,7 @@ def main() -> int:
     args["node_id"] = Name.to_str(Name.from_str(args["node_id"]))
     args["group_prefix"] = Name.to_str(Name.from_str(args["group_prefix"]))
 
-    SVSyncLogger.config(True if args["verbose"] else False, None, logging.INFO)
+    SVSyncLogger.config(True if args["verbose"] else False, None, logging.WARNING)
 
     try:
         app.run_forever(after_start=start_count(args))
