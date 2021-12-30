@@ -6,10 +6,10 @@
 #    @Documentation: https://ndn-python-svs.readthedocs.io
 
 # Basic Libraries
-from typing import Callable, Optional
+from typing import Callable, Optional, Tuple
 # NDN Imports
 from ndn.app import NDNApp
-from ndn.encoding import Name, Component, parse_data
+from ndn.encoding import Name, BinaryStr, Component, parse_data
 from ndn.types import InterestNack, InterestTimeout, InterestCanceled, ValidationFailure
 from ndn.storage import Storage
 # Custom Imports
@@ -27,7 +27,7 @@ class SVSyncShared(SVSyncBase):
         preDataPrefix = groupPrefix + [Component.from_str("d")] if self.cacheOthers else groupPrefix + [Component.from_str("d")] + nid
         preSyncPrefix = groupPrefix + [Component.from_str("s")]
         super().__init__(app, preSyncPrefix, preDataPrefix, groupPrefix, nid, updateCallback, storage, securityOptions)
-    async def fetchData(self, nid:Name, seqNum:int, retries:int=0) -> Optional[bytes]:
+    async def _fetch(self, nid:Name, seqNum:int, retries:int=0) -> Tuple[Optional[bytes], Optional[BinaryStr]]:
         name = self.getDataName(nid, seqNum)
         while retries+1 > 0:
             try:
@@ -36,11 +36,11 @@ class SVSyncShared(SVSyncBase):
                 ex_int_name, meta_info, content, sig_ptrs = parse_data(pkt)
                 isValidated = await self.secOptions.validate(ex_int_name, sig_ptrs)
                 if not isValidated:
-                    raise ValidationFailure()
+                    return (None, None)
                 SVSyncLogger.info(f'SVSync: received data {bytes(content)}')
                 if content and self.cacheOthers:
                     self.storage.put_packet(name, pkt)
-                return bytes(content) if content else None
+                return (bytes(content), pkt) if content else (None, pkt)
             except InterestNack as e:
                 SVSyncLogger.warning(f'SVSync: nacked with reason={e.reason}')
             except InterestTimeout:
@@ -54,7 +54,7 @@ class SVSyncShared(SVSyncBase):
 
             retries = retries - 1
             if retries+1 > 0:
-                SVSyncLogger.warning("SVSync: retrying fetching data")
-        return None
+                SVSyncLogger.info("SVSync: retrying fetching data")
+        return (None, None)
     def getDataName(self, nid:Name, seqNum:int) -> Name:
         return (self.groupPrefix + [Component.from_str("d")] + nid + Name.from_str(str(seqNum)))

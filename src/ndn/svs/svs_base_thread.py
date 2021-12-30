@@ -13,7 +13,7 @@ from threading import Thread
 from typing import Optional, List, Callable
 # NDN Imports
 from ndn.app import NDNApp
-from ndn.encoding import Name
+from ndn.encoding import Name, BinaryStr
 from ndn.security import Keychain
 from ndn.transport.stream_socket import Face
 from ndn.storage import Storage, DiskStorage
@@ -62,7 +62,11 @@ class SVSyncBase_Thread(Thread):
     def getSVSync(self) -> Optional[SVSyncBase]:
         return self.svs
     async def fetchData(self, nid:Name, seqNum:int, retries:int=0) -> Optional[bytes]:
-        return await self.svs.fetchData(nid, seqNum, retries)
+        data = await self.svs.fetchData(nid, seqNum, retries)
+        return data
+    async def fetchDataPacket(self, nid:Name, seqNum:int, retries:int=0) -> Optional[BinaryStr]:
+        pck = await self.svs.fetchDataPacket(nid, seqNum, retries)
+        return pck
     def publishData(self, data:bytes) -> None:
         if self.svs:
             self.svs.publishData(data)
