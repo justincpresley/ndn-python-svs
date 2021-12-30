@@ -6,7 +6,7 @@
 #    @Documentation: https://ndn-python-svs.readthedocs.io
 
 # Basic Libraries
-from typing import Optional, Callable
+from typing import Optional, Callable, Tuple
 # NDN Imports
 from ndn.app import NDNApp
 from ndn.encoding import Name, MetaInfo, InterestParam, BinaryStr, FormalName, SignatureType
@@ -36,7 +36,7 @@ class SVSyncBase():
         if data_pkt:
             SVSyncLogger.info(f'SVSync: served data {Name.to_str(int_name)}')
             self.app.put_raw_packet(data_pkt)
-    async def fetchData(self, nid:Name, seqNum:int, retries:int=0) -> Optional[bytes]:
+    async def _fetch(self, nid:Name, seqNum:int, retries:int=0) -> Tuple[Optional[bytes], Optional[BinaryStr]]:
         name = self.getDataName(nid, seqNum)
         while retries+1 > 0:
             try:
@@ -45,9 +45,9 @@ class SVSyncBase():
                 ex_int_name, meta_info, content, sig_ptrs = parse_data(pkt)
                 isValidated = await self.secOptions.validate(ex_int_name, sig_ptrs)
                 if not isValidated:
-                    return None
+                    return (None, None)
                 SVSyncLogger.info(f'SVSync: received data {bytes(content)}')
-                return bytes(content) if content else None
+                return (bytes(content), pkt) if content else (None, pkt)
             except InterestNack as e:
                 SVSyncLogger.warning(f'SVSync: nacked with reason={e.reason}')
             except InterestTimeout:
@@ -62,7 +62,13 @@ class SVSyncBase():
             retries = retries - 1
             if retries+1 > 0:
                 SVSyncLogger.info("SVSync: retrying fetching data")
-        return None
+        return (None, None)
+    async def fetchData(self, nid:Name, seqNum:int, retries:int=0) -> Optional[bytes]:
+        data, _ = await self._fetch(nid, seqNum, retries)
+        return data
+    async def fetchDataPacket(self, nid:Name, seqNum:int, retries:int=0) -> Optional[BinaryStr]:
+        _, pkt = await self._fetch(nid, seqNum, retries)
+        return pkt
     def publishData(self, data:bytes) -> None:
         name = self.getDataName(self.nid, self.core.getSeqNum()+1)
         data_packet = make_data(name, MetaInfo(freshness_period=5000), content=data, signer=self.secOptions.dataSig.signer)
