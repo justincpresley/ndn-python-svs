@@ -28,3 +28,6 @@ class SVSyncShared_Thread(SVSyncBase_Thread):
         self.cacheOthers = cacheOthers
     async def function(self) -> None:
         self.svs = SVSyncShared(self.app, self.groupPrefix, self.nid, self.missing_callback, self.cacheOthers, self.storage, self.secOptions)
+    def serveDataPacket(datapkt:BinaryStr) -> None:
+        if self.svs:
+            self.svs.serveDataPacket(datapkt)
