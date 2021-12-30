@@ -58,3 +58,7 @@ class SVSyncShared(SVSyncBase):
         return (None, None)
     def getDataName(self, nid:Name, seqNum:int) -> Name:
         return (self.groupPrefix + [Component.from_str("d")] + nid + Name.from_str(str(seqNum)))
+    def serveDataPacket(datapkt:BinaryStr) -> None:
+        name, _, content, _ = parse_data(datapkt)
+        if content:
+            self.storage.put_packet(name, datapkt)

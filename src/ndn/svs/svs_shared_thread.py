@@ -8,7 +8,7 @@
 # Basic Libraries
 from typing import Optional, Callable
 # NDN Imports
-from ndn.encoding import Name
+from ndn.encoding import Name, BinaryStr
 from ndn.security import Keychain
 from ndn.transport.stream_socket import Face
 from ndn.storage import Storage
@@ -28,3 +28,6 @@ class SVSyncShared_Thread(SVSyncBase_Thread):
         self.cacheOthers = cacheOthers
     async def function(self) -> None:
         self.svs = SVSyncShared(self.app, self.groupPrefix, self.nid, self.missing_callback, self.cacheOthers, self.storage, self.secOptions)
+    def serveDataPacket(datapkt:BinaryStr) -> None:
+        if self.svs:
+            self.svs.serveDataPacket(datapkt)
