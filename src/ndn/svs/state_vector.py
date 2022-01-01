@@ -102,12 +102,14 @@ class StateVectorModel:
 class StateVector:
     def __init__(self, component:Component=None) -> None:
         self.vector:StateVectorModel = StateVectorModel([])
+        self.wire:Optional[bytes] = None
         if component:
             temp_vector:Optional[StateVectorModel] = StateVectorModel.parse(component)
             if temp_vector != None:
                 for i in temp_vector.value:
                     self.set(bytes(i.nid).decode(), i.seqno, True)
     def set(self, nid:str, seqno:int, oldData:bool=False) -> None:
+        self.wire = None
         index:Optional[int] = self.index(nid)
         if index == None:
             svc:StateVectorComponentModel = StateVectorComponentModel()
@@ -136,7 +138,9 @@ class StateVector:
     def to_str(self) -> str:
         return " ".join([( bytes(i.nid).decode() + ":" + str(i.seqno) ) for i in self.vector.value])
     def encode(self) -> bytes:
-        return self.vector.encode()
+        if self.wire == None:
+            self.wire = self.vector.encode()
+        return self.wire
     def keys(self) -> List[str]:
         return [bytes(i.nid).decode() for i in self.vector.value]
     def list(self) -> List[StateVectorComponentModel]:
