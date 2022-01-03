@@ -7,7 +7,6 @@
 
 # Basic Libraries
 from typing import List
-from enum import Enum
 import struct
 # NDN Imports
 from ndn.encoding import Component, TlvModel, BytesField, UintField, RepeatedField, ModelField
@@ -15,18 +14,10 @@ from ndn.encoding import get_tl_num_size, write_tl_num, parse_tl_num
 
 # Class Type: an enumeration struct
 # Class Purpose:
-#   to differ tlv model types.
-class StateVectorModelTypes(Enum):
-    VECTOR    = 201
-    KEY       = 202
-    VALUE     = 203
-
-# Class Type: an enumeration struct
-# Class Purpose:
 #   to hold info about a singular node within the vector.
 class StateVectorComponentModel(TlvModel):
-    node_id = BytesField(StateVectorModelTypes.KEY.value)
-    seq_num = UintField(StateVectorModelTypes.VALUE.value)
+    node_id = BytesField(SVSyncTlvTypes.VECTOR_KEY.value)
+    seq_num = UintField(SVSyncTlvTypes.VECTOR_VALUE.value)
 
 # Class Type: an custom tlv model class
 # Class Purpose:
@@ -38,9 +29,9 @@ class StateVectorModel:
     def encode(self) -> bytearray:
         component_wires = [v.encode() for v in self.value]
         length = sum(len(w) for w in component_wires)
-        buf_len = length + get_tl_num_size(length) + get_tl_num_size(StateVectorModelTypes.VECTOR.value)
+        buf_len = length + get_tl_num_size(length) + get_tl_num_size(SVSyncTlvTypes.VECTOR.value)
         ret = bytearray(buf_len)
-        pos = write_tl_num(StateVectorModelTypes.VECTOR.value, ret)
+        pos = write_tl_num(SVSyncTlvTypes.VECTOR.value, ret)
         pos += write_tl_num(length, ret, pos)
         for w in component_wires:
             ret[pos:pos + len(w)] = w
@@ -50,7 +41,7 @@ class StateVectorModel:
     def parse(buf):
         # Verify the Type
         typ, pos = parse_tl_num(buf)
-        if typ != StateVectorModelTypes.VECTOR.value:
+        if typ != SVSyncTlvTypes.VECTOR.value:
             return None
         # Check the length
         length, l = parse_tl_num(buf, pos)
@@ -64,7 +55,7 @@ class StateVectorModel:
             # Node ID
             typ, l = parse_tl_num(buf, pos)
             pos += l
-            if typ != StateVectorModelTypes.KEY.value:
+            if typ != SVSyncTlvTypes.VECTOR_KEY.value:
                 return None
             length, l = parse_tl_num(buf, pos)
             pos += l
@@ -73,7 +64,7 @@ class StateVectorModel:
             # Value
             typ, l = parse_tl_num(buf, pos)
             pos += l
-            if typ != StateVectorModelTypes.VALUE.value:
+            if typ != SVSyncTlvTypes.VECTOR_VALUE.value:
                 return None
             length, l = parse_tl_num(buf, pos)
             pos += l
