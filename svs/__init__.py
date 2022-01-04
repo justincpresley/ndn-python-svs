@@ -10,7 +10,7 @@ from .svs import SVSync
 from .svs_base import SVSyncBase
 
 # Forked Thread API classes
-from .svs_base_thread import SVSyncBase_Thread
+from .svs_thread_base import SVSyncBase_Thread
 from .svs_thread import SVSync_Thread
 
 # Logic of SVS

@@ -36,12 +36,12 @@ class SVSyncBase():
         self.app.route(self.dataPrefix)(self.onDataInterest)
         logging.info(f'SVSync: started listening to {Name.to_str(self.dataPrefix)}')
     def onDataInterest(self, int_name:FormalName, int_param:InterestParam, _app_param:Optional[BinaryStr]) -> None:
-        data_pkt = self.storage.get_data_packet(int_name, int_param.can_be_prefix)
+        data_pkt = self.storage.get_packet(int_name, int_param.can_be_prefix)
         if data_pkt:
             logging.info(f'SVSync: served data {Name.to_str(int_name)}')
             self.app.put_raw_packet(data_pkt)
-    async def fetchData(self, nid:Name, seqNum:int, retries:int=0) -> Optional[bytes]:
-        name = self.getDataName(nid, seqNum)
+    async def fetchData(self, nid:Name, seqno:int, retries:int=0) -> Optional[bytes]:
+        name = self.getDataName(nid, seqno)
         while retries+1 > 0:
             try:
                 logging.info(f'SVSync: fetching data {Name.to_str(name)}')
@@ -68,12 +68,12 @@ class SVSyncBase():
                 logging.info(f'SVSync: retrying fetching data')
         return None
     def publishData(self, data:bytes) -> None:
-        name = self.getDataName(self.nid, self.core.getSeqNum()+1)
+        name = self.getDataName(self.nid, self.core.getSeqno()+1)
         data_packet = make_data(name, MetaInfo(freshness_period=5000), content=data, signer=self.secOptions.dataSig.signer)
         logging.info(f'SVSync: publishing data {Name.to_str(name)}')
-        self.storage.put_data_packet(name, data_packet)
-        self.core.updateStateVector(self.core.getSeqNum()+1)
+        self.storage.put_packet(name, data_packet)
+        self.core.updateStateVector(self.core.getSeqno()+1)
     def getCore(self) -> SVSyncCore:
         return self.core
-    def getDataName(self, nid:Name, seqNum:int) -> Name:
+    def getDataName(self, nid:Name, seqno:int) -> Name:
         raise NotImplementedError

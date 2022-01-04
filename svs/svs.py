@@ -24,5 +24,5 @@ class SVSync(SVSyncBase):
         preSyncPrefix = self.groupPrefix
         preDataPrefix = nid + self.groupPrefix
         super().__init__(app, preSyncPrefix, preDataPrefix, nid, updateCallback, storage, securityOptions)
-    def getDataName(self, nid:Name, seqNum:int) -> Name:
-        return ( nid + self.groupPrefix + Name.from_str( "/epoch-"+str(seqNum) ) )
+    def getDataName(self, nid:Name, seqno:int) -> Name:
+        return ( nid + self.groupPrefix + Name.from_str( "/epoch-"+str(seqno) ) )

@@ -70,8 +70,8 @@ class SVSyncBase_Thread(Thread):
         aio.ensure_future(self.updateCallback(self)(missing_list))
     def getSVSync(self) -> SVSyncBase:
         return self.svs
-    async def fetchData(self, nid:Name, seqNum:int, retries:int=0) -> Optional[bytes]:
-        return await self.svs.fetchData(nid, seqNum, retries)
+    async def fetchData(self, nid:Name, seqno:int, retries:int=0) -> Optional[bytes]:
+        return await self.svs.fetchData(nid, seqno, retries)
     def publishData(self, data:bytes) -> None:
         self.svs.publishData(data)
     def getCore(self) -> SVSyncCore:

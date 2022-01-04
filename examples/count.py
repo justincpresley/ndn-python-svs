@@ -18,7 +18,7 @@ from ndn.app import NDNApp
 from ndn.encoding import Name
 # Custom Imports
 sys.path.insert(0,'.')
-from src.ndn.svs import *
+from svs import *
 
 app = NDNApp()
 
@@ -59,14 +59,14 @@ class Program:
     async def on_missing_data(self, missing_list:List[MissingData]) -> None:
         for i in missing_list:
             nid = Name.from_str(i.nid)
-            while i.lowSeqNum <= i.highSeqNum:
-                content_str = await self.svs.fetchData(nid, i.lowSeqNum)
+            while i.lowSeqno <= i.highSeqno:
+                content_str = await self.svs.fetchData(nid, i.lowSeqno)
                 if content_str is not None:
                     content_str = i.nid + ": " + content_str.decode()
                     sys.stdout.write("\033[K")
                     sys.stdout.flush()
                     print(content_str)
-                i.lowSeqNum = i.lowSeqNum + 1
+                i.lowSeqno = i.lowSeqno + 1
 
 async def main(args:dict) -> int:
     prog = Program(args)

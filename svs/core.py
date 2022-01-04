@@ -24,11 +24,11 @@ from .security import SecurityOptions
 # Class Purpose:
 #   to hold the range of missing data for a specific node.
 class MissingData:
-    __slots__ = ('nid','lowSeqNum','highSeqNum')
-    def __init__(self, nid:str, lowSeqNum:int, highSeqNum:int) -> None:
+    __slots__ = ('nid','lowSeqno','highSeqno')
+    def __init__(self, nid:str, lowSeqno:int, highSeqno:int) -> None:
         self.nid        = nid
-        self.lowSeqNum  = lowSeqNum
-        self.highSeqNum = highSeqNum
+        self.lowSeqno   = lowSeqno
+        self.highSeqno  = highSeqno
 
 # Class Type: an enumeration struct
 # Class Purpose:
@@ -52,7 +52,7 @@ class SVSyncCore:
         self.syncPrefix = syncPrefix
         self.secOptions = secOptions
         self.vector = StateVector()
-        self.seqNum = 0
+        self.seqno = 0
         self.interval = 30000 # time in milliseconds
         self.randomPercent = 0.1
         self.briefInterval = 200 # time in milliseconds
@@ -123,14 +123,14 @@ class SVSyncCore:
                 self.scheduler.set_cycle(delay)
         logging.info(f'SVSyncCore: state {self.state.name}')
         logging.info(f'SVSyncCore: vector {self.vector.to_str()}')
-    def updateStateVector(self, seqNum:int, nid:Name=None) -> None:
+    def updateStateVector(self, seqno:int, nid:Name=None) -> None:
         if not nid:
             nid = self.nid
         if Name.to_str(nid) == Name.to_str(self.nid):
-            self.seqNum = seqNum
-        self.vector.set(Name.to_str(nid), seqNum)
+            self.seqno = seqno
+        self.vector.set(Name.to_str(nid), seqno)
         self.scheduler.skip_interval()
-    def getSeqNum(self) -> int:
-        return self.seqNum
+    def getSeqno(self) -> int:
+        return self.seqno
     def getStateVector(self) -> StateVector:
         return self.vector
