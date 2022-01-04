@@ -27,6 +27,10 @@ class AsyncWindow:
     async def gather(self) -> None:
         while self.tasks.qsize() != 0 or self.currtasks:
             await aio.sleep(0.001)
+    def getNumTasks(self) -> int:
+        return self.tasks.qsize()
+    def getWindowSize(self) -> int:
+        return self.maxWindow
     async def _task(self, task:TaskItem) -> None:
         await task.function(*task.args)
         self.currtasks.remove(task)
