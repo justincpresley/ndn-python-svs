@@ -24,8 +24,8 @@ from .svs_base import SVSyncBase
 class SVSyncShared(SVSyncBase):
     def __init__(self, app:NDNApp, groupPrefix:Name, nid:Name, updateCallback:Callable, cacheOthers:bool, storage:Optional[Storage]=None, securityOptions:Optional[SecurityOptions]=None) -> None:
         self.cacheOthers = cacheOthers
-        preDataPrefix = groupPrefix + [Component.from_str("d")] if self.cacheOthers else groupPrefix + [Component.from_str("d")] + nid
-        preSyncPrefix = groupPrefix + [Component.from_str("s")]
+        preDataPrefix = groupPrefix + [Component.from_str("data")] if self.cacheOthers else groupPrefix + [Component.from_str("data")] + nid
+        preSyncPrefix = groupPrefix + [Component.from_str("sync")]
         super().__init__(app, preSyncPrefix, preDataPrefix, groupPrefix, nid, updateCallback, storage, securityOptions)
     async def _fetch(self, nid:Name, seqno:int, retries:int=0) -> Tuple[Optional[bytes], Optional[BinaryStr]]:
         name = self.getDataName(nid, seqno)
@@ -57,7 +57,7 @@ class SVSyncShared(SVSyncBase):
                 SVSyncLogger.info("SVSync: retrying fetching data")
         return (None, None)
     def getDataName(self, nid:Name, seqno:int) -> Name:
-        return (self.groupPrefix + [Component.from_str("d")] + nid + Name.from_str(str(seqno)))
+        return (self.groupPrefix + [Component.from_str("data")] + nid + Name.from_str(str(seqno)))
     def serveDataPacket(datapkt:BinaryStr) -> None:
         name, _, content, _ = parse_data(datapkt)
         if content:
