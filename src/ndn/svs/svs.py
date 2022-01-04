@@ -22,5 +22,5 @@ class SVSync(SVSyncBase):
     def __init__(self, app:NDNApp, groupPrefix:Name, nid:Name, updateCallback:Callable, storage:Optional[Storage]=None, securityOptions:Optional[SecurityOptions]=None) -> None:
         preSyncPrefix, preDataPrefix = groupPrefix, nid + groupPrefix + Name.from_str("/data")
         super().__init__(app, preSyncPrefix, preDataPrefix, groupPrefix, nid, updateCallback, storage, securityOptions)
-    def getDataName(self, nid:Name, seqNum:int) -> Name:
-        return ( nid + self.groupPrefix + Name.from_str("/data") + Name.from_str(str(seqNum)) )
+    def getDataName(self, nid:Name, seqno:int) -> Name:
+        return ( nid + self.groupPrefix + Name.from_str("/data") + Name.from_str(str(seqno)) )

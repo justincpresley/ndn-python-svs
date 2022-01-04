@@ -43,7 +43,7 @@ class SVSyncCore:
     briefRandomPercent = 0.5
     def __init__(self, app:NDNApp, syncPrefix:Name, groupPrefix:Name, nid:Name, updateCallback:Callable, secOptions:SecurityOptions) -> None:
         SVSyncLogger.info("SVSyncCore: started svsync core")
-        self.app, self.nid, self.updateCallback, self.syncPrefix, self.groupPrefix, self.secOptions, self.state, self.seqNum = app, nid, updateCallback, syncPrefix, groupPrefix, secOptions, SVSyncCoreState.STEADY, 0
+        self.app, self.nid, self.updateCallback, self.syncPrefix, self.groupPrefix, self.secOptions, self.state, self.seqno = app, nid, updateCallback, syncPrefix, groupPrefix, secOptions, SVSyncCoreState.STEADY, 0
         self.table = StateTable(self.nid)
         self.balancer = SVSyncBalancer(self.app, self.groupPrefix, self.nid, self.table, self.updateCallback, self.secOptions)
         self.app.route(self.syncPrefix, need_sig_ptrs=True)(self.onSyncInterest)
@@ -106,8 +106,8 @@ class SVSyncCore:
         self.table.updateMyState(seqno)
         self.table.updateMetaData()
         self.scheduler.skip_interval()
-        self.seqNum = self.table.getSeqNum(self.nid)
-    def getSeqNum(self) -> int:
-        return self.seqNum
+        self.seqno = self.table.getSeqno(self.nid)
+    def getSeqno(self) -> int:
+        return self.seqno
     def getStateTable(self) -> StateTable:
         return self.table

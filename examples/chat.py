@@ -36,17 +36,17 @@ def parse_cmd_args() -> dict:
 def on_missing_data(thread:SVSyncBase_Thread) -> Callable:
     taskwindow = AsyncWindow(10)
     async def wrapper(missing_list:List[MissingData]) -> None:
-        async def missingfunc(nid:Name, noseq:int) -> None:
-            content_str:Optional[bytes] = await thread.getSVSync().fetchData(nid, noseq, 2)
+        async def missingfunc(nid:Name, seqno:int) -> None:
+            content_str:Optional[bytes] = await thread.getSVSync().fetchData(nid, seqno, 2)
             if content_str:
                 output_str:str = Name.to_str(nid) + ": " + content_str.decode()
                 sys.stdout.write("\033[K")
                 sys.stdout.flush()
                 print(output_str)
         for i in missing_list:
-            while i.lowSeqNum <= i.highSeqNum:
-                taskwindow.addTask(missingfunc, (Name.from_str(i.nid), i.lowSeqNum))
-                i.lowSeqNum = i.lowSeqNum + 1
+            while i.lowSeqno <= i.highSeqno:
+                taskwindow.addTask(missingfunc, (Name.from_str(i.nid), i.lowSeqno))
+                i.lowSeqno = i.lowSeqno + 1
     return wrapper
 
 class Program:

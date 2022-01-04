@@ -61,11 +61,11 @@ class SVSyncBase_Thread(Thread):
         aio.get_event_loop().create_task(self.updateCallback(self)(missing_list))
     def getSVSync(self) -> Optional[SVSyncBase]:
         return self.svs
-    async def fetchData(self, nid:Name, seqNum:int, retries:int=0) -> Optional[bytes]:
-        data = await self.svs.fetchData(nid, seqNum, retries)
+    async def fetchData(self, nid:Name, seqno:int, retries:int=0) -> Optional[bytes]:
+        data = await self.svs.fetchData(nid, seqno, retries)
         return data
-    async def fetchDataPacket(self, nid:Name, seqNum:int, retries:int=0) -> Optional[BinaryStr]:
-        pck = await self.svs.fetchDataPacket(nid, seqNum, retries)
+    async def fetchDataPacket(self, nid:Name, seqno:int, retries:int=0) -> Optional[BinaryStr]:
+        pck = await self.svs.fetchDataPacket(nid, seqno, retries)
         return pck
     def publishData(self, data:bytes) -> None:
         if self.svs:

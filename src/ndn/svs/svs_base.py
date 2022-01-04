@@ -36,8 +36,8 @@ class SVSyncBase():
         if data_pkt:
             SVSyncLogger.info(f'SVSync: served data {Name.to_str(int_name)}')
             self.app.put_raw_packet(data_pkt)
-    async def _fetch(self, nid:Name, seqNum:int, retries:int=0) -> Tuple[Optional[bytes], Optional[BinaryStr]]:
-        name = self.getDataName(nid, seqNum)
+    async def _fetch(self, nid:Name, seqno:int, retries:int=0) -> Tuple[Optional[bytes], Optional[BinaryStr]]:
+        name = self.getDataName(nid, seqno)
         while retries+1 > 0:
             try:
                 SVSyncLogger.info(f'SVSync: fetching data {Name.to_str(name)}')
@@ -63,19 +63,19 @@ class SVSyncBase():
             if retries+1 > 0:
                 SVSyncLogger.info("SVSync: retrying fetching data")
         return (None, None)
-    async def fetchData(self, nid:Name, seqNum:int, retries:int=0) -> Optional[bytes]:
-        data, _ = await self._fetch(nid, seqNum, retries)
+    async def fetchData(self, nid:Name, seqno:int, retries:int=0) -> Optional[bytes]:
+        data, _ = await self._fetch(nid, seqno, retries)
         return data
-    async def fetchDataPacket(self, nid:Name, seqNum:int, retries:int=0) -> Optional[BinaryStr]:
-        _, pkt = await self._fetch(nid, seqNum, retries)
+    async def fetchDataPacket(self, nid:Name, seqno:int, retries:int=0) -> Optional[BinaryStr]:
+        _, pkt = await self._fetch(nid, seqno, retries)
         return pkt
     def publishData(self, data:bytes) -> None:
-        name = self.getDataName(self.nid, self.core.getSeqNum()+1)
+        name = self.getDataName(self.nid, self.core.getSeqno()+1)
         data_packet = make_data(name, MetaInfo(freshness_period=5000), content=data, signer=self.secOptions.dataSig.signer)
         SVSyncLogger.info(f'SVSync: publishing data {Name.to_str(name)}')
         self.storage.put_packet(name, data_packet)
-        self.core.updateMyState(self.core.getSeqNum()+1)
+        self.core.updateMyState(self.core.getSeqno()+1)
     def getCore(self) -> SVSyncCore:
         return self.core
-    def getDataName(self, nid:Name, seqNum:int) -> Name:
+    def getDataName(self, nid:Name, seqno:int) -> Name:
         raise NotImplementedError

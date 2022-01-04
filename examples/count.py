@@ -60,14 +60,14 @@ class Program:
         aio.ensure_future(self.on_missing_data(missing_list))
     async def on_missing_data(self, missing_list:List[MissingData]) -> None:
         for i in missing_list:
-            while i.lowSeqNum <= i.highSeqNum:
-                content_str:Optional[bytes] = await self.svs.fetchData(Name.from_str(i.nid), i.lowSeqNum, 2)
+            while i.lowSeqno <= i.highSeqno:
+                content_str:Optional[bytes] = await self.svs.fetchData(Name.from_str(i.nid), i.lowSeqno, 2)
                 if content_str:
                     output_str:str = i.nid + ": " + content_str.decode()
                     sys.stdout.write("\033[K")
                     sys.stdout.flush()
                     print(output_str)
-                i.lowSeqNum = i.lowSeqNum + 1
+                i.lowSeqno = i.lowSeqno + 1
 
 async def start_count(args:dict) -> None:
     prog = Program(args)

@@ -9,6 +9,6 @@
 # Class Purpose:
 #   to hold the range of missing data for a specific node.
 class MissingData:
-    __slots__ = ('nid','lowSeqNum','highSeqNum')
-    def __init__(self, nid:str, lowSeqNum:int, highSeqNum:int) -> None:
-        self.nid, self.lowSeqNum, self.highSeqNum = nid, lowSeqNum, highSeqNum
+    __slots__ = ('nid','lowSeqno','highSeqno')
+    def __init__(self, nid:str, lowSeqno:int, highSeqno:int) -> None:
+        self.nid, self.lowSeqno, self.highSeqno = nid, lowSeqno, highSeqno

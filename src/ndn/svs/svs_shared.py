@@ -27,8 +27,8 @@ class SVSyncShared(SVSyncBase):
         preDataPrefix = groupPrefix + [Component.from_str("d")] if self.cacheOthers else groupPrefix + [Component.from_str("d")] + nid
         preSyncPrefix = groupPrefix + [Component.from_str("s")]
         super().__init__(app, preSyncPrefix, preDataPrefix, groupPrefix, nid, updateCallback, storage, securityOptions)
-    async def _fetch(self, nid:Name, seqNum:int, retries:int=0) -> Tuple[Optional[bytes], Optional[BinaryStr]]:
-        name = self.getDataName(nid, seqNum)
+    async def _fetch(self, nid:Name, seqno:int, retries:int=0) -> Tuple[Optional[bytes], Optional[BinaryStr]]:
+        name = self.getDataName(nid, seqno)
         while retries+1 > 0:
             try:
                 SVSyncLogger.info(f'SVSync: fetching data {Name.to_str(name)}')
@@ -56,8 +56,8 @@ class SVSyncShared(SVSyncBase):
             if retries+1 > 0:
                 SVSyncLogger.info("SVSync: retrying fetching data")
         return (None, None)
-    def getDataName(self, nid:Name, seqNum:int) -> Name:
-        return (self.groupPrefix + [Component.from_str("d")] + nid + Name.from_str(str(seqNum)))
+    def getDataName(self, nid:Name, seqno:int) -> Name:
+        return (self.groupPrefix + [Component.from_str("d")] + nid + Name.from_str(str(seqno)))
     def serveDataPacket(datapkt:BinaryStr) -> None:
         name, _, content, _ = parse_data(datapkt)
         if content:

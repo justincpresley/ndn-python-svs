@@ -69,5 +69,5 @@ class StateTable:
         return self.MTU # optimize this part for each packet (including interest)
     def getPartCuts(self) -> list:
         return self.parts
-    def getSeqNum(self, nid:Name) -> Optional[int]:
+    def getSeqno(self, nid:Name) -> Optional[int]:
         return self.table.get(Name.to_str(nid))
