@@ -20,7 +20,7 @@ from .svs_base import SVSyncBase
 #   to allow the user to interact with SVS, fetch and publish.
 class SVSync(SVSyncBase):
     def __init__(self, app:NDNApp, groupPrefix:Name, nid:Name, updateCallback:Callable, storage:Optional[Storage]=None, securityOptions:Optional[SecurityOptions]=None) -> None:
-        preSyncPrefix, preDataPrefix = groupPrefix, nid + groupPrefix + Name.from_str("/data")
+        preSyncPrefix, preDataPrefix = groupPrefix, nid + groupPrefix
         super().__init__(app, preSyncPrefix, preDataPrefix, groupPrefix, nid, updateCallback, storage, securityOptions)
     def getDataName(self, nid:Name, seqno:int) -> Name:
-        return ( nid + self.groupPrefix + Name.from_str("/data") + Name.from_str(str(seqno)) )
+        return ( nid + self.groupPrefix + Name.from_str(str(seqno)) )
