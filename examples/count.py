@@ -78,7 +78,7 @@ def main() -> int:
     args["node_id"] = Name.to_str(Name.from_str(args["node_id"]))
     args["group_prefix"] = Name.to_str(Name.from_str(args["group_prefix"]))
 
-    SVSyncLogger.config(True if args["verbose"] else False, None, logging.WARNING)
+    SVSyncLogger.config(True if args["verbose"] else False, None, logging.INFO)
 
     try:
         app.run_forever(after_start=start_count(args))

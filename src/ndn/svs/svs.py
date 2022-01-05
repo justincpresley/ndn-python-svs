@@ -9,7 +9,7 @@
 from typing import Callable, Optional
 # NDN Imports
 from ndn.app import NDNApp
-from ndn.encoding import Name
+from ndn.encoding import Name, Component
 from ndn.storage import Storage
 # Custom Imports
 from .security import SecurityOptions

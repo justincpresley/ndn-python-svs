@@ -107,6 +107,7 @@ class SVSyncCore:
         self.table.updateMetaData()
         self.scheduler.skip_interval()
     def getSeqno(self) -> int:
-        return self.table.getSeqno(self.nid)
+        seqno = self.table.getSeqno(self.nid)
+        return seqno if seqno != None else 0
     def getStateTable(self) -> StateTable:
         return self.table
