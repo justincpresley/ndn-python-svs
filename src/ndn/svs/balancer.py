@@ -27,6 +27,7 @@ from .window import AsyncWindow
 #   to find out about new data from other nodes.
 class SVSyncBalancer:
     def __init__(self, app:NDNApp, groupPrefix:Name, nid:Name, table:StateTable, updateCallback:Callable, secOptions:SecurityOptions) -> None:
+        SVSyncLogger.info("SVSyncBalancer: started svsync balancer")
         self.app, self.groupPrefix, self.nid, self.table, self.updateCallback, self.secOptions, self.busy = app, groupPrefix, nid, table, updateCallback, secOptions, False
         self.balancePrefix = self.nid + self.groupPrefix + Name.from_str("/prop")
         self.taskWindow:AsyncWindow = AsyncWindow(5)
@@ -59,7 +60,7 @@ class SVSyncBalancer:
         SVSyncLogger.info(f'SVSyncBalancer: sending balance {sv}')
         self.app.put_data(int_name, content=sv, freshness_period=1000)
     async def expressStateInterest(self, source:Name, nopck:int) -> Optional[StateVector]:
-        name:Name = source + self.groupPrefix + Name.from_str("/balance") + [Component.from_number(nopck, Component.TYPE_SEQUENCE_NUM)]
+        name:Name = source + self.groupPrefix + Name.from_str("/prop") + [Component.from_number(nopck, Component.TYPE_SEQUENCE_NUM)]
         try:
             SVSyncLogger.info(f'SVSyncBalancer: balancing by {Name.to_str(name)}')
             data_name, meta_info, content = await self.app.express_interest(
