@@ -68,7 +68,7 @@ def test_state_vector_set() -> None:
 
 def test_state_vector_decode() -> None:
     # hard coded bytes of component vector based on SVS protocol
-    enc_sv = b'\xCA\x03\x6F\x6E\x65\xCB\x01\x01\xCA\x03\x74\x77\x6F\xCB\x01\x02'
+    enc_sv = b'\xc8\x10\xc9\x03two\xca\x01\x02\xc9\x03one\xca\x01\x01'
     enc_sv = Component.from_bytes(enc_sv, SVSyncTlvTypes.VECTOR.value)
 
     sv:StateVector = StateVector(enc_sv)
@@ -82,7 +82,7 @@ def test_state_vector_encode() -> None:
 
     enc_sv:bytes = sv.encode()
     # does this state vector's byte value equal a hard coded byte value based on the state vector's protocol
-    assert enc_sv == b'\xc9\x10\xca\x03two\xcb\x01\x02\xca\x03one\xcb\x01\x01'
+    assert enc_sv == b'\xc8\x10\xc9\x03two\xca\x01\x02\xc9\x03one\xca\x01\x01'
 
 def test_state_vector_component_functionality() -> None:
     sv:StateVector = StateVector()
