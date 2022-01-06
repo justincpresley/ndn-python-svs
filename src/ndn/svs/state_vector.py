@@ -20,8 +20,8 @@ from .tlv import SVSyncTlvTypes
 # Class Purpose:
 #   to hold info about a singular node within the vector.
 class StateVectorComponentModel(TlvModel):
-    nid = BytesField(SVSyncTlvTypes.VECTOR_KEY.value)
-    seqno = UintField(SVSyncTlvTypes.VECTOR_VALUE.value)
+    nid = BytesField(SVSyncTlvTypes.VECTOR_ENTRY.value)
+    seqno = UintField(SVSyncTlvTypes.SEQNO.value)
 
 # Class Type: an custom tlv model class
 # Class Purpose:
@@ -55,37 +55,37 @@ class StateVectorModel:
         ret:StateVectorModel = StateVectorModel([])
         ret.value = []
         while pos < len(buf):
-            # Node ID
+            # Entry ID
             typ, l = parse_tl_num(buf, pos)
             pos += l
-            if typ != SVSyncTlvTypes.VECTOR_KEY.value:
+            if typ != SVSyncTlvTypes.VECTOR_ENTRY.value:
                 return None
             length, l = parse_tl_num(buf, pos)
             pos += l
-            node_id = buf[pos:pos + length]
+            entry = buf[pos:pos + length]
             pos += length
-            # Value
+            # Seqno
             typ, l = parse_tl_num(buf, pos)
             pos += l
-            if typ != SVSyncTlvTypes.VECTOR_VALUE.value:
+            if typ != SVSyncTlvTypes.SEQNO.value:
                 return None
             length, l = parse_tl_num(buf, pos)
             pos += l
             if length == 1:
-                value = unpack_from('!B', buf, pos)[0]
+                seqno = unpack_from('!B', buf, pos)[0]
             elif length == 2:
-                value = unpack_from('!H', buf, pos)[0]
+                seqno = unpack_from('!H', buf, pos)[0]
             elif length == 4:
-                value = unpack_from('!I', buf, pos)[0]
+                seqno = unpack_from('!I', buf, pos)[0]
             elif length == 8:
-                value = unpack_from('!Q', buf, pos)[0]
+                seqno = unpack_from('!Q', buf, pos)[0]
             else:
                 return None
             pos += length
             # Append the component
             comp:StateVectorComponentModel = StateVectorComponentModel()
-            comp.nid = node_id
-            comp.seqno = value
+            comp.nid = entry
+            comp.seqno = seqno
             ret.value.append(comp)
         return ret
 

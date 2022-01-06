@@ -29,12 +29,12 @@ class SVSyncBalancer:
     def __init__(self, app:NDNApp, groupPrefix:Name, nid:Name, table:StateTable, updateCallback:Callable, secOptions:SecurityOptions) -> None:
         SVSyncLogger.info("SVSyncBalancer: started svsync balancer")
         self.app, self.groupPrefix, self.nid, self.table, self.updateCallback, self.secOptions, self.busy = app, groupPrefix, nid, table, updateCallback, secOptions, False
-        self.balancePrefix = self.nid + self.groupPrefix + Name.from_str("/prop")
+        self.propPrefix = self.nid + self.groupPrefix + Name.from_str("/prop")
         self.taskWindow:AsyncWindow = AsyncWindow(5)
-        self.app.route(self.balancePrefix, need_sig_ptrs=True)(self.onStateInterest)
-        SVSyncLogger.info(f'SVSyncBalancer: started listening to {Name.to_str(self.balancePrefix)}')
-    async def balanceFromState(self, name:Name, nopck:int) -> None:
-        incoming_sv:Optional[StateVector] = await self.expressStateInterest(name, nopck)
+        self.app.route(self.propPrefix, need_sig_ptrs=True)(self.onPropInterest)
+        SVSyncLogger.info(f'SVSyncBalancer: started listening to {Name.to_str(self.propPrefix)}')
+    async def balanceFromProp(self, name:Name, pckno:int) -> None:
+        incoming_sv:Optional[StateVector] = await self.expressPropInterest(name, pckno)
         if not incoming_sv:
             return
         missingList = self.table.processStateVector(incoming_sv, oldData=True)
@@ -47,20 +47,20 @@ class SVSyncBalancer:
         self.busy = True
         name = Name.from_str(bytes(incoming_md.source).decode())
         for i in range(incoming_md.nopcks):
-            self.taskWindow.addTask(self.balanceFromState, (name, i+1))
+            self.taskWindow.addTask(self.balanceFromProp, (name, i+1))
         await self.taskWindow.gather()
         SVSyncLogger.info(f'SVSyncBalancer: nmeta {bytes(self.table.getMetaData().source).decode()} - {self.table.getMetaData().tseqno} total, {self.table.getMetaData().nopcks} pcks')
         SVSyncLogger.info(f'SVSyncBalancer: ntable {self.table.getCompleteStateVector().to_str()}')
         self.busy = False
-    def onStateInterest(self, int_name:FormalName, int_param:InterestParam, _app_param:Optional[BinaryStr], sig_ptrs:SignaturePtrs) -> None:
+    def onPropInterest(self, int_name:FormalName, int_param:InterestParam, _app_param:Optional[BinaryStr], sig_ptrs:SignaturePtrs) -> None:
         SVSyncLogger.info(f'SVSyncBalancer: received balance {Name.to_str(int_name)}')
-        aio.get_event_loop().create_task(self.onStateInterestHelper(int_name, int_param, _app_param, sig_ptrs))
-    async def onStateInterestHelper(self, int_name:FormalName, int_param:InterestParam, _app_param:Optional[BinaryStr], sig_ptrs:SignaturePtrs) -> None:
+        aio.get_event_loop().create_task(self.onPropInterestHelper(int_name, int_param, _app_param, sig_ptrs))
+    async def onPropInterestHelper(self, int_name:FormalName, int_param:InterestParam, _app_param:Optional[BinaryStr], sig_ptrs:SignaturePtrs) -> None:
         sv = bytes(self.table.getPart(Component.to_number(int_name[-1])))
         SVSyncLogger.info(f'SVSyncBalancer: sending balance {sv}')
         self.app.put_data(int_name, content=sv, freshness_period=1000)
-    async def expressStateInterest(self, source:Name, nopck:int) -> Optional[StateVector]:
-        name:Name = source + self.groupPrefix + Name.from_str("/prop") + [Component.from_number(nopck, Component.TYPE_SEQUENCE_NUM)]
+    async def expressPropInterest(self, source:Name, pckno:int) -> Optional[StateVector]:
+        name:Name = source + self.groupPrefix + Name.from_str("/prop") + [Component.from_number(pckno, Component.TYPE_SEQUENCE_NUM)]
         try:
             SVSyncLogger.info(f'SVSyncBalancer: balancing by {Name.to_str(name)}')
             data_name, meta_info, content = await self.app.express_interest(

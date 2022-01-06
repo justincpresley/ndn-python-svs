@@ -12,9 +12,9 @@ from enum import Enum
 # Class Purpose:
 #   to differ tlv model types.
 class SVSyncTlvTypes(Enum):
-    META_SOURCE  = 198
-    META_TOTAL   = 199
-    META_NOPCKS  = 200
-    VECTOR       = 201
-    VECTOR_KEY   = 202
-    VECTOR_VALUE = 203
+    META_SOURCE   = 197
+    META_TOTAL    = 198
+    META_NOPCKS   = 199
+    VECTOR        = 200
+    VECTOR_ENTRY  = 201
+    SEQNO         = 202
