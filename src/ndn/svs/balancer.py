@@ -34,7 +34,7 @@ class SVSyncBalancer:
         self.app.route(self.propPrefix, need_sig_ptrs=True)(self.onPropInterest)
         SVSyncLogger.info(f'SVSyncBalancer: started listening to {Name.to_str(self.propPrefix)}')
     async def balanceFromProp(self, name:Name, pckno:int) -> None:
-        incoming_sv:Optional[StateVector] = await self.expressPropInterest(name, pckno)
+        incoming_sv:Optional[StateVector] = await self.sendPropInterest(name, pckno)
         if not incoming_sv:
             return
         missingList = self.table.processStateVector(incoming_sv, oldData=True)
@@ -59,7 +59,7 @@ class SVSyncBalancer:
         sv = bytes(self.table.getPart(Component.to_number(int_name[-1])))
         SVSyncLogger.info(f'SVSyncBalancer: sending balance {sv}')
         self.app.put_data(int_name, content=sv, freshness_period=1000)
-    async def expressPropInterest(self, source:Name, pckno:int) -> Optional[StateVector]:
+    async def sendPropInterest(self, source:Name, pckno:int) -> Optional[StateVector]:
         name:Name = source + self.groupPrefix + Name.from_str("/prop") + [Component.from_number(pckno, Component.TYPE_SEQUENCE_NUM)]
         try:
             SVSyncLogger.info(f'SVSyncBalancer: balancing by {Name.to_str(name)}')
