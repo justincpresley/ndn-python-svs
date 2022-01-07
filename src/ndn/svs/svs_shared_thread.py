@@ -29,5 +29,7 @@ class SVSyncShared_Thread(SVSyncBase_Thread):
     async def function(self) -> None:
         self.svs = SVSyncShared(self.app, self.groupPrefix, self.nid, self.missing_callback, self.cacheOthers, self.storage, self.secOptions)
     def serveDataPacket(datapkt:BinaryStr) -> None:
-        if self.svs:
+        try:
             self.svs.serveDataPacket(datapkt)
+        except AttributeError:
+            raise self.SVSyncUnwaitedThread("A SVSync Thread needs to be waited on before doing operations.")

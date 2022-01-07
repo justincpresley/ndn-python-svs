@@ -30,6 +30,8 @@ from .svs_base import SVSyncBase
 #   to derive different SVSync_Thread classes from.
 #   to allow the user to interact with SVS, fetch and publish.
 class SVSyncBase_Thread(Thread):
+    class SVSyncUnwaitedThread(Exception):
+        pass
     def __init__(self, groupPrefix:Name, nid:Name, updateCallback:Callable, storage:Optional[Storage]=None, securityOptions:Optional[SecurityOptions]=None, face:Optional[Face]=None, keychain:Optional[Keychain]=None) -> None:
         SVSyncLogger.info("SVSync_Thread: Created thread to push SVS to.")
         Thread.__init__(self)
@@ -62,13 +64,21 @@ class SVSyncBase_Thread(Thread):
     def getSVSync(self) -> Optional[SVSyncBase]:
         return self.svs
     async def fetchData(self, nid:Name, seqno:int, retries:int=0) -> Optional[bytes]:
-        data = await self.svs.fetchData(nid, seqno, retries)
-        return data
+        try:
+            data = await self.svs.fetchData(nid, seqno, retries)
+            return data
+        except AttributeError:
+            raise self.SVSyncUnwaitedThread("A SVSync Thread needs to be waited on before doing operations.")
     async def fetchDataPacket(self, nid:Name, seqno:int, retries:int=0) -> Optional[BinaryStr]:
-        pck = await self.svs.fetchDataPacket(nid, seqno, retries)
-        return pck
+        try:
+            pck = await self.svs.fetchDataPacket(nid, seqno, retries)
+            return pck
+        except AttributeError:
+            raise self.SVSyncUnwaitedThread("A SVSync Thread needs to be waited on before doing operations.")
     def publishData(self, data:bytes) -> None:
-        if self.svs:
+        try:
             self.svs.publishData(data)
+        except AttributeError:
+            raise self.SVSyncUnwaitedThread("A SVSync Thread needs to be waited on before doing operations.")
     def getCore(self) -> Optional[SVSyncCore]:
         return self.svs.getCore() if self.svs else None
