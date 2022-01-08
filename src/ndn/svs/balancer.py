@@ -10,7 +10,7 @@ import asyncio as aio
 from typing import Optional, Callable
 # NDN Imports
 from ndn.app import NDNApp
-from ndn.encoding import Name, Component, InterestParam, BinaryStr, FormalName, SignaturePtrs
+from ndn.encoding import Name, Component, InterestParam, BinaryStr, FormalName, SignaturePtrs, parse_data
 from ndn.types import InterestNack, InterestTimeout, InterestCanceled, ValidationFailure
 # Custom Imports
 from .logger import SVSyncLogger
@@ -58,14 +58,16 @@ class SVSyncBalancer:
     async def onPropInterestHelper(self, int_name:FormalName, int_param:InterestParam, _app_param:Optional[BinaryStr], sig_ptrs:SignaturePtrs) -> None:
         sv = bytes(self.table.getPart(Component.to_number(int_name[-1])))
         SVSyncLogger.info(f'SVSyncBalancer: sending balance {sv}')
-        self.app.put_data(int_name, content=sv, freshness_period=1000)
+        self.app.put_data(int_name, content=sv, signer=self.secOptions.dataSig.signer, freshness_period=5000)
     async def sendPropInterest(self, source:Name, pckno:int) -> Optional[StateVector]:
         name:Name = source + self.groupPrefix + Name.from_str("/prop") + [Component.from_number(pckno, Component.TYPE_SEQUENCE_NUM)]
         try:
             SVSyncLogger.info(f'SVSyncBalancer: balancing by {Name.to_str(name)}')
-            data_name, meta_info, content = await self.app.express_interest(
-                name, must_be_fresh=True, can_be_prefix=True, lifetime=1000)
-            return StateVector(bytes(content)) if bytes(content) != b'' else None
+            _, _, _, pkt = await self.app.express_interest(
+                name, need_raw_packet=True, must_be_fresh=True, can_be_prefix=False, lifetime=2000)
+            int_name, meta_info, content, sig_ptrs = parse_data(pkt)
+            isValidated = await self.secOptions.validate(int_name, sig_ptrs)
+            return StateVector(bytes(content)) if bytes(content) != b'' and isValidated else None
         except (InterestNack, InterestTimeout, InterestCanceled, ValidationFailure):
             SVSyncLogger.info(f'SVSyncBalancer: failed to get {Name.to_str(name)}')
             return None

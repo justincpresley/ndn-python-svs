@@ -73,7 +73,6 @@ class SVSyncCore:
         SVSyncLogger.info(f'SVSyncCore:       {incomingVector.to_str()}')
 
         missingList:List[MissingData] = self.table.processStateVector(incomingVector, oldData=False)
-        SVSyncLogger.info(f'SVSyncCore:       {missingList}')
         self.table.updateMetaData()
         if missingList:
             self.updateCallback(missingList)

@@ -9,8 +9,7 @@
 from typing import Optional, Callable, Tuple
 # NDN Imports
 from ndn.app import NDNApp
-from ndn.encoding import Name, MetaInfo, InterestParam, BinaryStr, FormalName, SignatureType
-from ndn.encoding import make_data, parse_data
+from ndn.encoding import Name, MetaInfo, InterestParam, BinaryStr, FormalName, SignatureType, make_data, parse_data
 from ndn.types import InterestNack, InterestTimeout, InterestCanceled, ValidationFailure
 from ndn.storage import Storage, MemoryStorage
 # Custom Imports
@@ -41,7 +40,7 @@ class SVSyncBase():
         while retries+1 > 0:
             try:
                 SVSyncLogger.info(f'SVSync: fetching data {Name.to_str(name)}')
-                _, _, _, pkt = await self.app.express_interest(name, need_raw_packet=True, must_be_fresh=True, can_be_prefix=False, lifetime=6000)
+                _, _, _, pkt = await self.app.express_interest(name, need_raw_packet=True, must_be_fresh=True, can_be_prefix=False, lifetime=2000)
                 ex_int_name, meta_info, content, sig_ptrs = parse_data(pkt)
                 isValidated = await self.secOptions.validate(ex_int_name, sig_ptrs)
                 if not isValidated:
@@ -71,7 +70,7 @@ class SVSyncBase():
         return pkt
     def publishData(self, data:bytes) -> None:
         name = self.getDataName(self.nid, self.core.getSeqno()+1)
-        data_packet = make_data(name, MetaInfo(freshness_period=5000), content=data, signer=self.secOptions.dataSig.signer)
+        data_packet = make_data(name, MetaInfo(freshness_period=10000), content=data, signer=self.secOptions.dataSig.signer)
         SVSyncLogger.info(f'SVSync: publishing data {Name.to_str(name)}')
         self.storage.put_packet(name, data_packet)
         self.core.updateMyState(self.core.getSeqno()+1)
