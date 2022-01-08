@@ -14,53 +14,53 @@ from typing import Optional
 # Class Purpose:
 #   to properly handle all logging within this library
 class SVSyncLogger(object):
-    _loggerName = "ndn-svs"
-    _loggerLevel = logging.DEBUG
-    _loggerFormat = "(%(asctime)s) %(name)s:%(levelname)s | %(message)s"
-    _consoleLogging = False
-    _fileForLogging = None
-    _logger = None
-    _configured = False
+    LOGGER_NAME = "ndn-svs"
+    LOGGER_LEVEL = logging.DEBUG
+    LOGGER_FORMAT = "(%(asctime)s) %(name)s:%(levelname)s | %(message)s"
+    CONSOLE_LOGGING = False
+    LOGGER_FILE = None
+    LOGGER = None
+    CONFIGURED = False
 
     @staticmethod
-    def config(consoleLogging:bool, fileForLogging:Optional[str], level:int, lformat:Optional[str]=None) -> None:
-        if not SVSyncLogger._configured:
-            SVSyncLogger._configured = True
-            SVSyncLogger._loggerLevel = level
-            SVSyncLogger._consoleLogging = consoleLogging
-            SVSyncLogger._fileForLogging = fileForLogging
-            SVSyncLogger._loggerFormat = lformat if lformat else SVSyncLogger._loggerFormat
+    def config(console:bool, file:Optional[str], level:int, lformat:Optional[str]=None) -> None:
+        if not SVSyncLogger.CONFIGURED:
+            SVSyncLogger.CONFIGURED = True
+            SVSyncLogger.LOGGER_LEVEL = level
+            SVSyncLogger.CONSOLE_LOGGING = console
+            SVSyncLogger.LOGGER_FILE = file
+            SVSyncLogger.LOGGER_FORMAT = lformat if lformat else SVSyncLogger.LOGGER_FORMAT
 
-            SVSyncLogger._logger = logging.getLogger(SVSyncLogger._loggerName)
-            SVSyncLogger._logger.setLevel(SVSyncLogger._loggerLevel)
-            fm = logging.Formatter(SVSyncLogger._loggerFormat)
-            if SVSyncLogger._consoleLogging:
+            SVSyncLogger.LOGGER = logging.getLogger(SVSyncLogger.LOGGER_NAME)
+            SVSyncLogger.LOGGER.setLevel(SVSyncLogger.LOGGER_LEVEL)
+            fm = logging.Formatter(SVSyncLogger.LOGGER_FORMAT)
+            if SVSyncLogger.CONSOLE_LOGGING:
                 console_handler = logging.StreamHandler(stdout)
                 console_handler.setFormatter(fm)
-                SVSyncLogger._logger.addHandler(console_handler)
-            if SVSyncLogger._fileForLogging:
-                file_handler = logging.FileHandler(SVSyncLogger._fileForLogging)
+                SVSyncLogger.LOGGER.addHandler(console_handler)
+            if SVSyncLogger.LOGGER_FILE:
+                file_handler = logging.FileHandler(SVSyncLogger.LOGGER_FILE)
                 file_handler.setFormatter(fm)
-                SVSyncLogger._logger.addHandler(file_handler)
-            SVSyncLogger._logger.propagate = False
+                SVSyncLogger.LOGGER.addHandler(file_handler)
+            SVSyncLogger.LOGGER.propagate = False
 
     @staticmethod
     def debug(msg:str) -> None:
-        if SVSyncLogger._configured:
-            SVSyncLogger._logger.debug(msg)
+        if SVSyncLogger.CONFIGURED:
+            SVSyncLogger.LOGGER.debug(msg)
     @staticmethod
     def info(msg:str) -> None:
-        if SVSyncLogger._configured:
-            SVSyncLogger._logger.info(msg)
+        if SVSyncLogger.CONFIGURED:
+            SVSyncLogger.LOGGER.info(msg)
     @staticmethod
     def warning(msg:str) -> None:
-        if SVSyncLogger._configured:
-            SVSyncLogger._logger.warning(msg)
+        if SVSyncLogger.CONFIGURED:
+            SVSyncLogger.LOGGER.warning(msg)
     @staticmethod
     def error(msg:str) -> None:
-        if SVSyncLogger._configured:
-            SVSyncLogger._logger.error(msg)
+        if SVSyncLogger.CONFIGURED:
+            SVSyncLogger.LOGGER.error(msg)
     @staticmethod
     def critical(msg:str) -> None:
-        if SVSyncLogger._configured:
-            SVSyncLogger._logger.critical(msg)
+        if SVSyncLogger.CONFIGURED:
+            SVSyncLogger.LOGGER.critical(msg)

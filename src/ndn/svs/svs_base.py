@@ -22,6 +22,8 @@ from .security import SecurityOptions, SigningInfo, ValidatingInfo
 #   to derive different SVSync from.
 #   to allow the user to interact with SVS, fetch and publish.
 class SVSyncBase():
+    DATA_INTEREST_LIFETIME = 2000
+    DATA_PACKET_FRESHNESS = 10000
     def __init__(self, app:NDNApp, syncPrefix:Name, dataPrefix:Name, groupPrefix:Name, nid:Name, updateCallback:Callable, storage:Optional[Storage]=None, securityOptions:Optional[SecurityOptions]=None) -> None:
         SVSyncLogger.info("SVSync: started an svsync type")
         self.app, self.syncPrefix, self.dataPrefix, self.groupPrefix, self.nid, self.updateCallback = app, syncPrefix, dataPrefix, groupPrefix, nid, updateCallback
@@ -40,7 +42,7 @@ class SVSyncBase():
         while retries+1 > 0:
             try:
                 SVSyncLogger.info(f'SVSync: fetching data {Name.to_str(name)}')
-                _, _, _, pkt = await self.app.express_interest(name, need_raw_packet=True, must_be_fresh=True, can_be_prefix=False, lifetime=2000)
+                _, _, _, pkt = await self.app.express_interest(name, need_raw_packet=True, must_be_fresh=True, can_be_prefix=False, lifetime=self.DATA_INTEREST_LIFETIME)
                 ex_int_name, meta_info, content, sig_ptrs = parse_data(pkt)
                 isValidated = await self.secOptions.validate(ex_int_name, sig_ptrs)
                 if not isValidated:
@@ -70,7 +72,7 @@ class SVSyncBase():
         return pkt
     def publishData(self, data:bytes) -> None:
         name = self.getDataName(self.nid, self.core.getSeqno()+1)
-        data_packet = make_data(name, MetaInfo(freshness_period=10000), content=data, signer=self.secOptions.dataSig.signer)
+        data_packet = make_data(name, MetaInfo(freshness_period=self.DATA_PACKET_FRESHNESS), content=data, signer=self.secOptions.dataSig.signer)
         SVSyncLogger.info(f'SVSync: publishing data {Name.to_str(name)}')
         self.storage.put_packet(name, data_packet)
         self.core.updateMyState(self.core.getSeqno()+1)

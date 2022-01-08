@@ -37,10 +37,11 @@ class SVSyncCoreState(Enum):
 #   to hear about other sync interests
 #   to find out about new data from other nodes.
 class SVSyncCore:
-    interval = 30000
-    randomPercent = 0.1
-    briefInterval = 200
-    briefRandomPercent = 0.5
+    INTERVAL = 30000
+    INTERVAL_RANDOMNESS = 0.1
+    BRIEF_INTERVAL = 200
+    BRIEF_INTERVAL_RANDOMNESS = 0.5
+    SYNC_INTEREST_LIFETIME = 1000
     def __init__(self, app:NDNApp, syncPrefix:Name, groupPrefix:Name, nid:Name, updateCallback:Callable, secOptions:SecurityOptions) -> None:
         SVSyncLogger.info("SVSyncCore: started svsync core")
         self.app, self.nid, self.updateCallback, self.syncPrefix, self.groupPrefix, self.secOptions, self.state = app, nid, updateCallback, syncPrefix, groupPrefix, secOptions, SVSyncCoreState.STEADY
@@ -48,14 +49,14 @@ class SVSyncCore:
         self.balancer = SVSyncBalancer(self.app, self.groupPrefix, self.nid, self.table, self.updateCallback, self.secOptions)
         self.app.route(self.syncPrefix, need_sig_ptrs=True)(self.onSyncInterest)
         SVSyncLogger.info(f'SVSyncCore: started listening to {Name.to_str(self.syncPrefix)}')
-        self.scheduler = AsyncScheduler(self.sendSyncInterest, self.interval, self.randomPercent)
+        self.scheduler = AsyncScheduler(self.sendSyncInterest, self.INTERVAL, self.INTERVAL_RANDOMNESS)
         self.scheduler.skip_interval()
     async def asyncSendSyncInterest(self) -> None:
         name:Name = self.syncPrefix + [self.table.getMetaData().encode()] + [ self.table.getPart(0) ]
         SVSyncLogger.info(f'SVSyncCore: sync {Name.to_str(name)}')
         try:
             data_name, meta_info, content = await self.app.express_interest(
-                name, signer=self.secOptions.syncSig.signer, must_be_fresh=True, can_be_prefix=True, lifetime=1000)
+                name, signer=self.secOptions.syncSig.signer, must_be_fresh=True, can_be_prefix=True, lifetime=self.SYNC_INTEREST_LIFETIME)
         except (InterestNack, InterestTimeout, InterestCanceled, ValidationFailure):
             pass
     def sendSyncInterest(self) -> None:
@@ -85,7 +86,7 @@ class SVSyncCore:
         if self.state == SVSyncCoreState.STEADY:
             self.scheduler.set_cycle()
         else:
-            delay = self.briefInterval + round( uniform(-self.briefRandomPercent,self.briefRandomPercent)*self.briefInterval )
+            delay = self.BRIEF_INTERVAL + round( uniform(-self.BRIEF_INTERVAL_RANDOMNESS,self.BRIEF_INTERVAL_RANDOMNESS)*self.BRIEF_INTERVAL )
             if self.scheduler.get_time_left() > delay:
                 self.scheduler.set_cycle(delay)
         SVSyncLogger.info(f'SVSyncCore: state {self.state.name}')
