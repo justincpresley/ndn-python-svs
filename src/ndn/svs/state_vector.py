@@ -45,8 +45,7 @@ class StateVectorModel:
     def __init__(self, value:List[StateVectorEntry]) -> None:
         self.value:List[StateVectorEntry] = value
     def encode(self) -> bytearray:
-        length = 0
-        component_wires = []
+        length, component_wires = 0, []
         for v in self.value:
             ba = v.encode()
             length += len(ba)
