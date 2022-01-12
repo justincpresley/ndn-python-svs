@@ -12,7 +12,7 @@ from ndn.encoding import Component, Name
 # Custom Imports
 from .meta_data import MetaData
 from .missing_data import MissingData
-from .state_vector import StateVector, StateVectorComponentModel
+from .state_vector import StateVector, StateVectorEntry
 
 # Class Type: a class
 # Class Purpose:
@@ -23,7 +23,7 @@ class StateTable:
         self.table, self.meta, self.parts = StateVector(), MetaData(), [[0,0]]
         self.meta.source = Name.to_str(mynid).encode()
     def processStateVector(self, incoming_sv:StateVector, oldData:bool) -> List[MissingData]:
-        listOrder:List[StateVectorComponentModel] = incoming_sv.list() if oldData else reversed(incoming_sv.list())
+        listOrder:List[StateVectorEntry] = incoming_sv.list() if oldData else reversed(incoming_sv.list())
         missingList:List[MissingData] = []
         for i in listOrder:
             tableSeqno:int = self.table.get(bytes(i.nid).decode()) if self.table.get(bytes(i.nid).decode()) else 0

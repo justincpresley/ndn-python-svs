@@ -11,27 +11,46 @@ from __future__ import annotations
 from struct import unpack_from
 from typing import List, Optional
 # NDN Imports
-from ndn.encoding import Component, TlvModel, BytesField, UintField
-from ndn.encoding import get_tl_num_size, write_tl_num, parse_tl_num
+from ndn.encoding import Component, get_tl_num_size, write_tl_num, parse_tl_num, pack_uint_bytes
 # Custom Imports
 from .tlv import SVSyncTlvTypes
 
 # Class Type: a struct
 # Class Purpose:
 #   to hold info about a singular node within the vector.
-class StateVectorComponentModel(TlvModel):
-    nid = BytesField(SVSyncTlvTypes.VECTOR_ENTRY.value)
-    seqno = UintField(SVSyncTlvTypes.SEQNO.value)
+class StateVectorEntry:
+    __slots__ = ('nid','seqno')
+    def __init__(self, nid:bytes, seqno:int) -> None:
+        self.nid, self.seqno = nid, seqno
+    def encode(self) -> bytearray:
+        bseqno, bnid = pack_uint_bytes(self.seqno), self.nid
+        #seqno
+        size = len(bnid) + get_tl_num_size(len(bnid)) + get_tl_num_size(SVSyncTlvTypes.VECTOR_ENTRY.value)
+        temp1 = bytearray(size)
+        pos = write_tl_num(SVSyncTlvTypes.VECTOR_ENTRY.value, temp1)
+        pos += write_tl_num(len(bnid), temp1, pos)
+        temp1[pos:pos + len(bnid)] = bnid
+        # nid
+        size = len(bseqno) + get_tl_num_size(len(bseqno)) + get_tl_num_size(SVSyncTlvTypes.SEQNO.value)
+        temp2 = bytearray(size)
+        pos = write_tl_num(SVSyncTlvTypes.SEQNO.value, temp2)
+        pos += write_tl_num(len(bseqno), temp2, pos)
+        temp2[pos:pos + len(bseqno)] = bseqno
+        return temp1+temp2
 
 # Class Type: an custom tlv model class
 # Class Purpose:
 #   to contain all the info of a state vector.
 class StateVectorModel:
-    def __init__(self, value:List[StateVectorComponentModel]) -> None:
-        self.value:List[StateVectorComponentModel] = value
+    def __init__(self, value:List[StateVectorEntry]) -> None:
+        self.value:List[StateVectorEntry] = value
     def encode(self) -> bytearray:
-        component_wires = [v.encode() for v in self.value]
-        length = sum(len(w) for w in component_wires)
+        length = 0
+        component_wires = []
+        for v in self.value:
+            ba = v.encode()
+            length += len(ba)
+            component_wires.append(ba)
         buf_len = length + get_tl_num_size(length) + get_tl_num_size(SVSyncTlvTypes.VECTOR.value)
         ret = bytearray(buf_len)
         pos = write_tl_num(SVSyncTlvTypes.VECTOR.value, ret)
@@ -83,10 +102,7 @@ class StateVectorModel:
                 return None
             pos += length
             # Append the component
-            comp:StateVectorComponentModel = StateVectorComponentModel()
-            comp.nid = entry
-            comp.seqno = seqno
-            ret.value.append(comp)
+            ret.value.append(StateVectorEntry(entry, seqno))
         return ret
 
 # Class Type: a class
@@ -105,9 +121,7 @@ class StateVector:
         self.wire = None
         index:Optional[int] = self.index(nid)
         if index == None:
-            svc:StateVectorComponentModel = StateVectorComponentModel()
-            svc.seqno = seqno
-            svc.nid = nid.encode()
+            svc:StateVectorEntry = StateVectorEntry(nid.encode(), seqno)
             if not oldData:
                 self.vector.value.insert(0,svc)
             else:
@@ -136,7 +150,7 @@ class StateVector:
         return self.wire
     def keys(self) -> List[str]:
         return [bytes(i.nid).decode() for i in self.vector.value]
-    def list(self) -> List[StateVectorComponentModel]:
+    def list(self) -> List[StateVectorEntry]:
         return self.vector.value
     def to_component(self) -> Component:
         return self.encode()
@@ -144,7 +158,7 @@ class StateVector:
         return len(self.encode())
     def partition(self, start:int, end:int) -> Component:
         return StateVectorModel(self.vector.value[start:end]).encode()
-    def entry(self, index:int) -> Optional[StateVectorComponentModel]:
+    def entry(self, index:int) -> Optional[StateVectorEntry]:
         try:
             return self.vector.value[index]
         except (IndexError, ValueError):
