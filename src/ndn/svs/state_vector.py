@@ -24,13 +24,13 @@ class StateVectorEntry:
         self.nid, self.seqno = nid, seqno
     def encode(self) -> bytearray:
         bseqno, bnid = pack_uint_bytes(self.seqno), self.nid
-        #seqno
+        # nid
         size = len(bnid) + get_tl_num_size(len(bnid)) + get_tl_num_size(SVSyncTlvTypes.VECTOR_ENTRY.value)
         temp1 = bytearray(size)
         pos = write_tl_num(SVSyncTlvTypes.VECTOR_ENTRY.value, temp1)
         pos += write_tl_num(len(bnid), temp1, pos)
         temp1[pos:pos + len(bnid)] = bnid
-        # nid
+        # seqno
         size = len(bseqno) + get_tl_num_size(len(bseqno)) + get_tl_num_size(SVSyncTlvTypes.SEQNO.value)
         temp2 = bytearray(size)
         pos = write_tl_num(SVSyncTlvTypes.SEQNO.value, temp2)
@@ -115,7 +115,7 @@ class StateVector:
             temp_vector:Optional[StateVectorModel] = StateVectorModel.parse(component)
             if temp_vector != None:
                 for i in temp_vector.value:
-                    self.set(bytes(i.nid).decode(), i.seqno, True)
+                    self.set(i.nid.decode(), i.seqno, True)
     def set(self, nid:str, seqno:int, oldData:bool=False) -> None:
         self.wire = None
         index:Optional[int] = self.index(nid)
@@ -131,24 +131,24 @@ class StateVector:
                 self.vector.value.insert(0, self.vector.value.pop(index))
     def get(self, nid:str) -> Optional[int]:
         for i in self.vector.value:
-            if bytes(i.nid).decode() == nid:
+            if i.nid.decode() == nid:
                 return i.seqno
         return None
     def has(self, nid:str) -> bool:
         return False if self.index(nid) == None else True
     def index(self, nid:str) -> Optional[int]:
         for index, value in enumerate(self.vector.value):
-            if bytes(value.nid).decode() == nid:
+            if value.nid.decode() == nid:
                 return index
         return None
     def to_str(self) -> str:
-        return " ".join([( bytes(i.nid).decode() + ":" + str(i.seqno) ) for i in self.vector.value])
+        return " ".join([( i.nid.decode() + ":" + str(i.seqno) ) for i in self.vector.value])
     def encode(self) -> bytes:
         if self.wire == None:
             self.wire = self.vector.encode()
         return self.wire
     def keys(self) -> List[str]:
-        return [bytes(i.nid).decode() for i in self.vector.value]
+        return [i.nid.decode() for i in self.vector.value]
     def list(self) -> List[StateVectorEntry]:
         return self.vector.value
     def to_component(self) -> Component:
