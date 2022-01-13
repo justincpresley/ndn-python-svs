@@ -114,8 +114,7 @@ class StateVector:
         if component:
             temp_vector:Optional[StateVectorModel] = StateVectorModel.parse(component)
             if temp_vector != None:
-                for i in temp_vector.value:
-                    self.set(i.nid.decode(), i.seqno, True)
+                self.vector = temp_vector
     def set(self, nid:str, seqno:int, oldData:bool=False) -> None:
         self.wire = None
         index:Optional[int] = self.index(nid)
