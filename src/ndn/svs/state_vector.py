@@ -109,15 +109,13 @@ class StateVectorModel:
 #   to allow an easier time to interact with the StateVectorModel class.
 class StateVector:
     def __init__(self, component:Component=None) -> None:
-        self.vector:StateVectorModel = StateVectorModel([])
-        self.wire:Optional[bytes] = None
+        self.vector, self.wire = StateVectorModel([]), None
         if component:
             temp_vector:Optional[StateVectorModel] = StateVectorModel.parse(component)
             if temp_vector != None:
                 self.vector = temp_vector
     def set(self, nid:str, seqno:int, oldData:bool=False) -> None:
-        self.wire = None
-        index:Optional[int] = self.index(nid)
+        index, self.wire = self.index(nid), None
         if index == None:
             svc:StateVectorEntry = StateVectorEntry(nid, seqno)
             if not oldData:
