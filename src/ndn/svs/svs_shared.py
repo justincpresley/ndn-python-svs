@@ -32,7 +32,7 @@ class SVSyncShared(SVSyncBase):
         while retries+1 > 0:
             try:
                 SVSyncLogger.info(f'SVSync: fetching data {Name.to_str(name)}')
-                _, _, _, pkt = await self.app.express_interest(name, need_raw_packet=True, must_be_fresh=True, can_be_prefix=False, lifetime=2000)
+                _, _, _, pkt = await self.app.express_interest(name, need_raw_packet=True, must_be_fresh=True, can_be_prefix=False, lifetime=self.DATA_INTEREST_LIFETIME)
                 ex_int_name, meta_info, content, sig_ptrs = parse_data(pkt)
                 isValidated = await self.secOptions.validate(ex_int_name, sig_ptrs)
                 if not isValidated:
