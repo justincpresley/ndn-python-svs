@@ -26,11 +26,11 @@ class StateTable:
         listOrder:List[StateVectorEntry] = incoming_sv.list() if oldData else reversed(incoming_sv.list())
         missingList:List[MissingData] = []
         for i in listOrder:
-            tableSeqno:int = self.table.get(bytes(i.nid).decode()) if self.table.get(bytes(i.nid).decode()) else 0
+            tableSeqno:int = self.table.get(i.nid) if self.table.get(i.nid) else 0
             if tableSeqno < i.seqno:
                 tableSeqno = tableSeqno + 1
-                temp:MissingData = MissingData(bytes(i.nid).decode(), tableSeqno, i.seqno)
-                self.table.set(bytes(i.nid).decode(), i.seqno, oldData)
+                temp:MissingData = MissingData(i.nid, tableSeqno, i.seqno)
+                self.table.set(i.nid, i.seqno, oldData)
                 missingList.append(temp)
         return missingList
     def updateMetaData(self) -> None:
