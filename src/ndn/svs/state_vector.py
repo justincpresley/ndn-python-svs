@@ -101,7 +101,7 @@ class StateVectorModel:
                 return None
             pos += length
             # Append the component
-            ret.value.append(StateVectorEntry(entry, seqno))
+            ret.value.append(StateVectorEntry(bytes(entry), seqno))
         return ret
 
 # Class Type: a class
