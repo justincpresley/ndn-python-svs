@@ -132,7 +132,7 @@ class StateVector:
                 return i.seqno
         return None
     def has(self, nid:str) -> bool:
-        return False if self.index(nid) == None else True
+        return False if self.get(nid) == None else True
     def index(self, nid:str) -> Optional[int]:
         for index, value in enumerate(self.vector.value):
             if value.nid == nid:
