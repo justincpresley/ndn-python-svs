@@ -21,7 +21,7 @@ from .security import SecurityOptions, SigningInfo, ValidatingInfo
 # Class Purpose:
 #   to derive different SVSync from.
 #   to allow the user to interact with SVS, fetch and publish.
-class SVSyncBase():
+class SVSyncBase:
     DATA_INTEREST_LIFETIME = 2000
     DATA_PACKET_FRESHNESS = 10000
     def __init__(self, app:NDNApp, syncPrefix:Name, dataPrefix:Name, groupPrefix:Name, nid:Name, updateCallback:Callable, storage:Optional[Storage]=None, securityOptions:Optional[SecurityOptions]=None) -> None:
