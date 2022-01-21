@@ -67,9 +67,6 @@ class SVSyncBase:
     async def fetchData(self, nid:Name, seqno:int, retries:int=0) -> Optional[bytes]:
         data, _ = await self._fetch(nid, seqno, retries)
         return data
-    async def fetchDataPacket(self, nid:Name, seqno:int, retries:int=0) -> Optional[BinaryStr]:
-        _, pkt = await self._fetch(nid, seqno, retries)
-        return pkt
     def publishData(self, data:bytes) -> None:
         name = self.getDataName(self.nid, self.core.getSeqno()+1)
         data_packet = make_data(name, MetaInfo(freshness_period=self.DATA_PACKET_FRESHNESS), content=data, signer=self.secOptions.dataSig.signer)
