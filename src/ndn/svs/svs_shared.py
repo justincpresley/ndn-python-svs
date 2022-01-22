@@ -59,6 +59,9 @@ class SVSyncShared(SVSyncBase):
     async def fetchDataPacket(self, nid:Name, seqno:int, retries:int=0) -> Optional[BinaryStr]:
         _, pkt = await self._fetch(nid, seqno, retries)
         return pkt
+    async def fetchData(self, nid:Name, seqno:int, retries:int=0) -> Optional[bytes]:
+        data, _ = await self._fetch(nid, seqno, retries)
+        return data
     def getDataName(self, nid:Name, seqno:int) -> Name:
         return ( self.groupPrefix + [Component.from_str("data")] + nid + [Component.from_str(str(seqno))] )
     def serveDataPacket(datapkt:BinaryStr) -> None:
