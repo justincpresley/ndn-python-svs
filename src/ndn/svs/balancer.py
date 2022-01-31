@@ -72,7 +72,7 @@ class SVSyncBalancer:
             isValidated = await self.secOptions.validate(int_name, sig_ptrs)
             return StateVector(bytes(content)) if bytes(content) != b'' and isValidated else None
         except (InterestNack, InterestTimeout, InterestCanceled, ValidationFailure):
-            SVSyncLogger.info(f'SVSyncBalancer: failed to get {Name.to_str(name)}')
+            SVSyncLogger.info(f'SVSyncBalancer: failed to balance from {Name.to_str(name)}')
             return None
     def isBusy(self) -> bool:
         return self.busy

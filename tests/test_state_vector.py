@@ -109,8 +109,6 @@ def test_state_vector_partition() -> None:
     sv.set("B", 10)
     sv.set("z", 15)
     sv.set("x", 5225)
-
-    nsv:StateVector = StateVector(sv.partition(0,0))
-    osv:StateVector = StateVector(None)
+    nsv, osv = StateVector(sv.partition(0,0)), StateVector(None)
 
     assert osv.to_str() == nsv.to_str()

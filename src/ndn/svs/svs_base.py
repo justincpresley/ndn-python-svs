@@ -21,7 +21,7 @@ from .security import SecurityOptions, SigningInfo, ValidatingInfo
 # Class Purpose:
 #   to derive different SVSync from.
 #   to allow the user to interact with SVS, fetch and publish.
-class SVSyncBase():
+class SVSyncBase:
     DATA_INTEREST_LIFETIME = 2000
     DATA_PACKET_FRESHNESS = 10000
     def __init__(self, app:NDNApp, syncPrefix:Name, dataPrefix:Name, groupPrefix:Name, nid:Name, updateCallback:Callable, storage:Optional[Storage]=None, securityOptions:Optional[SecurityOptions]=None) -> None:
@@ -37,7 +37,7 @@ class SVSyncBase():
         if data_pkt:
             SVSyncLogger.info(f'SVSync: served data {Name.to_str(int_name)}')
             self.app.put_raw_packet(data_pkt)
-    async def _fetch(self, nid:Name, seqno:int, retries:int=0) -> Tuple[Optional[bytes], Optional[BinaryStr]]:
+    async def fetchData(self, nid:Name, seqno:int, retries:int=0) -> Optional[bytes]:
         name = self.getDataName(nid, seqno)
         while retries+1 > 0:
             try:
@@ -46,9 +46,9 @@ class SVSyncBase():
                 ex_int_name, meta_info, content, sig_ptrs = parse_data(pkt)
                 isValidated = await self.secOptions.validate(ex_int_name, sig_ptrs)
                 if not isValidated:
-                    return (None, None)
+                    return None
                 SVSyncLogger.info(f'SVSync: received data {bytes(content)}')
-                return (bytes(content), pkt) if content else (None, pkt)
+                return bytes(content) if content else None
             except InterestNack as e:
                 SVSyncLogger.warning(f'SVSync: nacked with reason={e.reason}')
             except InterestTimeout:
@@ -63,13 +63,7 @@ class SVSyncBase():
             retries = retries - 1
             if retries+1 > 0:
                 SVSyncLogger.info("SVSync: retrying fetching data")
-        return (None, None)
-    async def fetchData(self, nid:Name, seqno:int, retries:int=0) -> Optional[bytes]:
-        data, _ = await self._fetch(nid, seqno, retries)
-        return data
-    async def fetchDataPacket(self, nid:Name, seqno:int, retries:int=0) -> Optional[BinaryStr]:
-        _, pkt = await self._fetch(nid, seqno, retries)
-        return pkt
+        return None
     def publishData(self, data:bytes) -> None:
         name = self.getDataName(self.nid, self.core.getSeqno()+1)
         data_packet = make_data(name, MetaInfo(freshness_period=self.DATA_PACKET_FRESHNESS), content=data, signer=self.secOptions.dataSig.signer)

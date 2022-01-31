@@ -17,7 +17,7 @@ from src.ndn.svs.meta_data import MetaData
 #   to ensure encode and component compatibility.
 
 def test_meta_data_encode() -> None:
-    md = MetaData(None)
+    md:MetaData = MetaData(None)
     md.source = b'/node1/data'
     md.tseqno = 512
     md.nopcks = 3
@@ -26,12 +26,12 @@ def test_meta_data_encode() -> None:
     assert enc_md == b'\x08\x14\xc6\x0b/node1/data\xc7\x02\x02\x00\xc8\x01\x03'
 
 def test_meta_data_past_component() -> None:
-    md = MetaData(None)
+    md:MetaData = MetaData(None)
     md.source = b'/node1/data'
     md.tseqno = 512
     md.nopcks = 3
 
-    new_md = MetaData(md.encode())
+    new_md:MetaData = MetaData(md.encode())
     assert new_md.nopcks == md.nopcks
     assert new_md.tseqno == md.tseqno
     assert new_md.source == md.source
