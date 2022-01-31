@@ -18,3 +18,5 @@ class SVSyncTlvTypes(Enum):
     VECTOR        = 201
     VECTOR_ENTRY  = 202
     SEQNO         = 203
+    PLOT_ENTRY    = 204
+    PLOT          = 205
