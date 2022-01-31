@@ -20,8 +20,8 @@ from .state_vector import StateVector, StateVectorEntry
 class StateTable:
     MTU = 7300
     def __init__(self, mynid:Name) -> None:
-        self.table, self.meta, self.parts = StateVector(), MetaData(), [[0,0]]
-        self.meta.source = Name.to_str(mynid).encode()
+        self.table, self.meta, self.parts, self.nidstr = StateVector(), MetaData(), [[0,0]], Name.to_str(mynid)
+        self.meta.source = self.nidstr.encode()
     def processStateVector(self, incoming_sv:StateVector, oldData:bool) -> List[MissingData]:
         listOrder:List[StateVectorEntry] = incoming_sv.list() if oldData else reversed(incoming_sv.list())
         missingList:List[MissingData] = []
@@ -38,7 +38,7 @@ class StateTable:
         self.calculateParts()
         self.meta.nopcks = len(self.parts) - 1
     def updateMyState(self, seqno:int) -> None:
-        self.table.set(bytes(self.meta.source).decode(), seqno)
+        self.table.set(self.nidstr, seqno)
     def getPart(self, no:int) -> Component:
         try:
             return self.table.partition(self.parts[no][0],self.parts[no][1])

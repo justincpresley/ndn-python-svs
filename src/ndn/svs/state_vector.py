@@ -119,7 +119,7 @@ class StateVector:
         if index == None:
             svc:StateVectorEntry = StateVectorEntry(nid, seqno)
             if not oldData:
-                self.vector.value.insert(0,svc)
+                self.vector.value.insert(0, svc)
             else:
                 self.vector.value.append(svc)
         else:
