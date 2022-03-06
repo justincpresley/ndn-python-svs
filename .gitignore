@@ -10,8 +10,9 @@
 *.pytest_cache
 */__pycache__
 
-# The build folder
+# The build folders
 /build/
+docs/_build
 
 # Setuptools distribution folder.
 /dist/
