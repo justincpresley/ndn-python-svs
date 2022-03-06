@@ -9,11 +9,7 @@ Each providing unique functionality that may be useful in some situations and ha
 Items below are not implemented yet and will added in the future!
 
     * **Prefetch**: send interests ahead of time to get data 1/2 RTT, reducing latency.
-<<<<<<< HEAD
     * **PubSub**: keep your unique data name and just use a mapping! publish and subscribe to data streams.
-=======
-    * **PubSub**: keep your unique data name and just use a mapping! publish and subscribe to streams.
->>>>>>> 49c578eba7f76fa7a307ecc832b1231416424fcf
     * **Prefixed**: need multiple channels or just need 'reset' the state vector? control multiple prefixes.
     * **Uncapped**: automatic data segmentation, no more publication size limits!
     * **Secret**: keep things confidential with encryption. no unauthorized node needs to know who's in the system!
