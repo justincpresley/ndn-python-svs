@@ -6,4 +6,4 @@
 #    @Documentation: https://ndn-python-svs.readthedocs.io
 
 # version of SVS according to pip
-__version__ = "0.3.15"
+__version__ = "0.3.16"

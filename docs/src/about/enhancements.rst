@@ -4,8 +4,10 @@ Enhancements
 There are many enhancements that have been made to ndn-python-svs that deviate it from the traditional specification.
 A full list is below.
 
-    * **Shared type of SVSync**: cache other people's data to help spread their data!
-    * **Thread versions of all types of SVSync**: sometimes a program can not release control to the async queue like for input.
-    * **State Table of ordered latest data entries**: be sure to get the latest data entry updates.
+    * **Unique Types**: tons of types to suit an environment specifically, check types_ for more info.
+    * **Thread versions**: sometimes a program can not release control to the async queue like for input.
+    * **State Table**: be sure to get the latest data entry updates via ordered entries.
     * **Node Balancer**: a node did not get all the data from the sync interests? Request it!
     * **Sliding Window**: asynchronously send interests when balancing a node's state or fetching data.
+
+.. _types: https://ndn-python-svs.readthedocs.io/src/specification/types.html
