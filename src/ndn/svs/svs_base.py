@@ -22,8 +22,11 @@ from .security import SecurityOptions, SigningInfo, ValidatingInfo
 #   to derive different SVSync from.
 #   to allow the user to interact with SVS, fetch and publish.
 class SVSyncBase:
+    NDN_MTU = 8800
     DATA_INTEREST_LIFETIME = 2000
     DATA_PACKET_FRESHNESS = 10000
+    class SVSyncPublicationTooLarge(Exception):
+        pass
     def __init__(self, app:NDNApp, syncPrefix:Name, dataPrefix:Name, groupPrefix:Name, nid:Name, updateCallback:Callable, storage:Optional[Storage]=None, securityOptions:Optional[SecurityOptions]=None) -> None:
         SVSyncLogger.info("SVSync: started an svsync type")
         self.app, self.syncPrefix, self.dataPrefix, self.groupPrefix, self.nid, self.updateCallback = app, syncPrefix, dataPrefix, groupPrefix, nid, updateCallback
@@ -67,6 +70,8 @@ class SVSyncBase:
     def publishData(self, data:bytes) -> None:
         name = self.getDataName(self.nid, self.core.getSeqno()+1)
         data_packet = make_data(name, MetaInfo(freshness_period=self.DATA_PACKET_FRESHNESS), content=data, signer=self.secOptions.dataSig.signer)
+        if len(data_packet) > self.NDN_MTU:
+            raise self.SVSyncPublicationTooLarge(f"A SVSync Publication can not be over NDN's MTU ({self.NDN_MTU}).")
         SVSyncLogger.info(f'SVSync: publishing data {Name.to_str(name)}')
         self.storage.put_packet(name, data_packet)
         self.core.updateMyState(self.core.getSeqno()+1)
