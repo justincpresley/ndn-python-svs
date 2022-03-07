@@ -8,7 +8,7 @@ Items listed below are implemented.
 
     * **Shared**: cache other nodes' data to help spread their data!
 
-Items listed below are not implemented yet and will added in the future!
+Items listed below are not implemented yet and will be added in the future!
 
     * **Prefetch**: send interests ahead of time to get data 1/2 RTT, reducing latency.
     * **Pubsub**: keep your unique data name and just use a mapping! publish and subscribe to data streams.
