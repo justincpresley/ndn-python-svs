@@ -12,7 +12,7 @@ Items listed below are not implemented yet and will be added in the future!
 
     * **Prefetch**: send interests ahead of time to get data 1/2 RTT, reducing latency.
     * **Pubsub**: keep your unique data name and just use a mapping! publish and subscribe to data streams.
-    * **Prefixed**: need multiple channels or just need 'reset' the state vector? control multiple prefixes.
+    * **Prefixed**: need multiple channels or need to 'reset' the state vector? control multiple prefixes.
     * **Uncapped**: automatic data segmentation, no more publication size limits!
     * **Secret**: keep things confidential with encryption. no unauthorized node needs to know who's in the system!
     * **Feed**: trying to reduce NFD prefix registrations? manually feed the interests!
