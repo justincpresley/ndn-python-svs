@@ -67,7 +67,7 @@ class SVSyncBalancer:
         try:
             SVSyncLogger.info(f'SVSyncBalancer: balancing by {Name.to_str(name)}')
             _, _, _, pkt = await self.app.express_interest(
-                name, need_raw_packet=True, must_be_fresh=True, can_be_prefix=False, lifetime=self.PROP_INTEREST_LIFETIME)
+                name, need_raw_packet=True, must_be_fresh=True, can_be_prefix=True, lifetime=self.PROP_INTEREST_LIFETIME)
             int_name, meta_info, content, sig_ptrs = parse_data(pkt)
             isValidated = await self.secOptions.validate(int_name, sig_ptrs)
             return StateVector(bytes(content)) if bytes(content) != b'' and isValidated else None

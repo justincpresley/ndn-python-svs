@@ -45,7 +45,7 @@ class SVSyncBase:
         while retries+1 > 0:
             try:
                 SVSyncLogger.info(f'SVSync: fetching data {Name.to_str(name)}')
-                _, _, _, pkt = await self.app.express_interest(name, need_raw_packet=True, must_be_fresh=True, can_be_prefix=False, lifetime=self.DATA_INTEREST_LIFETIME)
+                _, _, _, pkt = await self.app.express_interest(name, need_raw_packet=True, must_be_fresh=True, can_be_prefix=True, lifetime=self.DATA_INTEREST_LIFETIME)
                 ex_int_name, meta_info, content, sig_ptrs = parse_data(pkt)
                 isValidated = await self.secOptions.validate(ex_int_name, sig_ptrs)
                 if not isValidated:
@@ -53,13 +53,13 @@ class SVSyncBase:
                 SVSyncLogger.info(f'SVSync: received data {bytes(content)}')
                 return bytes(content) if content else None
             except InterestNack as e:
-                SVSyncLogger.warning(f'SVSync: nacked with reason={e.reason}')
+                SVSyncLogger.warning(f'SVSync: nacked with reason={e.reason} {Name.to_str(name)}')
             except InterestTimeout:
-                SVSyncLogger.warning("SVSync: timeout")
+                SVSyncLogger.warning(f'SVSync: timeout {Name.to_str(name)}')
             except InterestCanceled:
-                SVSyncLogger.warning("SVSync: canceled")
+                SVSyncLogger.warning(f'SVSync: canceled {Name.to_str(name)}')
             except ValidationFailure:
-                SVSyncLogger.warning("SVSync: data failed to validate")
+                SVSyncLogger.warning(f'SVSync: data failed to validate {Name.to_str(name)}')
             except Exception as e:
                 SVSyncLogger.warning(f'SVSync: unknown error has occured: {e}')
 
