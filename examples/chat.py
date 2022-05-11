@@ -58,7 +58,7 @@ class Program:
         self.svs_thread.wait()
         print(f'SVS chat client started | {self.args["group_prefix"]} - {self.args["node_id"]} |')
     def run(self) -> None:
-        while True:
+        while 1:
             try:
                 val:str = input("")
                 sys.stdout.write("\033[F"+"\033[K")
@@ -71,7 +71,6 @@ class Program:
 
 def main() -> int:
     args = parse_cmd_args()
-
     args["node_id"] = Name.to_str(Name.from_str(args["node_id"]))
     args["group_prefix"] = Name.to_str(Name.from_str(args["group_prefix"]))
     args["cache_data"] = True
