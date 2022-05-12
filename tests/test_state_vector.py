@@ -12,7 +12,7 @@ from ndn.encoding import Component, Name
 # Custom Imports
 sys.path.insert(0,'.')
 from src.ndn.svs.state_vector import StateVector
-from src.ndn.svs.tlv import SVSyncTlvTypes
+from src.ndn.svs.tlv import TlvTypes
 
 # File Type: pytest Testing
 # Testing Classes: StateVector
@@ -68,7 +68,7 @@ def test_state_vector_set() -> None:
 def test_state_vector_decode() -> None:
     # hard coded bytes of component vector based on SVS protocol
     enc_sv = b'\xCA\x03\x6F\x6E\x65\xCB\x01\x01\xCA\x03\x74\x77\x6F\xCB\x01\x02'
-    enc_sv = Component.from_bytes(enc_sv, SVSyncTlvTypes.VECTOR.value)
+    enc_sv = Component.from_bytes(enc_sv, TlvTypes.VECTOR.value)
 
     sv:StateVector = StateVector(enc_sv)
     assert sv.get("one") == 1

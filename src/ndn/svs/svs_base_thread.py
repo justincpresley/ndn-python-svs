@@ -15,7 +15,7 @@ from typing import Optional, List, Callable
 from ndn.app import NDNApp
 from ndn.encoding import Name, BinaryStr
 from ndn.security import Keychain
-from ndn.transport.stream_socket import Face
+from ndn.transport.face import Face
 from ndn.storage import Storage, DiskStorage
 # Custom Imports
 from .core import Core

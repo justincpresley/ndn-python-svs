@@ -10,7 +10,7 @@ from typing import Optional, Callable
 # NDN Imports
 from ndn.encoding import Name
 from ndn.security import Keychain
-from ndn.transport.stream_socket import Face
+from ndn.transport.face import Face
 from ndn.storage import Storage
 # Custom Imports
 from .security import SecurityOptions
