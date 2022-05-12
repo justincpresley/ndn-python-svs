@@ -13,7 +13,7 @@ from ndn.encoding import Name, BinaryStr, Component, parse_data
 from ndn.types import InterestNack, InterestTimeout, InterestCanceled, ValidationFailure
 from ndn.storage import Storage
 # Custom Imports
-from .constants import *
+from .constants import DATA_INTEREST_LIFETIME
 from .logger import SVSyncLogger
 from .security import SecurityOptions
 from .svs_base import SVSyncBase

@@ -16,7 +16,7 @@ from ndn.encoding import Name, InterestParam, BinaryStr, FormalName, SignaturePt
 from ndn.types import InterestNack, InterestTimeout, InterestCanceled, ValidationFailure
 # Custom Imports
 from .balancer import Balancer
-from .constants import *
+from .constants import SYNC_INTEREST_LIFETIME, INTERVAL, INTERVAL_RANDOMNESS, BRIEF_INTERVAL, BRIEF_INTERVAL_RANDOMNESS
 from .state_table import StateTable
 from .meta_data import MetaData
 from .state_vector import StateVector

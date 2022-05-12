@@ -13,7 +13,7 @@ from ndn.app import NDNApp
 from ndn.encoding import Name, Component, InterestParam, BinaryStr, FormalName, SignaturePtrs, parse_data
 from ndn.types import InterestNack, InterestTimeout, InterestCanceled, ValidationFailure
 # Custom Imports
-from .constants import *
+from .constants import PROP_WINDOW, PROP_INTEREST_LIFETIME, PROP_PACKET_FRESHNESS
 from .logger import SVSyncLogger
 from .meta_data import MetaData
 from .security import SecurityOptions
