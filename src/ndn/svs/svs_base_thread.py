@@ -18,7 +18,7 @@ from ndn.security import Keychain
 from ndn.transport.stream_socket import Face
 from ndn.storage import Storage, DiskStorage
 # Custom Imports
-from .core import SVSyncCore
+from .core import Core
 from .logger import SVSyncLogger
 from .missing_data import MissingData
 from .security import SecurityOptions
@@ -80,5 +80,5 @@ class SVSyncBase_Thread(Thread):
             self.svs.publishData(data)
         except AttributeError:
             raise self.SVSyncUnwaitedThread("A SVSync Thread needs to be waited on before doing operations.")
-    def getCore(self) -> Optional[SVSyncCore]:
+    def getCore(self) -> Optional[Core]:
         return self.svs.getCore() if self.svs else None

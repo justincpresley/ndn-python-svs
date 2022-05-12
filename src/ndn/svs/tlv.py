@@ -11,7 +11,7 @@ from enum import Enum
 # Class Type: an enumeration struct
 # Class Purpose:
 #   to differ tlv model types.
-class SVSyncTlvTypes(Enum):
+class TlvTypes(Enum):
     META_SOURCE   = 198
     META_TOTAL    = 199
     META_NOPCKS   = 200

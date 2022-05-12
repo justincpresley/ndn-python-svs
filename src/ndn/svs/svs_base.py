@@ -13,7 +13,8 @@ from ndn.encoding import Name, MetaInfo, InterestParam, BinaryStr, FormalName, S
 from ndn.types import InterestNack, InterestTimeout, InterestCanceled, ValidationFailure
 from ndn.storage import Storage, MemoryStorage
 # Custom Imports
-from .core import SVSyncCore
+from .constants import *
+from .core import Core
 from .logger import SVSyncLogger
 from .security import SecurityOptions, SigningInfo, ValidatingInfo
 
@@ -22,9 +23,6 @@ from .security import SecurityOptions, SigningInfo, ValidatingInfo
 #   to derive different SVSync from.
 #   to allow the user to interact with SVS, fetch and publish.
 class SVSyncBase:
-    NDN_MTU = 8800
-    DATA_INTEREST_LIFETIME = 2000
-    DATA_PACKET_FRESHNESS = 10000
     class SVSyncPublicationTooLarge(Exception):
         pass
     def __init__(self, app:NDNApp, syncPrefix:Name, dataPrefix:Name, groupPrefix:Name, nid:Name, updateCallback:Callable, storage:Optional[Storage]=None, securityOptions:Optional[SecurityOptions]=None) -> None:
@@ -33,7 +31,7 @@ class SVSyncBase:
         self.storage = MemoryStorage() if not storage else storage
         self.secOptions = securityOptions if securityOptions is not None else SecurityOptions(SigningInfo(SignatureType.DIGEST_SHA256), ValidatingInfo(ValidatingInfo.get_validator(SignatureType.DIGEST_SHA256)), SigningInfo(SignatureType.DIGEST_SHA256), [])
         self.app.route(self.dataPrefix)(self.onDataInterest)
-        self.core = SVSyncCore(self.app, self.syncPrefix, self.groupPrefix, self.nid, self.updateCallback, self.secOptions)
+        self.core = Core(self.app, self.syncPrefix, self.groupPrefix, self.nid, self.updateCallback, self.secOptions)
         SVSyncLogger.info(f'SVSync: started listening to {Name.to_str(self.dataPrefix)}')
     def onDataInterest(self, int_name:FormalName, int_param:InterestParam, _app_param:Optional[BinaryStr]) -> None:
         data_pkt = self.storage.get_packet(int_name, int_param.can_be_prefix)
@@ -45,7 +43,7 @@ class SVSyncBase:
         while retries+1 > 0:
             try:
                 SVSyncLogger.info(f'SVSync: fetching data {Name.to_str(name)}')
-                _, _, _, pkt = await self.app.express_interest(name, need_raw_packet=True, must_be_fresh=True, can_be_prefix=True, lifetime=self.DATA_INTEREST_LIFETIME)
+                _, _, _, pkt = await self.app.express_interest(name, need_raw_packet=True, must_be_fresh=True, can_be_prefix=True, lifetime=DATA_INTEREST_LIFETIME)
                 ex_int_name, meta_info, content, sig_ptrs = parse_data(pkt)
                 isValidated = await self.secOptions.validate(ex_int_name, sig_ptrs)
                 if not isValidated:
@@ -69,13 +67,13 @@ class SVSyncBase:
         return None
     def publishData(self, data:bytes) -> None:
         name = self.getDataName(self.nid, self.core.getSeqno()+1)
-        data_packet = make_data(name, MetaInfo(freshness_period=self.DATA_PACKET_FRESHNESS), content=data, signer=self.secOptions.dataSig.signer)
-        if len(data_packet) > self.NDN_MTU:
+        data_packet = make_data(name, MetaInfo(freshness_period=DATA_PACKET_FRESHNESS), content=data, signer=self.secOptions.dataSig.signer)
+        if len(data_packet) > NDN_MTU:
             raise self.SVSyncPublicationTooLarge(f"A SVSync Publication can not be over NDN's MTU ({self.NDN_MTU}).")
         SVSyncLogger.info(f'SVSync: publishing data {Name.to_str(name)}')
         self.storage.put_packet(name, data_packet)
         self.core.updateMyState(self.core.getSeqno()+1)
-    def getCore(self) -> SVSyncCore:
+    def getCore(self) -> Core:
         return self.core
     def getDataName(self, nid:Name, seqno:int) -> Name:
         raise NotImplementedError

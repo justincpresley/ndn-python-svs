@@ -10,6 +10,7 @@ from typing import List, Optional
 # NDN Imports
 from ndn.encoding import Component, Name
 # Custom Imports
+from .constants import *
 from .meta_data import MetaData
 from .missing_data import MissingData
 from .state_vector import StateVector, StateVectorEntry
@@ -18,7 +19,6 @@ from .state_vector import StateVector, StateVectorEntry
 # Class Purpose:
 #   to allow an easier time to form sync interest and handle all states
 class StateTable:
-    NDN_MTU = 8800
     def __init__(self, mynid:Name) -> None:
         self.table, self.meta, self.parts, self.nidstr = StateVector(), MetaData(), [[0,0]], Name.to_str(mynid)
         self.meta.source = self.nidstr.encode()
@@ -66,7 +66,7 @@ class StateTable:
             mainlist.append(templist)
         self.parts = mainlist
     def getPartMaximum(self, part:int) -> int:
-        return (self.NDN_MTU - 1500) # optimize this part for each packet (including interest)
+        return (NDN_MTU - 1500) # optimize this part for each packet (including interest)
     def getPartCuts(self) -> list:
         return self.parts
     def getSeqno(self, nid:Name) -> Optional[int]:

@@ -5,5 +5,17 @@
 #    @Pip-Library: https://pypi.org/project/ndn-svs
 #    @Documentation: https://ndn-python-svs.readthedocs.io
 
-# version of SVS according to pip
-__version__ = "0.4.0"
+NDN_MTU = 8800
+
+PROP_WINDOW = 5
+
+INTERVAL = 30000
+INTERVAL_RANDOMNESS = 0.1
+BRIEF_INTERVAL = 200
+BRIEF_INTERVAL_RANDOMNESS = 0.5
+
+PROP_INTEREST_LIFETIME = 2000
+PROP_PACKET_FRESHNESS = 5000
+DATA_INTEREST_LIFETIME = 2000
+DATA_PACKET_FRESHNESS = 10000
+SYNC_INTEREST_LIFETIME = 1000

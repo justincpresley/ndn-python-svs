@@ -13,6 +13,7 @@ from ndn.encoding import Name, BinaryStr, Component, parse_data
 from ndn.types import InterestNack, InterestTimeout, InterestCanceled, ValidationFailure
 from ndn.storage import Storage
 # Custom Imports
+from .constants import *
 from .logger import SVSyncLogger
 from .security import SecurityOptions
 from .svs_base import SVSyncBase
@@ -32,7 +33,7 @@ class SVSyncShared(SVSyncBase):
         while retries+1 > 0:
             try:
                 SVSyncLogger.info(f'SVSync: fetching data {Name.to_str(name)}')
-                _, _, _, pkt = await self.app.express_interest(name, need_raw_packet=True, must_be_fresh=True, can_be_prefix=True, lifetime=self.DATA_INTEREST_LIFETIME)
+                _, _, _, pkt = await self.app.express_interest(name, need_raw_packet=True, must_be_fresh=True, can_be_prefix=True, lifetime=DATA_INTEREST_LIFETIME)
                 ex_int_name, meta_info, content, sig_ptrs = parse_data(pkt)
                 isValidated = await self.secOptions.validate(ex_int_name, sig_ptrs)
                 if not isValidated:

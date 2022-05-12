@@ -77,7 +77,7 @@ def main() -> int:
     args = parse_cmd_args()
     args["node_id"] = Name.to_str(Name.from_str(args["node_id"]))
     args["group_prefix"] = Name.to_str(Name.from_str(args["group_prefix"]))
-    
+
     SVSyncLogger.config(True if args["verbose"] else False, None, logging.INFO)
 
     try:

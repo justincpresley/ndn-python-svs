@@ -16,8 +16,8 @@ from .svs_thread import SVSync_Thread
 from .svs_shared_thread import SVSyncShared_Thread
 
 # Logic of SVS
-from .core import SVSyncCore
-from .balancer import SVSyncBalancer
+from .core import Core
+from .balancer import Balancer
 
 # Additional SVS useful classes
 from .meta_data import MetaData
@@ -25,7 +25,7 @@ from .missing_data import MissingData
 from .state_vector import StateVector
 from .state_table import StateTable
 from .security import SigningInfo, ValidatingInfo, SecurityOptions
-from .tlv import SVSyncTlvTypes
+from .tlv import TlvTypes
 
 # Tool classes
 from .scheduler import AsyncScheduler
@@ -33,3 +33,6 @@ from .window import AsyncWindow
 
 # Logging class
 from .logger import SVSyncLogger
+
+# Constants
+from .constants import *

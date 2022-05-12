@@ -8,15 +8,15 @@
 # NDN Imports
 from ndn.encoding import Component, TlvModel, UintField, BytesField, DecodeError
 # Custom Imports
-from .tlv import SVSyncTlvTypes
+from .tlv import TlvTypes
 
 # Class Type: a tlv structure for encoding
 # Class Purpose:
 #   hold all aspects of MetaData in a Model
 class MetaDataModel(TlvModel):
-    source = BytesField(SVSyncTlvTypes.META_SOURCE.value)
-    tseqno = UintField(SVSyncTlvTypes.META_TOTAL.value)
-    nopcks = UintField(SVSyncTlvTypes.META_NOPCKS.value)
+    source = BytesField(TlvTypes.META_SOURCE.value)
+    tseqno = UintField(TlvTypes.META_TOTAL.value)
+    nopcks = UintField(TlvTypes.META_NOPCKS.value)
 
 # Class Type: a API class
 # Class Purpose:

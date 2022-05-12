@@ -13,7 +13,7 @@ from typing import List, Optional
 # NDN Imports
 from ndn.encoding import Component, get_tl_num_size, write_tl_num, parse_tl_num, pack_uint_bytes
 # Custom Imports
-from .tlv import SVSyncTlvTypes
+from .tlv import TlvTypes
 
 # Class Type: a struct
 # Class Purpose:
@@ -25,15 +25,15 @@ class StateVectorEntry:
     def encode(self) -> bytearray:
         bseqno, bnid = pack_uint_bytes(self.seqno), self.nid.encode()
         # nid
-        size = len(bnid) + get_tl_num_size(len(bnid)) + get_tl_num_size(SVSyncTlvTypes.VECTOR_ENTRY.value)
+        size = len(bnid) + get_tl_num_size(len(bnid)) + get_tl_num_size(TlvTypes.VECTOR_ENTRY.value)
         temp1 = bytearray(size)
-        pos = write_tl_num(SVSyncTlvTypes.VECTOR_ENTRY.value, temp1)
+        pos = write_tl_num(TlvTypes.VECTOR_ENTRY.value, temp1)
         pos += write_tl_num(len(bnid), temp1, pos)
         temp1[pos:pos + len(bnid)] = bnid
         # seqno
-        size = len(bseqno) + get_tl_num_size(len(bseqno)) + get_tl_num_size(SVSyncTlvTypes.SEQNO.value)
+        size = len(bseqno) + get_tl_num_size(len(bseqno)) + get_tl_num_size(TlvTypes.SEQNO.value)
         temp2 = bytearray(size)
-        pos = write_tl_num(SVSyncTlvTypes.SEQNO.value, temp2)
+        pos = write_tl_num(TlvTypes.SEQNO.value, temp2)
         pos += write_tl_num(len(bseqno), temp2, pos)
         temp2[pos:pos + len(bseqno)] = bseqno
         return temp1+temp2
@@ -50,9 +50,9 @@ class StateVectorModel:
             ba = v.encode()
             length += len(ba)
             component_wires.append(ba)
-        buf_len = length + get_tl_num_size(length) + get_tl_num_size(SVSyncTlvTypes.VECTOR.value)
+        buf_len = length + get_tl_num_size(length) + get_tl_num_size(TlvTypes.VECTOR.value)
         ret = bytearray(buf_len)
-        pos = write_tl_num(SVSyncTlvTypes.VECTOR.value, ret)
+        pos = write_tl_num(TlvTypes.VECTOR.value, ret)
         pos += write_tl_num(length, ret, pos)
         for w in component_wires:
             ret[pos:pos + len(w)] = w
@@ -62,7 +62,7 @@ class StateVectorModel:
     def parse(buf:Component) -> Optional[StateVectorModel]:
         # Verify the Type
         typ, pos = parse_tl_num(buf)
-        if typ != SVSyncTlvTypes.VECTOR.value:
+        if typ != TlvTypes.VECTOR.value:
             return None
         # Check the length
         length, l = parse_tl_num(buf, pos)
@@ -76,7 +76,7 @@ class StateVectorModel:
             # Entry ID
             typ, l = parse_tl_num(buf, pos)
             pos += l
-            if typ != SVSyncTlvTypes.VECTOR_ENTRY.value:
+            if typ != TlvTypes.VECTOR_ENTRY.value:
                 return None
             length, l = parse_tl_num(buf, pos)
             pos += l
@@ -85,7 +85,7 @@ class StateVectorModel:
             # Seqno
             typ, l = parse_tl_num(buf, pos)
             pos += l
-            if typ != SVSyncTlvTypes.SEQNO.value:
+            if typ != TlvTypes.SEQNO.value:
                 return None
             length, l = parse_tl_num(buf, pos)
             pos += l
