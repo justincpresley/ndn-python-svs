@@ -9,6 +9,7 @@
 from .svs_base import SVSyncBase
 from .svs import SVSync
 from .svs_shared import SVSyncShared
+from .svs_health import SVSyncHealth
 
 # Forked Thread API classes
 from .svs_base_thread import SVSyncBase_Thread
@@ -18,6 +19,7 @@ from .svs_shared_thread import SVSyncShared_Thread
 # Logic of SVS
 from .core import Core
 from .balancer import Balancer
+from .heart_tracker import HeartTracker
 
 # Additional SVS useful classes
 from .meta_data import MetaData
@@ -26,6 +28,7 @@ from .state_vector import StateVector
 from .state_table import StateTable
 from .security import SigningInfo, ValidatingInfo, SecurityOptions
 from .tlv import TlvTypes
+from .heart import Heart
 
 # Tool classes
 from .scheduler import AsyncScheduler

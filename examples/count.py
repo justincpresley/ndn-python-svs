@@ -45,7 +45,7 @@ class Program:
     def __init__(self, args:dict) -> None:
         self.args = args
         self.svs:SVSync = SVSync(app, Name.from_str(self.args["group_prefix"]), Name.from_str(self.args["node_id"]), self.missing_callback)
-        print(f'SVS client started | {self.args["group_prefix"]} - {self.args["node_id"]} |')
+        print(f'SVS count client started | {self.args["group_prefix"]} - {self.args["node_id"]} |')
     async def run(self) -> None:
         num:int = 0
         while 1:

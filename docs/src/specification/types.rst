@@ -7,6 +7,7 @@ Each providing unique functionality that may be useful in some situations and ha
 Items listed below are implemented.
 
     * **Shared**: cache other nodes' data to help spread their data!
+    * **Health**: only track all nodes' aliveness, ensure that everyone is healthy! (only uses sync interests)
 
 Items listed below are not implemented yet and will be added in the future!
 
@@ -16,7 +17,6 @@ Items listed below are not implemented yet and will be added in the future!
     * **Uncapped**: automatic data segmentation, no more publication size limits!
     * **Secret**: keep things confidential with encryption. no unauthorized node needs to know who's in the system!
     * **Feed**: trying to reduce NFD prefix registrations? manually feed the interests!
-    * **Status**: only track all nodes' status, ensure that everyone is healthy! (only uses sync interests)
 
 Additionally, multiple types will later be combined to give users of this library ultimate functionality.
 
