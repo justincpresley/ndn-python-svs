@@ -14,7 +14,7 @@ from ndn.transport.face import Face
 from ndn.storage import Storage
 # Custom Imports
 from .security import SecurityOptions
-from .svs_base_thread import SVSyncBase_Thread
+from .svs_base_thread import SVSyncBase_Thread, SVSyncUnwaitedThread
 from .svs_shared import SVSyncShared
 
 # Class Type: an API thread class
@@ -32,4 +32,4 @@ class SVSyncShared_Thread(SVSyncBase_Thread):
         try:
             self.svs.serveDataPacket(datapkt)
         except AttributeError:
-            raise self.SVSyncUnwaitedThread("A SVSync Thread needs to be waited on before doing operations.")
+            raise SVSyncUnwaitedThread("A SVSync Thread needs to be waited on before doing operations.")

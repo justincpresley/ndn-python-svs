@@ -37,5 +37,8 @@ from .window import AsyncWindow
 # Logging class
 from .logger import SVSyncLogger
 
+# Exceptions / Errors
+from .exceptions import *
+
 # Constants
 from .constants import *

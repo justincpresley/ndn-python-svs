@@ -52,9 +52,9 @@ class Program:
             await aio.sleep(0.1)
     def status_callback(self, heart:Heart) -> None:
         if heart.alive:
-            print(f"[RENEW] Node {heart.nid} started beating again.")
+            print(f"[RENEW] Node {heart.nid}'s heart is noticeably alive!")
         else:
-            print(f"[EXPIRE] Node {heart.nid} just died.")
+            print(f"[EXPIRE] Node {heart.nid}'s heart is ghostly silent.'")
 
 async def start(args:dict) -> None:
     prog = Program(args)
