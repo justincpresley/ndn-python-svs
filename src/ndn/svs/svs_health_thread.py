@@ -12,6 +12,7 @@ from ndn.encoding import Name, BinaryStr
 from ndn.security import Keychain
 from ndn.transport.face import Face
 # Custom Imports
+from .heart_tracker import HeartTracker
 from .security import SecurityOptions
 from .svs_shared import SVSyncHealth
 
@@ -21,12 +22,12 @@ from .svs_shared import SVSyncHealth
 #   to allow the user to interact with SVS, get health info.
 #   to not worry about health stuff in the main loop.
 class SVSyncHealth_Thread(Thread):
-    def __init__(self, groupPrefix:Name, nid:Name, heartCallback:Callable, securityOptions:Optional[SecurityOptions]=None, face:Optional[Face]=None, keychain:Optional[Keychain]=None) -> None:
+    def __init__(self, groupPrefix:Name, nid:Name, tracker:HeartTracker, securityOptions:Optional[SecurityOptions]=None, face:Optional[Face]=None, keychain:Optional[Keychain]=None) -> None:
         SVSyncLogger.info("SVSync_Thread: Created thread to push SVS to.")
         Thread.__init__(self)
-        self.groupPrefix, self.nid, self.face, self.keychain, self.secOptions, self.heartCallback, self.svs, self.loop, self.app, self.failed = groupPrefix, nid, face, keychain, securityOptions, heartCallback, None, None, None, False
+        self.groupPrefix, self.nid, self.face, self.keychain, self.secOptions, self.tracker, self.svs, self.loop, self.app, self.failed = groupPrefix, nid, face, keychain, securityOptions, tracker, None, None, None, False
     async def function(self) -> None:
-        self.svs = SVSyncHealth(self.app, self.groupPrefix, self.nid, self.heartCallback, self.secOptions)
+        self.svs = SVSyncHealth(self.app, self.groupPrefix, self.nid, self.tracker, self.secOptions)
         while 1:
             try:
                 self.svs.examine()

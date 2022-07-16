@@ -65,13 +65,14 @@ class SVSyncBase:
                 SVSyncLogger.info("SVSync: retrying fetching data")
         return None
     def publishData(self, data:bytes) -> None:
-        name = self.getDataName(self.nid, self.core.getSeqno()+1)
+        segno = self.core.getSeqno()+1
+        name = self.getDataName(self.nid, segno)
         data_packet = make_data(name, MetaInfo(freshness_period=DATA_PACKET_FRESHNESS), content=data, signer=self.secOptions.dataSig.signer)
         if len(data_packet) > NDN_MTU:
             raise SVSyncPublicationTooLarge(f"A SVSync Publication can not be over NDN's MTU ({self.NDN_MTU}).")
         SVSyncLogger.info(f'SVSync: publishing data {Name.to_str(name)}')
         self.storage.put_packet(name, data_packet)
-        self.core.updateMyState(self.core.getSeqno()+1)
+        self.core.updateMyState(segno)
     def getCore(self) -> Core:
         return self.core
     def getDataName(self, nid:Name, seqno:int) -> Name:

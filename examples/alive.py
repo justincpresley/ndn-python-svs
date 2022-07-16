@@ -15,7 +15,7 @@ from ndn.app import NDNApp
 from ndn.encoding import Name
 # Custom Imports
 sys.path.insert(0,'.')
-from src.ndn.svs import SVSyncHealth, Heart, SVSyncLogger
+from src.ndn.svs import SVSyncHealth, Heart, SVSyncLogger, HeartTracker
 
 app = NDNApp()
 
@@ -41,7 +41,8 @@ def parse_cmd_args() -> dict:
 class Program:
     def __init__(self, args:dict) -> None:
         self.args = args
-        self.svs:SVSyncHealth = SVSyncHealth(app, Name.from_str(self.args["group_prefix"]), Name.from_str(self.args["node_id"]), self.status_callback)
+        self.tracker:HeartTracker = HeartTracker(self.status_callback, 25000, 3, 3)
+        self.svs:SVSyncHealth = SVSyncHealth(app, Name.from_str(self.args["group_prefix"]), Name.from_str(self.args["node_id"]), self.tracker)
         print(f'SVS status client started | {self.args["group_prefix"]} - {self.args["node_id"]} |')
     async def run(self) -> None:
         while 1:

@@ -9,7 +9,7 @@
 import time
 from typing import Optional, Callable
 # Custom Imports
-from .constants import TRACKER_RATE, BEAT_RATE, BEATS_TO_RENEW, BEATS_TO_EXPIRE
+from .constants import TRACKER_DIFFERENCE
 from .heart import Heart
 from .logger import SVSyncLogger
 
@@ -18,8 +18,8 @@ from .logger import SVSyncLogger
 #   to keep track of the last send update of all nodes
 #   to keep track of the status of all nodes
 class HeartTracker:
-    def __init__(self, nid:str, callback:Callable) -> None:
-        self.hearts, self.nid, self.callback = {}, nid, callback
+    def __init__(self, callback:Callable, beat_rate:int, beats_to_renew:int, beats_to_expire:int) -> None:
+        self.hearts, self.callback, self.rate, self.track, self.btr, self.bte = {}, callback, beat_rate, beat_rate+TRACKER_DIFFERENCE, beats_to_renew, beats_to_expire
     def reset(self, nid:str) -> None:
         try:
             heart = self.hearts[nid]
@@ -31,7 +31,7 @@ class HeartTracker:
             heart.cycles = 0
         else:
             heart.cycles += 1
-            if heart.cycles >= BEATS_TO_RENEW:
+            if heart.cycles >= self.btr:
                 heart.cycles = 0
                 heart.alive = True
                 self.callback(heart)
@@ -40,19 +40,19 @@ class HeartTracker:
         for nid in list(self.hearts):
             heart = self.hearts[nid]
             time_past = (time.perf_counter()*1000) - heart.last_beat
-            if not heart.alive and time_past > TRACKER_RATE:
+            if not heart.alive and time_past > self.track:
                 heart.cycles = 0
-            elif time_past > TRACKER_RATE:
-                heart.cycles = time_past // TRACKER_RATE
-                if heart.cycles >= BEATS_TO_EXPIRE:
+            elif time_past > self.track:
+                heart.cycles = time_past // self.track
+                if heart.cycles >= self.bte:
                     heart.cycles = 0
                     heart.alive = False
                     self.updateCallback(heart)
                     SVSyncLogger.info(f"HeartTracker: Node {nid} expired!")
-    def beat(self) -> bool:
+    def beat(self, nid:str) -> bool:
         try:
-            time_past = (time.perf_counter()*1000) - self.hearts[self.nid].last_beat
-            if time_past >= BEAT_RATE:
+            time_past = (time.perf_counter()*1000) - self.hearts[nid].last_beat
+            if time_past >= self.rate:
                 return True
         except KeyError:
             return True

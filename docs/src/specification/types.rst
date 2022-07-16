@@ -7,7 +7,7 @@ Each providing unique functionality that may be useful in some situations and ha
 Items listed below are implemented.
 
     * **Shared**: cache other nodes' data to help spread their data!
-    * **Health**: only track all nodes' aliveness, ensure that everyone is healthy! (only uses sync interests)
+    * **Health**: only track all nodes' aliveness, ensure that everyone is healthy! (only uses interests!)
 
 Items listed below are not implemented yet and will be added in the future!
 

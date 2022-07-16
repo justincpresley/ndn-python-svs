@@ -23,10 +23,9 @@ from .security import SecurityOptions, SigningInfo, ValidatingInfo
 #   to know what nodes are alive or dead with reduced network traffic
 #   to have a seperate SVS type specifically to monitor the status
 class SVSyncHealth:
-    def __init__(self, app:NDNApp, groupPrefix:Name, nid:Name, heartCallback:Callable, securityOptions:Optional[SecurityOptions]=None) -> None:
+    def __init__(self, app:NDNApp, groupPrefix:Name, nid:Name, tracker:HeartTracker, securityOptions:Optional[SecurityOptions]=None) -> None:
         SVSyncLogger.info("SVSync: started an svsync type")
-        self.nid = Name.to_str(nid)
-        self.tracker= HeartTracker(self.nid, heartCallback)
+        self.nid, self.tracker = Name.to_str(nid), tracker
         secOptions = securityOptions if securityOptions is not None else SecurityOptions(SigningInfo(SignatureType.DIGEST_SHA256), ValidatingInfo(ValidatingInfo.get_validator(SignatureType.DIGEST_SHA256)), SigningInfo(SignatureType.DIGEST_SHA256), [])
         self.core = Core(app, groupPrefix + [Component.from_str("sync")], groupPrefix, nid, self._missing_callback, secOptions)
     def _missing_callback(self, missing_list:List[MissingData]) -> None:
@@ -36,7 +35,7 @@ class SVSyncHealth:
             self.tracker.reset(i.nid)
     def examine(self) -> None:
         self.tracker.detect()
-        if self.tracker.beat():
+        if self.tracker.beat(self.nid):
             self.core.updateMyState(self.core.getSeqno()+1)
             self.tracker.reset(self.nid)
     def getHeart(self, nid:str) -> Optional[Heart]:
