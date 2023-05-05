@@ -9,7 +9,7 @@
 from typing import Callable, Optional
 # NDN Imports
 from ndn.app import NDNApp
-from ndn.encoding import Name
+from ndn.encoding import Name, Component
 from ndn.storage import Storage
 # Custom Imports
 from .svs_base import SVSyncBase
@@ -25,4 +25,4 @@ class SVSync(SVSyncBase):
         preDataPrefix = nid + self.groupPrefix
         super().__init__(app, preSyncPrefix, preDataPrefix, nid, updateCallback, storage, securityOptions)
     def getDataName(self, nid:Name, seqno:int) -> Name:
-        return ( nid + self.groupPrefix + Name.from_str( "/epoch-"+str(seqno) ) )
+        return ( nid + self.groupPrefix + [Component.from_number(seqno, Component.TYPE_GENERIC)] )
