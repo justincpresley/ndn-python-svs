@@ -14,4 +14,4 @@ from enum import Enum
 class SVSyncTlvTypes(Enum):
     VECTOR       = 201
     VECTOR_KEY   = 202
-    VECTOR_VALUE = 203
+    VECTOR_VALUE = 204
